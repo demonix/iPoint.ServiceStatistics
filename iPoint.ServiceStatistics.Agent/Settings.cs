@@ -1,0 +1,102 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+
+namespace iPoint.ServiceStatistics.Agent
+{
+    public class Settings
+    {
+        public List<LogDescription> LogDescriptions;
+
+        public Settings()
+        {
+            LogDescriptions = GetLogDescrptions();
+        }
+        private static List<LogDescription> GetLogDescrptions()
+        {
+            List<LogDescription> result = new List<LogDescription>();
+            FileInfo[] fileInfos = new DirectoryInfo("./settings/LogDescriptions").GetFiles("*.logDescription");
+            foreach (FileInfo fileInfo in fileInfos)
+            {
+                result.AddRange(ProcessLogDescription(fileInfo.FullName));
+            }
+            return result;
+        }
+
+        static string GetConfigParam(string[] config, string paramName)
+        {
+            string result = null;
+            foreach (string line in config)
+            {
+                string key = line.Split('=')[0].Trim();
+                if (key.ToLower() != paramName.ToLower()) continue;
+                string value = line.Split('=')[1].Trim();
+
+                if (!String.IsNullOrEmpty(result))
+                    throw new Exception(paramName + " specified miltiple times in config");
+                result = value;
+            }
+            if (result == null)
+                throw new Exception(paramName + " not specified in config");
+            return result;
+        }
+
+        static List<string> GetConfigParams(string[] config, string paramName)
+        {
+            List<string> result = new List<string>();
+            foreach (string line in config)
+            {
+                string key = line.Split('=')[0].Trim();
+                if (key.ToLower() != paramName.ToLower()) continue;
+                string value = line.Split('=')[1].Trim();
+                result.Add(value);
+            }
+            if (result.Count == 0)
+                throw new Exception(paramName + " not specified in config");
+            return result;
+        }
+
+
+        private static IEnumerable<LogDescription> ProcessLogDescription(string fileName)
+        {
+            string[] data = File.ReadAllLines(fileName);
+            string fileMask = GetConfigParam(data, "FileMask");
+            string encoding = GetConfigParam(data, "Encoding");
+            List<string> logDirectories = GetConfigParams(data, "LogDirectory");
+            List<LogEventDescription> logEventDescriptions = GetLogEventDescrptions(Path.ChangeExtension(fileName, "EventDescripions"));
+            foreach (string logDirectory in logDirectories)
+            {
+                yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, logDirectory);
+            }
+        }
+
+        private static List<LogEventDescription> GetLogEventDescrptions(string directoryName)
+        {
+            List<LogEventDescription> result = new List<LogEventDescription>();
+            FileInfo[] fileInfos = new DirectoryInfo(directoryName).GetFiles();
+            foreach (FileInfo fileInfo in fileInfos)
+            {
+                result.Add(ProcessLogEventDescription(fileInfo.FullName));
+            }
+            return result;
+        }
+
+        private static LogEventDescription ProcessLogEventDescription(string fileName)
+        {
+            string[] data = File.ReadAllLines(fileName);
+            string type = GetConfigParam(data, "Type");
+            string source = GetConfigParam(data, "Source");
+            string category = GetConfigParam(data, "Category");
+            string counter = GetConfigParam(data, "Counter");
+            string instance = GetConfigParam(data, "Instance");
+            string value = GetConfigParam(data, "Value");
+            string dateTime = GetConfigParam(data, "DateTime");
+            string dateFormat = GetConfigParam(data, "DateFormat");
+            string regex = GetConfigParam(data, "Regex");
+            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance, value, dateTime, dateFormat);
+            return result;
+
+        }
+    }
+}
