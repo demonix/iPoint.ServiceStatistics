@@ -1,0 +1,10 @@
+Type=Performance
+Source=$host
+Category = ServiceInteraction
+Counter = RequestProcessingTimes
+instance = server.reg
+ExtendedInfo = {extendedInfo}
+Value=1
+DateTime = {date}
+dateFormat = yyyy-MM-dd HH:mm:ss,fff
+Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+DEBUG.*?\s+?EndRecive -> endpoint:\s+?(?<extendedInfo>(?:[0-9]{1,3}\.){3}[0-9]{1,3}:\d*?),.*with seconds (?<value>\d+[\.\,]\d+)

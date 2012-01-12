@@ -18,7 +18,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         private const string _dateFormat = "yyyy-MM-dd HH:mm:ss,fff";
 
         public TestLogEventDescription()
-            : base(_regEx,_eventType.ToString(),_source,_category,_counter,_instance,_value,_dateTime,_dateFormat)
+            : base(_regEx,_eventType.ToString(),_source,_category,_counter,_instance, "", _value,_dateTime,_dateFormat)
         {
 
         }
@@ -35,6 +35,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         private string _instanceRule;
         private string _counterRule;
         private string _valueRule;
+        private string _extendedDataRule;
         private string _dateTimeRule;
 
 
@@ -44,6 +45,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         private MatchDelegate _getCounter;
         private MatchDelegate _getSource;
         private MatchDelegate _getValue;
+        private MatchDelegate _getExtendedData;
         private MatchDelegate _getDateTime;
         
         private MatchDelegate CreateMatchDelegate(string rule)
@@ -73,7 +75,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             return match => rule;
         }
         
-        public LogEventDescription(string regexRule, string logEventType, string sourceRule, string categoryRule, string counterRule, string instanceRule, string valueRule, string dateTimeRule, string dateFormat)
+        public LogEventDescription(string regexRule, string logEventType, string sourceRule, string categoryRule, string counterRule, string instanceRule, string extendedDataRule, string valueRule, string dateTimeRule, string dateFormat)
         {
             Rule = new Regex(regexRule, RegexOptions.Compiled);
             DateFormat = dateFormat;
@@ -83,11 +85,13 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             _valueRule = valueRule;
             _categoryRule = categoryRule;
             _instanceRule = instanceRule;
+            _extendedDataRule = extendedDataRule;
             _counterRule = counterRule;
             _getSource = CreateMatchDelegate(_sourceRule);
             _getCategory = CreateMatchDelegate(_categoryRule);
             _getInstance = CreateMatchDelegate(_instanceRule);
             _getCounter = CreateMatchDelegate(_counterRule);
+            _getExtendedData = CreateMatchDelegate(_extendedDataRule);
             _getValue = CreateMatchDelegate(_valueRule);
             _getDateTime = CreateMatchDelegate(_dateTimeRule);
         }
@@ -128,6 +132,11 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         public string GetDateTime(Match match)
         {
             return _getDateTime(match);
+        }
+        
+        public string GetExtendedData(Match match)
+        {
+            return _getExtendedData(match);
         }
     }
 }

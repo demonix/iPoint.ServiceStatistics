@@ -13,6 +13,7 @@ namespace iPoint.ServiceStatistics.Agent
         {
             LogDescriptions = GetLogDescrptions();
         }
+
         private static List<LogDescription> GetLogDescrptions()
         {
             List<LogDescription> result = new List<LogDescription>();
@@ -90,11 +91,12 @@ namespace iPoint.ServiceStatistics.Agent
             string category = GetConfigParam(data, "Category");
             string counter = GetConfigParam(data, "Counter");
             string instance = GetConfigParam(data, "Instance");
+            string extendedData = GetConfigParam(data, "ExtendedData");
             string value = GetConfigParam(data, "Value");
             string dateTime = GetConfigParam(data, "DateTime");
             string dateFormat = GetConfigParam(data, "DateFormat");
             string regex = GetConfigParam(data, "Regex");
-            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance, value, dateTime, dateFormat);
+            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance,extendedData, value, dateTime, dateFormat);
             return result;
 
         }

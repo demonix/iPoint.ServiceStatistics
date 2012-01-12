@@ -29,7 +29,11 @@ namespace iPoint.ServiceStatistics.Server
         private List<double> _percentileParameters;
         private Action<object> OnResult()
         {
-            return result => Console.WriteLine("{0}{1}{2}: {3}", CounterCategory, String.IsNullOrEmpty(CounterName)? "": "."+CounterName, String.IsNullOrEmpty(CounterInstance)? "":"@"+CounterInstance , result);
+            return
+                result =>
+                Console.WriteLine("{0}{1}{2}: {3}", CounterCategory,
+                                  String.IsNullOrEmpty(CounterName) ? "" : "." + CounterName,
+                                  String.IsNullOrEmpty(CounterInstance) ? "" : "@" + CounterInstance, result);
         }
 
         private Func<string, object> CreateParser()
@@ -96,25 +100,52 @@ namespace iPoint.ServiceStatistics.Server
                 case "Int32":
                     //result = input.Sum(e => (Int32)_parser(e.EventArgs.LogEvent.Data));
 
-                    result = String.Join(", ", 
-                                         input.GroupBy(
+                    result = String.Join(", ",
+                                         input.AsParallel().GroupBy(
                                              k =>
-                                             new Tuple<string, string>(k.EventArgs.LogEvent.Counter,
-                                                                       k.EventArgs.LogEvent.Instance),
-                                             (k => Int32.Parse(k.EventArgs.LogEvent.Data.Value))).
-                                             Select(s => s.Key.Item1 + "@" + s.Key.Item2 + ": " + s.Sum()));
+                                             new Tuple<string, string, string, string>(
+                                                 k.EventArgs.LogEvent.Counter,
+                                                 k.EventArgs.LogEvent.Source,
+                                                 k.EventArgs.LogEvent.Instance,
+                                                 k.EventArgs.LogEvent.ExtendedData),
+                                             (k => Int32.Parse(k.EventArgs.LogEvent.Value))).Union(input.AsParallel().GroupBy(
+                                             k =>
+                                             new Tuple<string, string, string, string>(
+                                                 k.EventArgs.LogEvent.Counter,
+                                                 "ALL_SOURCES",
+                                                 k.EventArgs.LogEvent.Instance,
+                                                 k.EventArgs.LogEvent.ExtendedData),
+                                             (k => Int32.Parse(k.EventArgs.LogEvent.Value))).Union(
+                                             input.AsParallel().GroupBy(
+                                             k =>
+                                             new Tuple<string, string, string, string>(
+                                                 k.EventArgs.LogEvent.Counter,
+                                                 k.EventArgs.LogEvent.Source,
+                                                 "ALL_INSTANCES",
+                                                 k.EventArgs.LogEvent.ExtendedData),
+                                             (k => Int32.Parse(k.EventArgs.LogEvent.Value))).Union(
+                                             input.AsParallel().GroupBy(
+                                             k =>
+                                             new Tuple<string, string, string, string>(
+                                                 k.EventArgs.LogEvent.Counter,
+                                                 k.EventArgs.LogEvent.Source,
+                                                 k.EventArgs.LogEvent.Instance,
+                                                 "ALL_EXTDATA"),
+                                             (k => Int32.Parse(k.EventArgs.LogEvent.Value)))))).
+                                             Select(s => String.Format("{0}{1}{2}{3}: {4}", s.Key.Item1, "." + s.Key.Item2, String.IsNullOrEmpty(s.Key.Item3) ?
+                "" : "@" + s.Key.Item3, String.IsNullOrEmpty(s.Key.Item4) ? "" : " " + s.Key.Item4, s.Sum())));
                     break;
                 case "Int64":
-                    result = input.Sum(e => (Int64)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Sum(e => (Int64)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Double":
-                    result = input.Sum(e => (Double)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Sum(e => (Double)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "TimeSpan":
-                    result = TimeSpan.FromTicks(input.Sum(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Data.Value)).Ticks));
+                    result = TimeSpan.FromTicks(input.Sum(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks));
                     break;
                 case "String":
-                    result = String.Join(", ", input.Select(e => e.EventArgs.LogEvent.Data.Value));
+                    result = String.Join(", ", input.Select(e => e.EventArgs.LogEvent.Value));
                     break;
                 default:
                     throw new Exception("Cannot compute Sum() on " + _inputType.FullName);
@@ -129,17 +160,17 @@ namespace iPoint.ServiceStatistics.Server
             switch (_inputType.Name)
             {
                 case "Int32":
-                    result = input.Count() == 0 ? 0 : input.Average(e => (Int32)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Count() == 0 ? 0 : input.Average(e => (Int32)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Int64":
-                    result = input.Count() == 0 ? 0 : input.Average(e => (Int64)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Count() == 0 ? 0 : input.Average(e => (Int64)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Double":
-                    result = input.Count() == 0 ? 0 : input.Average(e => (Double)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Count() == 0 ? 0 : input.Average(e => (Double)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "TimeSpan":
-                    result = input.Count() == 0 ? "00:00:00" : String.Join(", ", input.GroupBy(k => k.EventArgs.LogEvent.Instance, (e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Data.Value)).Ticks)).Select(s => s.Key + ": " + s.Average()));
-                    //result = input.Count() == 0 ? TimeSpan.Zero : TimeSpan.FromTicks((long)input.Average(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Data)).Ticks));
+                    result = input.Count() == 0 ? "00:00:00" : String.Join(", ", input.GroupBy(k => k.EventArgs.LogEvent.Instance, (e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks)).Select(s => s.Key + ": " + s.Average()));
+                    //result = input.Count() == 0 ? TimeSpan.Zero : TimeSpan.FromTicks((long)input.Average(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks));
                     break;
                 default:
                     throw new Exception("Cannot compute Avg() on " + _inputType.FullName);
@@ -153,16 +184,16 @@ namespace iPoint.ServiceStatistics.Server
             switch (_inputType.Name)
             {
                 case "Int32":
-                    result = input.Max(e => (Int32)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Max(e => (Int32)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Int64":
-                    result = input.Max(e => (Int64)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Max(e => (Int64)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Double":
-                    result = input.Max(e => (Double)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Max(e => (Double)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "TimeSpan":
-                    result = TimeSpan.FromTicks(input.Max(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Data.Value)).Ticks));
+                    result = TimeSpan.FromTicks(input.Max(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks));
                     break;
                 default:
                     throw new Exception("Cannot compute Max() on " + _inputType.FullName);
@@ -181,7 +212,7 @@ namespace iPoint.ServiceStatistics.Server
                 case "Int32":
                 case "Int64":
                 case "Double":
-                    _percentileParameters.ForEach(pp => result.Add(pp, Percentile(input.Select(e => (double)_parser(e.EventArgs.LogEvent.Data.Value)).ToArray(), pp)));
+                    _percentileParameters.ForEach(pp => result.Add(pp, Percentile(input.Select(e => (double)_parser(e.EventArgs.LogEvent.Value)).ToArray(), pp)));
                     break;
                 case "TimeSpan":
                     _percentileParameters.ForEach(
@@ -190,7 +221,7 @@ namespace iPoint.ServiceStatistics.Server
                                    TimeSpan.FromTicks(
                                        (long)
                                        Percentile(
-                                           input.Select(e => (double)((TimeSpan)_parser(e.EventArgs.LogEvent.Data.Value)).Ticks).ToArray().Sort(), pp))));
+                                           input.Select(e => (double)((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks).ToArray().Sort(), pp))));
                     break;
                 default:
                     throw new Exception("Cannot compute Percentile() on " + _inputType.FullName);
@@ -204,16 +235,16 @@ namespace iPoint.ServiceStatistics.Server
             switch (_inputType.Name)
             {
                 case "Int32":
-                    result = input.Min(e => (Int32)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Min(e => (Int32)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Int64":
-                    result = input.Min(e => (Int64)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Min(e => (Int64)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "Double":
-                    result = input.Min(e => (Double)_parser(e.EventArgs.LogEvent.Data.Value));
+                    result = input.Min(e => (Double)_parser(e.EventArgs.LogEvent.Value));
                     break;
                 case "TimeSpan":
-                    result = TimeSpan.FromTicks(input.Min(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Data.Value)).Ticks));
+                    result = TimeSpan.FromTicks(input.Min(e => ((TimeSpan)_parser(e.EventArgs.LogEvent.Value)).Ticks));
                     break;
                 default:
                     throw new Exception("Cannot compute Min() on " + _inputType.FullName);

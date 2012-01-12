@@ -47,8 +47,9 @@ namespace iPoint.ServiceStatistics.Server
             IObservable<long> oneSecondBufferOpenings;
             Func<long, IObservable<long>> fiveSecondsBufferClosingSelector;
             MovingWindowSequenceGenerator.Generate(1000, 1000*5, out oneSecondBufferOpenings, out fiveSecondsBufferClosingSelector);
-            
-            CounterAggregatorSettings counterAggregatorSettings = new CounterAggregatorSettings("FT", null, "RN_Sent", CounterAggregationType.Sum,typeof(Int32));
+
+            CounterAggregatorSettings counterAggregatorSettings = new CounterAggregatorSettings("PrintServer", null, "IncomingRequestCount", CounterAggregationType.Sum, typeof(Int32));
+            //CounterAggregatorSettings counterAggregatorSettings = new CounterAggregatorSettings("FT", null, "RN_Sent", CounterAggregationType.Sum, typeof(Int32));
             counterAggregatorSettings.UnsubscriptionToken = receiver.ObservableEvents.Buffer(oneSecondBufferOpenings, fiveSecondsBufferClosingSelector)
                 .Select(counterAggregatorSettings.EventSelector)
                 .Subscribe(counterAggregatorSettings.AggregationAction);

@@ -1,0 +1,10 @@
+Type=Performance
+Source=$host
+Category = FT
+Counter = IB_Index_MR_Reports
+instance = {instance}
+ExtendedData =
+Value={value}
+DateTime = {date}
+dateFormat = yyyy-MM-dd HH:mm:ss,fff
+Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+INFO.*?\s+STAT\s+END\s+GET\s+(?<instance>.*?/mrreports)\s+(?<value>[\d.:,]+)\s+LIVE

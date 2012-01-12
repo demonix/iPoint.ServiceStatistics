@@ -31,7 +31,8 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
                                            System.DateTime.ParseExact(eventDescription.GetDateTime(m),
                                                                       eventDescription.DateFormat,
                                                                       CultureInfo.InvariantCulture),
-                                       Data = new EventData(null, eventDescription.GetValue(m))
+                                       ExtendedData = eventDescription.GetExtendedData(m),
+                                       Value = eventDescription.GetValue(m)
                                      
                                 };
                 yield return evt;
