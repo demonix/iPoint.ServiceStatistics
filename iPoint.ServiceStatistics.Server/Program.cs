@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using iPoint.ServiceStatistics.Server.DataLayer;
 using MyLib.Networking;
 
 namespace iPoint.ServiceStatistics.Server
@@ -40,19 +41,26 @@ namespace iPoint.ServiceStatistics.Server
 
         static void Main(string[] args)
         {
+            
+
+            //CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator = ".";
             AsyncTcpServer srv = new AsyncTcpServer(new IPEndPoint(IPAddress.Any, 50001));
             srv.Start();
             //srv.MessageReceived += srv_MessageReceived;
             MessageReceiver receiver = new MessageReceiver(srv);
-            IObservable<long> oneSecondBufferOpenings;
-            Func<long, IObservable<long>> fiveSecondsBufferClosingSelector;
-            MovingWindowSequenceGenerator.Generate(1000, 1000*5, out oneSecondBufferOpenings, out fiveSecondsBufferClosingSelector);
-
-            CounterAggregatorSettings counterAggregatorSettings = new CounterAggregatorSettings("PrintServer", null, "IncomingRequestCount", CounterAggregationType.Sum, typeof(Int32));
-            //CounterAggregatorSettings counterAggregatorSettings = new CounterAggregatorSettings("FT", null, "RN_Sent", CounterAggregationType.Sum, typeof(Int32));
-            counterAggregatorSettings.UnsubscriptionToken = receiver.ObservableEvents.Buffer(oneSecondBufferOpenings, fiveSecondsBufferClosingSelector)
-                .Select(counterAggregatorSettings.EventSelector)
-                .Subscribe(counterAggregatorSettings.AggregationAction);
+            IObservable<long> bufferOpenings;
+            Func<long, IObservable<long>> bufferClosingSelector;
+            MovingWindowSequenceGenerator.Generate(1000*30, 1000*5*60, out bufferOpenings, out bufferClosingSelector);
+            CountersDatabase db = CountersDatabase.Connect("127.0.0.1", null, "counters");
+            IObservable<IList<EventPattern<LogEventArgs>>> observableEvents = receiver.ObservableEvents.Buffer(bufferOpenings, bufferClosingSelector);
+            List<CounterAggregator> aggregators = new List<CounterAggregator>();
+            Settings settings = new Settings();
+            foreach (AggregationParameters parameters in settings.AggregationParameters)
+            {
+                CounterAggregator counterAggregator = new CounterAggregator(parameters, db);
+                counterAggregator.BeginAggregation(observableEvents);
+                aggregators.Add(counterAggregator);
+            }
             Console.ReadKey();
         }
 

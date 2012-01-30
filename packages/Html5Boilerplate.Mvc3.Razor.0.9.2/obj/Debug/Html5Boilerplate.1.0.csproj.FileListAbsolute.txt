@@ -1,0 +1,5 @@
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetPackages\Html5Boilerplate.1.0\bin\Debug\Html5Boilerplate.1.0.dll
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetPackages\Html5Boilerplate.1.0\bin\Debug\Html5Boilerplate.1.0.pdb
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetPackages\Html5Boilerplate.1.0\obj\Debug\ResolveAssemblyReference.cache
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetPackages\Html5Boilerplate.1.0\obj\Debug\Html5Boilerplate.1.0.dll
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetPackages\Html5Boilerplate.1.0\obj\Debug\Html5Boilerplate.1.0.pdb

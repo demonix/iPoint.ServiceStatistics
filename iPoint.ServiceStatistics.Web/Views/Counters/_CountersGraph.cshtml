@@ -1,0 +1,13 @@
+﻿<div id="placeholder" style="width:600px;height:300px;"></div>
+
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function() {
+        yepnope([{
+            test: Modernizr.canvas,
+            nope: "@Url.Content("~/Scripts/flot/excanvas.js")"
+        }]);
+    })
+</script>
+<!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
+<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>

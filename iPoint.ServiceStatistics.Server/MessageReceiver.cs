@@ -24,8 +24,24 @@ namespace iPoint.ServiceStatistics.Server
 
         private void InvokeOnLogEvent(LogEventArgs e)
         {
-            EventHandler<LogEventArgs> handler = OnLogEvent;
-            if (handler != null) handler(null, e);
+
+            if (OnLogEvent == null)
+                return;
+            //async
+            /*
+            Delegate[] delegates = OnLogEvent.GetInvocationList();
+            foreach (EventHandler<LogEventArgs> handler in delegates)
+            {
+                handler.BeginInvoke(null, e, EndInvokeOnLogEvent, handler);    
+            }*/
+            //sync
+            OnLogEvent(null, e);
+
+        }
+
+        private void EndInvokeOnLogEvent(IAsyncResult ar)
+        {
+            (ar.AsyncState as EventHandler<LogEventArgs>).EndInvoke(ar);
         }
 
         void srv_MessageReceived(object sender, MessageReceivedEventArgs e)

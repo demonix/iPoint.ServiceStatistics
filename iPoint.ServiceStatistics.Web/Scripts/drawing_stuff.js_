@@ -1,0 +1,79 @@
+﻿var options = {
+    lines: {
+        show: true
+    },
+    points: {
+        show: false
+    },
+    xaxis: {
+        transform: function (v) {
+            return v;
+        }
+    }
+};
+
+var data = [[]];
+var freshestLeaveCount = 10, spliceEvery = 10, totalLeaveCount = 50;
+var totalLen = 0, rapidLen = 0, slowLen = 0;
+var fbig, lbig, fsmall, lsmall, count;
+var interval = 1000;
+var base = 10;
+var xcoord = 0;
+var lastTime;
+//var fplot = $.plot($("#placeholder"), data, options);
+function getGraphData () {
+    var sd = $("#StartDate").val();
+    var ed = $("#EndDate").val();
+    var cc = $("#CounterCategory").val();
+    var cn = $("#CounterName").val();
+    var cs = $("#CounterSource").val();
+    var ci = $("#CounterInstance").val();
+    var ced = $("#CounterExtData").val();
+    return $.getJSON("/Counters/CounterData", { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced }, update);
+};
+var dots = 0;
+
+function update(counterData) {
+
+    //var val = counterData.values;
+    //var time = counterData.values;
+    //xcoord = time;
+    //lastTime = time;
+    //var datum = [time, val];
+    var data = [];
+    data.push(counterData);
+    var data2 = [[[0, 0], [1, 1], [2, 4]]];
+    console.log(data2.length);
+    //data[0].push(datum);
+
+    //rapidLen = rapidLen + 1;
+    /*if (data[0].length >= (totalLeaveCount + freshestLeaveCount + spliceEvery)) {
+        slowLen = slowLen - 1;
+        console.log(data[0].length + " is more than " + totalLeaveCount + freshestLeaveCount + spliceEvery + " - remove first");
+        dots = dots - 1;
+        data[0].splice(0, 1);
+        fbig = data[0][0];
+    }
+
+    if (data[0].length >= (freshestLeaveCount + spliceEvery + dots)) {
+        slowLen = slowLen + 1;
+        rapidLen = rapidLen - 10 - dots;
+        console.log(data[0].length + " is more than " + (20 + dots) + " - remove nine");
+        data[0].splice(data[0].length - (freshestLeaveCount + spliceEvery), spliceEvery - 1);
+        dots = dots + 1;
+    }
+    */
+    //totalLen = data[0].length;
+    //printArr(data[0]);
+    //console.log(totalLen + " " + rapidLen + " " + slowLen);
+    $.plot($("#placeholder"), data, options);
+    //setTimeout(getGraphData, interval);
+}
+
+function printArr(arr) {
+    var str = arr[0];
+    for (var i = 1; i < arr.length; i++) {
+        str = str + "|" + arr[i];
+    }
+    console.log(str);
+}

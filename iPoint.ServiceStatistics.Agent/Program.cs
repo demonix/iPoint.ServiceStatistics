@@ -18,8 +18,16 @@ namespace iPoint.ServiceStatistics.Agent
         private static Dictionary<string, ILogReader> _logReaders = new Dictionary<string, ILogReader>();
         private static Settings _settings;
         private static TcpClient _tcpClient;
+
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            File.AppendAllText("Errors", DateTime.Now + "\r\n" + e.ExceptionObject.ToString()+"\r\n\r\n");
+        }
+
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(args[0]), Int32.Parse(args[1])));
             _settings = new Settings();
             _logDescriptions = _settings.LogDescriptions;
@@ -35,13 +43,27 @@ namespace iPoint.ServiceStatistics.Agent
                 logWatcher.NewLogFileCreated += logWatcher_NewLogFileCreated;
                 logWatcher.LogFileCompleted += new EventHandler<LogWatcherEventArgs>(logWatcher_LogFileCompleted);
                 //TODO: dirty hack
-                DateTime now = DateTime.Now;
-                string path = Path.Combine(logDescription.LogDirectory,"log"+now.Year.ToString("0000")+"."+now.Month.ToString("00")+"."+now.Day.ToString("00"));
-                if (File.Exists(path))
-                    CreateNewReader(path, new FileInfo(path).Length, _logEventMatchers[logWatcher.Id]);
+                CreateReadersForCurrentLogs(logDescription, logWatcher);
             }
             Console.ReadKey();
 
+
+        }
+
+
+        static void CreateReadersForCurrentLogs(LogDescription logDescription, LogWatcher logWatcher)
+        {
+            DateTime now = DateTime.Now;
+
+            FileInfo[] files = new DirectoryInfo(logDescription.LogDirectory).GetFiles();
+            foreach (FileInfo fileInfo in files)
+            {
+                if (fileInfo.LastWriteTime.Date != now.Date)
+                    continue;
+                CreateNewReader(fileInfo.FullName, fileInfo.Length, _logEventMatchers[logWatcher.Id]);    
+            }
+
+            
 
         }
 
@@ -56,11 +78,16 @@ namespace iPoint.ServiceStatistics.Agent
 
          static void CreateNewReader(string filePath, long position, LogEventMatcher logEventMatcher)
          {
+             Console.WriteLine("Begin reading of " + filePath);
              ILogReader lr = new TextLogReader(filePath, position, Encoding.Default, null, logEventMatcher);
              lr.LineReaded += OutToConsole;
              lr.LineReaded += OutToServer;
              lr.BeginRead();
-             _logReaders.Add(filePath, lr); 
+             _logReaders.Add(filePath, lr);
+             lock (_logReaders)
+             {
+                 File.AppendAllText("Files", DateTime.Now + " Begin reading " + filePath + "\r\n");
+             }
          }
         static void CreateNewReader(string filePath, LogEventMatcher logEventMatcher)
         {
