@@ -17,9 +17,7 @@ namespace iPoint.ServiceStatistics.Server
         public IEnumerable<string> AllSources { get; private set; }
         public IEnumerable<string> AllInstances { get; private set; }
         public IEnumerable<string> AllExtendedDatas { get; private set; }
-        private IEnumerable<GroupAggregationResult> TSTITE;
-        private IEnumerable<GroupAggregationResult> TI;
-        private IEnumerable<GroupAggregationResult> TE;
+
 
         public TotalAggregationResult(string counterCategory, string counterName, AggregationType counterAggregationType, IEnumerable<GroupAggregationResult> groupAggregationResults)
         {
@@ -30,22 +28,6 @@ namespace iPoint.ServiceStatistics.Server
             AllSources = groupAggregationResults.Select(g => g.CounterGroup.Source).Distinct().Where(g => g != "ALL_SOURCES");
             AllInstances = groupAggregationResults.Select(g => g.CounterGroup.Instance).Distinct().Where(g => g != "ALL_INSTANCES");
             AllExtendedDatas = groupAggregationResults.Select(g => g.CounterGroup.ExtendedData).Distinct().Where(g => g != "ALL_EXTDATA");
-            TSTITE =
-                groupAggregationResults.Where(
-                    r =>
-                    r.CounterGroup.Source == "ALL_SOURCES" && r.CounterGroup.Instance == "ALL_INSTANCES" &&
-                    r.CounterGroup.ExtendedData == "ALL_EXTDATA");
-            TI =
-               groupAggregationResults.Where(
-                   r =>
-                   r.CounterGroup.Source != "ALL_SOURCES" && r.CounterGroup.Instance == "ALL_INSTANCES" &&
-                   r.CounterGroup.ExtendedData != "ALL_EXTDATA");
-
-            TE =
-             groupAggregationResults.Where(
-                 r =>
-                 r.CounterGroup.Source != "ALL_SOURCES" && r.CounterGroup.Instance != "ALL_INSTANCES" &&
-                 r.CounterGroup.ExtendedData == "ALL_EXTDATA");
         }
        
 

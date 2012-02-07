@@ -53,14 +53,13 @@ namespace iPoint.ServiceStatistics.Agent
 
         static void CreateReadersForCurrentLogs(LogDescription logDescription, LogWatcher logWatcher)
         {
+            
             DateTime now = DateTime.Now;
-
             FileInfo[] files = new DirectoryInfo(logDescription.LogDirectory).GetFiles();
             foreach (FileInfo fileInfo in files)
             {
-                if (fileInfo.LastWriteTime.Date != now.Date)
-                    continue;
-                CreateNewReader(fileInfo.FullName, fileInfo.Length, _logEventMatchers[logWatcher.Id]);    
+                if (logDescription.FileMask.IsMatch(fileInfo.Name) && fileInfo.LastWriteTime >= now.Date.AddMinutes(1))
+                    CreateNewReader(fileInfo.FullName, fileInfo.Length, _logEventMatchers[logWatcher.Id]);
             }
 
             
@@ -103,8 +102,9 @@ namespace iPoint.ServiceStatistics.Agent
         private static void OutToServer(object sender, LineReadedEventArgs e)
         {
             string line = e.Line;
+            string logFileName = e.LogFileName;
             LogEventMatcher matcher = e.LogEventMatcher;
-            foreach (LogEvent logEvent in matcher.FindMatches(line))
+            foreach (LogEvent logEvent in matcher.FindMatches(logFileName, line))
             {
                 MemoryStream ms = new MemoryStream();
                 BinaryFormatter bf = new BinaryFormatter();
@@ -119,8 +119,9 @@ namespace iPoint.ServiceStatistics.Agent
         private static void OutToConsole(object sender, LineReadedEventArgs e)
         {
             string line = e.Line;
+            string logFileName = e.LogFileName;
             LogEventMatcher matcher = e.LogEventMatcher;
-            foreach (LogEvent logEvent in matcher.FindMatches(line))
+            foreach (LogEvent logEvent in matcher.FindMatches(logFileName, line))
             {
                 Console.WriteLine(logEvent);
             }

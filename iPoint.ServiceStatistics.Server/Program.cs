@@ -35,6 +35,7 @@ namespace iPoint.ServiceStatistics.Server
 
         static private void InvokeOnLogEvent(LogEventArgs e)
         {
+            
             EventHandler<LogEventArgs> handler = OnLogEvent;
             if (handler != null) handler(null, e);
         }
@@ -48,25 +49,52 @@ namespace iPoint.ServiceStatistics.Server
             srv.Start();
             //srv.MessageReceived += srv_MessageReceived;
             MessageReceiver receiver = new MessageReceiver(srv);
-            IObservable<long> bufferOpenings;
-            Func<long, IObservable<long>> bufferClosingSelector;
-            MovingWindowSequenceGenerator.Generate(1000*30, 1000*5*60, out bufferOpenings, out bufferClosingSelector);
-            CountersDatabase db = CountersDatabase.Connect("127.0.0.1", null, "counters");
-            IObservable<IList<EventPattern<LogEventArgs>>> observableEvents = receiver.ObservableEvents.Buffer(bufferOpenings, bufferClosingSelector);
+            //IObservable<long> bufferOpenings = null;
+            //Func<long, IObservable<long>> bufferClosingSelector = null;
+            MovingWindowSequence seq = new MovingWindowSequence(1000*30, 1000*5*60);
+            //MovingWindowSequence.Generate(, ref bufferOpenings, ref bufferClosingSelector);
+            //CountersDatabase db = CountersDatabase.Connect("127.0.0.1", null, "counters");
+            CountersDatabase.InitConnection("127.0.0.1", null, "counters");
+            IObservable<IList<EventPattern<LogEventArgs>>> observableEvents = receiver.ObservableEvents.Buffer(seq.BufferOpenings, seq.ClosingWindowSequenceSelector);
             List<CounterAggregator> aggregators = new List<CounterAggregator>();
             Settings settings = new Settings();
+            CountersAutoDiscoverer countersAutoDiscoverer = new CountersAutoDiscoverer(receiver.ObservableEvents, observableEvents, aggregators, settings);
+            
             foreach (AggregationParameters parameters in settings.AggregationParameters)
             {
-                CounterAggregator counterAggregator = new CounterAggregator(parameters, db);
+                CounterAggregator counterAggregator = new CounterAggregator(parameters);
                 counterAggregator.BeginAggregation(observableEvents);
                 aggregators.Add(counterAggregator);
             }
-            Console.ReadKey();
+            ConsoleKeyInfo keyInfo;
+            while ((keyInfo = Console.ReadKey()).Key!=ConsoleKey.Enter)
+            {
+                if (keyInfo.Key == ConsoleKey.Add)
+                {
+                    seq.IncreaseInterval();
+                    Console.WriteLine("Interval is {0} ms now", seq.MoveEvery);
+                }
+                if (keyInfo.Key == ConsoleKey.Subtract)
+                {
+                    seq.DecreaseInterval();
+                    Console.WriteLine("Interval is {0} ms now", seq.MoveEvery);
+                }
+            }
+        }
+
+        private static EventPattern<LogEventArgs> Transform(EventPattern<LogEventArgs> eventPattern)
+        {
+            LogEvent logEvent = eventPattern.EventArgs.LogEvent;
+            string counterNameReplacement = Settings.ExtendedDataTransformations.GetCounterNameReplacement(logEvent.ExtendedData);
+            /* if (!String.IsNullOrEmpty(counterNameReplacement))
+                 Console.WriteLine(logEvent.ExtendedData +" --> " + counterNameReplacement);
+            */
+            logEvent.Counter += counterNameReplacement;
+            return eventPattern;
         }
 
 
-        
-       /* static void srv_MessageReceived(object sender, MessageReceivedEventArgs e)
+        /* static void srv_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
             BinaryFormatter bf = new BinaryFormatter();
             MemoryStream ms = new MemoryStream(e.Message.MessageData);

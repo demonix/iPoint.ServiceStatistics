@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
@@ -14,89 +15,108 @@ namespace iPoint.ServiceStatistics.Server
 {
     public class CounterAggregator
     {
-        public CounterAggregator(string counterCategory, string counterName, AggregationType aggregationType, Type inputType, CountersDatabase db)
+        public CounterAggregator(string counterCategory, string counterName, AggregationType aggregationType, Type inputType/*, CountersDatabase db*/)
         {
-            CounterCategory = counterCategory;
+            if (String.IsNullOrEmpty(counterCategory) || String.IsNullOrEmpty(counterName))
+                throw new ArgumentException("counterCategory and counterName must not be empty");
+                
+            CounterCategory  = counterCategory;
             CounterName = counterName;
             AggregationType = aggregationType;
             EventSelector = CreateEventSelector();
             AggregationAction = CreateAggregationActionNew();
-            _inputType = inputType;
+            InputType = inputType;
             //_parser = CreateParser();
             _onResult = OnResult();
             _percentileParameters = new List<double>() { 25, 50, 75 };
-            _db = db;
+            //_db = db;
         }
 
-        private CountersDatabase _db;
+        //private CountersDatabase _db;
         private List<double> _percentileParameters;
         public Action<IEnumerable<EventPattern<LogEventArgs>>> AggregationAction;
         public Func<EventPattern<LogEventArgs>, bool> EventSelector;
         public IDisposable UnsubscriptionToken;
         public string CounterCategory { get; private set; }
-        public string CounterInstance { get; private set; }
         public string CounterName { get; private set; }
         public AggregationType AggregationType { get; private set; }
-        private Type _inputType;
+        public Type InputType { get; private set; }
         private Func<string, object> _parser;
+        //private Action<IEnumerable<TotalAggregationResult>> _onResult;
         private Action<TotalAggregationResult> _onResult;
 
-        public CounterAggregator(AggregationParameters aggregationParameters, CountersDatabase counterDb)
-            : this(aggregationParameters.CounterCategory, aggregationParameters.CounterName, aggregationParameters.CounterAggregationType, aggregationParameters.CounterType, counterDb)
+        public CounterAggregator(AggregationParameters aggregationParameters/*, CountersDatabase counterDb*/)
+            : this(aggregationParameters.CounterCategory, aggregationParameters.CounterName, aggregationParameters.CounterAggregationType, aggregationParameters.CounterType/*, counterDb*/)
         {
             
         }
 
+        /*private Action<IEnumerable<TotalAggregationResult>> OnResult()
+        {
+            return
+                //result => Void();
+                result => result.AsParallel().ForAll(r => _db.SaveCounters(r));
+            //DateTime.Now, CounterCategory, CounterName, result);
+        }*/
         private Action<TotalAggregationResult> OnResult()
         {
-            return 
+            return
                 //result => Void();
-                result => _db.SaveCounters(result);
+                result => CountersDatabase.Instance.SaveCounters(result);
             //DateTime.Now, CounterCategory, CounterName, result);
         }
-
-        private void Void()
-        {
-            
-        }
-       
-
+        
         public Func<EventPattern<LogEventArgs>, bool> CreateEventSelector()
         {
             Expression<Func<EventPattern<LogEventArgs>, bool>> exp =
-                item => (String.IsNullOrEmpty(CounterCategory) || item.EventArgs.LogEvent.Category == CounterCategory)
-                     &&
-                     (String.IsNullOrEmpty(CounterInstance) || item.EventArgs.LogEvent.Instance == CounterInstance)
-                     && (String.IsNullOrEmpty(CounterName) || item.EventArgs.LogEvent.Counter == CounterName);
+                item =>  (item.EventArgs.LogEvent.Category == CounterCategory) &&
+                    //item.EventArgs.LogEvent.Counter.StartsWith(CounterName);
+                    (item.EventArgs.LogEvent.Counter == CounterName);
             exp.Compile();
                
             return exp.Compile();
         }
 
+        
+        
         private Action<IEnumerable<EventPattern<LogEventArgs>>> CreateAggregationActionNew()
         {
             Expression<Action<IEnumerable<EventPattern<LogEventArgs>>>> actionResult;// = input => _onResult("empty");
-
             switch (AggregationType)
             {
-                case AggregationType.Sum:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
+                case AggregationType.Sum: 
+                    //actionResult = input => _onResult(GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum())).
+                //                      GroupBy(gar => gar.CounterGroup.CounterName).
+                //                      Select(gar => new TotalAggregationResult(CounterCategory, gar.Key, AggregationType, gar)));
+                actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
                     //actionResult = input => _onResult(String.Join("}, {", GroupCountersParallel(input).Select(s => FormatResult(s, new List<Tuple<string, UniversalValue>>() { new Tuple<string, UniversalValue>("value", s.Sum()) }))));
                     //actionResult = input => _onResult(Sum(input));
                     break;
                 case AggregationType.Min:
+                //    actionResult = input => _onResult(GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Min())).
+                //                      GroupBy(gar => gar.CounterGroup.CounterName).
+                //                      Select(gar => new TotalAggregationResult(CounterCategory, gar.Key, AggregationType, gar)));
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Min()))));
                     //actionResult = input => _onResult(String.Join("}, {", GroupCountersParallel(input).Select(s => FormatResult(s,new List<Tuple<string, UniversalValue>>() {new Tuple<string, UniversalValue>("value", s.Min())}))));
                     break;
                 case AggregationType.Max:
+                    //actionResult = input => _onResult(GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Max())).
+                    //                  GroupBy(gar => gar.CounterGroup.CounterName).
+                    //                  Select(gar => new TotalAggregationResult(CounterCategory, gar.Key, AggregationType, gar)));
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Max()))));
                     //actionResult = input => _onResult(String.Join("}, {", GroupCountersParallel(input).Select(s => FormatResult(s, new List<Tuple<string, UniversalValue>>() { new Tuple<string, UniversalValue>("value", s.Max()) }))));
                     break;
                 case AggregationType.Avg:
+                    //actionResult = input => _onResult(GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Average())).
+                     //                 GroupBy(gar => gar.CounterGroup.CounterName).
+                      //                Select(gar => new TotalAggregationResult(CounterCategory, gar.Key, AggregationType, gar)));
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Average()))));
                     //actionResult = input => _onResult(String.Join("}, {", GroupCountersParallel(input).Select(s => FormatResult(s, new List<Tuple<string, UniversalValue>>() { new Tuple<string, UniversalValue>("value", s.Average()) }))));
                     break;
                 case AggregationType.Percentile:
+                    //actionResult = input => _onResult(GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Percentile(_percentileParameters))).
+                    //                  GroupBy(gar => gar.CounterGroup.CounterName).
+                     //                 Select(gar => new TotalAggregationResult(CounterCategory, gar.Key, AggregationType, gar)));
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Percentile(_percentileParameters)))));
                     //actionResult = input => _onResult(String.Join("}, {", GroupCountersParallel(input).Select(s => FormatResult(s, s.Percentile(_percentileParameters)))));
                     break;
@@ -106,13 +126,17 @@ namespace iPoint.ServiceStatistics.Server
 
             return actionResult.Compile();
         }
-        private ParallelQuery<IGrouping<CounterGroup, UniversalValue>> GroupCountersParallel(IEnumerable<EventPattern<LogEventArgs>> input)
+
+       
+
+        /*private ParallelQuery<IGrouping<CounterGroup, UniversalValue>> GroupCountersParallel(IEnumerable<EventPattern<LogEventArgs>> input)
         {
 
             return input.AsParallel().GroupBy(k => CreateCounterGroupByMask("1111", k),
                                               k =>
                                               UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value))
-                .Concat(input.AsParallel().GroupBy(k => CreateCounterGroupByMask("1011", k),
+                .Concat(
+                input.AsParallel().GroupBy(k => CreateCounterGroupByMask("1011", k),
                                                    k =>
                                                    UniversalValue.ParseFromString(_inputType,
                                                                                   k.EventArgs.LogEvent.Value)))
@@ -128,46 +152,44 @@ namespace iPoint.ServiceStatistics.Server
                     input.AsParallel().GroupBy(k => CreateCounterGroupByMask("1000", k),
                                                k =>
                                                UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)));
-        }
+        }*/
 
         private IEnumerable<IGrouping<CounterGroup, UniversalValue>> GroupCounters(IEnumerable<EventPattern<LogEventArgs>> input)
         {
 
-            return input.GroupBy(k => CreateCounterGroupByMask("1111", k),
+            return input.GroupBy(k => CreateCounterGroupByMask("111", k),
                                  k =>
-                                 UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value))
+                                 UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value))
                 .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("1011", k),
+                    input.GroupBy(k => CreateCounterGroupByMask("011", k),
                                   k =>
-                                  UniversalValue.ParseFromString(_inputType,
-                                                                 k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
                 .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("1101", k),
+                    input.GroupBy(k => CreateCounterGroupByMask("101", k),
                                   k =>
-                                  UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
                 .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("1110", k),
+                    input.GroupBy(k => CreateCounterGroupByMask("110", k),
                                   k =>
-                                  UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)))
-                                  .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("1100", k),
-                                  k =>
-                                  UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)))
-                
+                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
                 .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("1000", k),
+                    input.GroupBy(k => CreateCounterGroupByMask("100", k),
                                   k =>
-                                  UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)));
+                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
+                .Concat(
+                    input.GroupBy(k => CreateCounterGroupByMask("000", k),
+                                  k =>
+                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)));
         }
 
         private CounterGroup CreateCounterGroupByMask(string mask, EventPattern<LogEventArgs> eventPattern)
         {
-            if (mask.Length !=4) throw new Exception("Mask should be exactly 4 chars length");
+            if (mask.Length !=3) throw new Exception("Mask should be exactly 3 chars length");
             return new CounterGroup(
-                mask[0] == '0' ? "ALL_COUNTERS" : eventPattern.EventArgs.LogEvent.Counter,
-                mask[1] == '0' ? "ALL_SOURCES" : eventPattern.EventArgs.LogEvent.Source,
-                mask[2] == '0' ? "ALL_INSTANCES" : eventPattern.EventArgs.LogEvent.Instance,
-                mask[3] == '0' ? "ALL_EXTDATA" : eventPattern.EventArgs.LogEvent.ExtendedData
+                eventPattern.EventArgs.LogEvent.Counter,
+                mask[0] == '0' ? "ALL_SOURCES" : eventPattern.EventArgs.LogEvent.Source,
+                mask[1] == '0' ? "ALL_INSTANCES" : eventPattern.EventArgs.LogEvent.Instance,
+                mask[2] == '0' ? "ALL_EXTDATA" : eventPattern.EventArgs.LogEvent.ExtendedData
                 );
         }
 

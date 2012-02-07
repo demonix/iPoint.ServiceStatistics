@@ -14,7 +14,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             _eventDescriptions = eventDescriptions;
         }
 
-        public IEnumerable<LogEvent> FindMatches(string line)
+        public IEnumerable<LogEvent> FindMatches(string logFileName, string line)
         {
             foreach (LogEventDescription eventDescription in _eventDescriptions)
             {
@@ -22,17 +22,17 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
                 if (!m.Success) continue;
                 LogEvent evt = new LogEvent
                                    {
-                                       Source = eventDescription.GetSource(m),
-                                       Category = eventDescription.GetCategory(m),
-                                       Counter = eventDescription.GetCounter(m),
-                                       Instance = eventDescription.GetInstance(m),
+                                       Source = eventDescription.GetSource(logFileName, m),
+                                       Category = eventDescription.GetCategory(logFileName, m),
+                                       Counter = eventDescription.GetCounter(logFileName, m),
+                                       Instance = eventDescription.GetInstance(logFileName, m),
                                        Type = eventDescription.EventType,
                                        DateTime =
-                                           System.DateTime.ParseExact(eventDescription.GetDateTime(m),
+                                           System.DateTime.ParseExact(eventDescription.GetDateTime(logFileName, m),
                                                                       eventDescription.DateFormat,
                                                                       CultureInfo.InvariantCulture),
-                                       ExtendedData = eventDescription.GetExtendedData(m),
-                                       Value = eventDescription.GetValue(m)
+                                       ExtendedData = eventDescription.GetExtendedData(logFileName, m),
+                                       Value = eventDescription.GetValue(logFileName, m)
                                      
                                 };
                 yield return evt;

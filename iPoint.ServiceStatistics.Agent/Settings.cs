@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
 
 namespace iPoint.ServiceStatistics.Agent
@@ -68,8 +69,51 @@ namespace iPoint.ServiceStatistics.Agent
             List<LogEventDescription> logEventDescriptions = GetLogEventDescrptions(Path.ChangeExtension(fileName, "EventDescripions"));
             foreach (string logDirectory in logDirectories)
             {
-                yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, logDirectory);
+                if (Directory.Exists(logDirectory))
+                    yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, logDirectory);
+                if (logDirectory.Contains("*"))
+                {
+                    List<string> paths = GetMultiplePaths("", logDirectory);
+                    foreach (string path in paths)
+                    {
+                        yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, path);
+                    }
+                }
             }
+        }
+
+        private static List<string> GetMultiplePaths(string begining, string pathTailwithMask)
+        {
+            List<string> result = new List<string>();
+            string currentPath = begining;
+            string[] possibleDirectories;
+            string[] parts = pathTailwithMask.Split(new[] {'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+            {
+                if (Directory.Exists(currentPath))
+                    result.Add(currentPath);
+                return result;
+            }
+
+
+            if (!parts[0].Contains("*"))
+            {
+                possibleDirectories = new string[1];
+                possibleDirectories[0] = currentPath += parts[0];
+            }
+            else
+            {
+                possibleDirectories = Directory.GetDirectories(currentPath, parts[0]);
+            }
+            foreach (string possibleDirectory in possibleDirectories)
+            {
+                result.AddRange(GetMultiplePaths(possibleDirectory + Path.DirectorySeparatorChar,
+                                                 String.Join(new string(Path.DirectorySeparatorChar, 1),
+                                                             parts.Skip(1).ToArray())));
+            }
+            
+            return result;
+
         }
 
         private static List<LogEventDescription> GetLogEventDescrptions(string directoryName)

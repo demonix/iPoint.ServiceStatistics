@@ -60,7 +60,6 @@
     <Compile Include="Core\LogFiles\LineReadedEventArgs.cs" />
     <Compile Include="Core\LogEvents\LogDescription.cs" />
     <Compile Include="Core\LogEvents\LogEventType.cs" />
-    <Compile Include="Core\LogFiles\LogQueue.cs" />
     <Compile Include="Core\LogFiles\LogReaderBase.cs" />
     <Compile Include="Core\LogFiles\LogRotationType.cs" />
     <Compile Include="Core\LogFiles\TextLogReader.cs" />

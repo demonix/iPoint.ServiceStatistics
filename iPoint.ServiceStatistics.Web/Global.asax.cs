@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using iPoint.ServiceStatistics.Server;
 using iPoint.ServiceStatistics.Server.DataLayer;
 
 namespace iPoint.ServiceStatistics.Web
@@ -33,10 +34,12 @@ namespace iPoint.ServiceStatistics.Web
 
         protected void Application_Start()
         {
+            
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
             InitDatabase();
+            new Settings();
         }
 
         private void InitDatabase()

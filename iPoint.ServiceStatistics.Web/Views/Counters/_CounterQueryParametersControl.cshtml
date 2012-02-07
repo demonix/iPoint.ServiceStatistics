@@ -35,14 +35,37 @@
         });
 
 
+        function sorter(a, b) {
+            if (a.Value === -1)
+                return -1;
+            if (b.Value === -1)
+                return 1;
+            if (a.Text === "ALL_SOURCES" || a.Text === "ALL_INSTANCES" || a.Text === "ALL_EXTDATA")
+                return -1;
 
+            if (b.Text === "ALL_SOURCES" || b.Text === "ALL_INSTANCES" || b.Text === "ALL_EXTDATA")
+                return 1;
+            
+            if (a.Text < b.Text)
+                return -1;
+            if (a.Text > b.Text)
+                return 1;
+            return 0;
+        }
 
         function setSelectorItems(data, category) {
             var ccSelector = $(category);
             ccSelector.empty();
+            if (data.length > 2 && category != "#CounterCategory")
+                ccSelector.append($("<option/>", { value: -1, text: "EVERY" }));
+            data.sort(sorter);
             $.each(data, function (index, item) {
-                ccSelector.append($("<option/>", { value: item.Value, text: item.Text }));
+                if (index == 0)
+                    ccSelector.append($("<option/>", { value: item.Value, text: item.Text, selected: "selected" }));
+                else
+                    ccSelector.append($("<option/>", { value: item.Value, text: item.Text }));
             });
+
             ccSelector.change();
         }
     });

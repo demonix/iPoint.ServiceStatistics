@@ -3,28 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
 {
-    public class TestLogEventDescription : LogEventDescription
-    {
-        private const string _regEx =
-            @"^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+INFO.*?\s+STAT\s+END\s+GET\s+(?<instance>.*?/mrreports)\s+(?<value>[\d.:,]+)\s+LIVE";
-
-        private const LogEventType _eventType = LogEventType.Performance;
-        private const string _source = "$host";
-        private const string _category = "FT";
-        private const string _instance = "{instance}";
-        private const string _counter = "IB_Index_MR_Reports";
-        private const string _value = "{value}";
-        private const string _dateTime = "{date}";
-        private const string _dateFormat = "yyyy-MM-dd HH:mm:ss,fff";
-
-        public TestLogEventDescription()
-            : base(_regEx,_eventType.ToString(),_source,_category,_counter,_instance, "", _value,_dateTime,_dateFormat)
-        {
-
-        }
-    }
-
-
+  
     public class LogEventDescription
     {
         public Regex Rule { get; private set; }
@@ -39,7 +18,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         private string _dateTimeRule;
 
 
-        protected delegate string MatchDelegate(Match match);
+        protected delegate string MatchDelegate(string logFileName, Match match);
         private MatchDelegate _getCategory;
         private MatchDelegate _getInstance;
         private MatchDelegate _getCounter;
@@ -51,14 +30,16 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         private MatchDelegate CreateMatchDelegate(string rule)
         {
             if (rule.ToLower() == "$host")
-                return match => Environment.MachineName;
+                return (logFileName, match) => Environment.MachineName;
             if (rule.ToLower() == "$datetime")
-                return match => DateTime.Now.ToString();
+                return (logFileName, match) => DateTime.Now.ToString();
+            if (rule.ToLower().StartsWith("$path:"))
+                return (logFileName, match) => logFileName.Split('/','\\')[Convert.ToInt32(rule.Split(':')[1])];
             if (rule.ToLower() == "$rate")
             {
                 if (Rule.GroupNumberFromName("timespan") > 0 && Rule.GroupNumberFromName("value") > 0)
                     return
-                        match =>
+                        (logFileName, match) =>
                             {
                                 double value;
                                 TimeSpan timeSpan;
@@ -71,8 +52,8 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             }
             string regexGroupName = rule.Trim(new[] { '{', '}' });
             if (rule.StartsWith("{") && rule.EndsWith("}") && Rule.GroupNumberFromName(regexGroupName) >= 0)
-                return match => match.Groups[regexGroupName].Value;
-            return match => rule;
+                return (logFileName, match) => match.Groups[regexGroupName].Value;
+            return (logFileName, match) => rule;
         }
         
         public LogEventDescription(string regexRule, string logEventType, string sourceRule, string categoryRule, string counterRule, string instanceRule, string extendedDataRule, string valueRule, string dateTimeRule, string dateFormat)
@@ -109,34 +90,33 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             }
         }
 
-        public string GetSource(Match match)
+        public string GetSource(string logFileName, Match match)
         {
-            return _getSource(match);
+            return _getSource(logFileName, match);
         }
-        public string GetCategory(Match match)
+        public string GetCategory(string logFileName, Match match)
         {
-            return _getCategory(match);
+            return _getCategory(logFileName, match);
         }
-        public string GetCounter(Match match)
+        public string GetCounter(string logFileName, Match match)
         {
-            return _getCounter(match);
+            return _getCounter(logFileName, match);
         }
-        public string GetInstance(Match match)
+        public string GetInstance(string logFileName, Match match)
         {
-            return _getInstance(match);
+            return _getInstance(logFileName, match);
         }
-        public string GetValue(Match match)
+        public string GetValue(string logFileName, Match match)
         {
-            return _getValue(match);
+            return _getValue(logFileName, match);
         }
-        public string GetDateTime(Match match)
+        public string GetDateTime(string logFileName, Match match)
         {
-            return _getDateTime(match);
+            return _getDateTime(logFileName, match);
         }
-        
-        public string GetExtendedData(Match match)
+        public string GetExtendedData(string logFileName, Match match)
         {
-            return _getExtendedData(match);
+            return _getExtendedData(logFileName, match);
         }
     }
 }

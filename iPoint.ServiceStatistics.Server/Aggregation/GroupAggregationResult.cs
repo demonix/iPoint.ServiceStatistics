@@ -18,8 +18,11 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
         public string StorageKey {
             get
             {
-                return String.Format("{0}|{1}|{2}|{3}", CounterGroup.CounterName, CounterGroup.Source,
-                                     CounterGroup.Instance, CounterGroup.ExtendedData);
+                return String.Format("{0}|{1}|{2}",
+                                     CounterGroup.Source.Replace('.', '_'),
+                                     CounterGroup.Instance.Replace('.', '_'),
+                                     CounterGroup.ExtendedData.Replace('.', '_'));
+                
             }
         }
         

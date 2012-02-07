@@ -315,6 +315,45 @@ namespace Links {
         private const string URLPATH = "~/Scripts";
         public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
         public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+        public static readonly string drawer_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/drawer.min.js") ? Url("drawer.min.js") : Url("drawer.js");
+                      
+        public static readonly string drawing_stuff_js_ = Url("drawing_stuff.js_");
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public static class flot {
+            private const string URLPATH = "~/Scripts/flot";
+            public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+            public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+            public static readonly string excanvas_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/excanvas.min.js") ? Url("excanvas.min.js") : Url("excanvas.js");
+                          
+            public static readonly string excanvas_min_js = Url("excanvas.min.js");
+            public static readonly string jquery_colorhelpers_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.colorhelpers.min.js") ? Url("jquery.colorhelpers.min.js") : Url("jquery.colorhelpers.js");
+                          
+            public static readonly string jquery_flot_categories_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.categories.min.js") ? Url("jquery.flot.categories.min.js") : Url("jquery.flot.categories.js");
+                          
+            public static readonly string jquery_flot_crosshair_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.crosshair.min.js") ? Url("jquery.flot.crosshair.min.js") : Url("jquery.flot.crosshair.js");
+                          
+            public static readonly string jquery_flot_fillbetween_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.fillbetween.min.js") ? Url("jquery.flot.fillbetween.min.js") : Url("jquery.flot.fillbetween.js");
+                          
+            public static readonly string jquery_flot_image_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.image.min.js") ? Url("jquery.flot.image.min.js") : Url("jquery.flot.image.js");
+                          
+            public static readonly string jquery_flot_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.min.js") ? Url("jquery.flot.min.js") : Url("jquery.flot.js");
+                          
+            public static readonly string jquery_flot_navigate_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.navigate.min.js") ? Url("jquery.flot.navigate.min.js") : Url("jquery.flot.navigate.js");
+                          
+            public static readonly string jquery_flot_pie_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.pie.min.js") ? Url("jquery.flot.pie.min.js") : Url("jquery.flot.pie.js");
+                          
+            public static readonly string jquery_flot_resize_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.resize.min.js") ? Url("jquery.flot.resize.min.js") : Url("jquery.flot.resize.js");
+                          
+            public static readonly string jquery_flot_selection_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.selection.min.js") ? Url("jquery.flot.selection.min.js") : Url("jquery.flot.selection.js");
+                          
+            public static readonly string jquery_flot_stack_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.stack.min.js") ? Url("jquery.flot.stack.min.js") : Url("jquery.flot.stack.js");
+                          
+            public static readonly string jquery_flot_symbol_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.symbol.min.js") ? Url("jquery.flot.symbol.min.js") : Url("jquery.flot.symbol.js");
+                          
+            public static readonly string jquery_flot_threshold_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.threshold.min.js") ? Url("jquery.flot.threshold.min.js") : Url("jquery.flot.threshold.js");
+                          
+        }
+    
         public static readonly string jquery_1_7_1_vsdoc_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-1.7.1-vsdoc.min.js") ? Url("jquery-1.7.1-vsdoc.min.js") : Url("jquery-1.7.1-vsdoc.js");
                       
         public static readonly string jquery_1_7_1_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-1.7.1.min.js") ? Url("jquery-1.7.1.min.js") : Url("jquery-1.7.1.js");
@@ -323,6 +362,12 @@ namespace Links {
         public static readonly string jquery_ui_1_8_17_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui-1.8.17.min.js") ? Url("jquery-ui-1.8.17.min.js") : Url("jquery-ui-1.8.17.js");
                       
         public static readonly string jquery_ui_1_8_17_min_js = Url("jquery-ui-1.8.17.min.js");
+        public static readonly string jquery_ui_datepicker_ru_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui.datepicker-ru.min.js") ? Url("jquery-ui.datepicker-ru.min.js") : Url("jquery-ui.datepicker-ru.js");
+                      
+        public static readonly string jquery_ui_timepicker_ru_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui.timepicker-ru.min.js") ? Url("jquery-ui.timepicker-ru.min.js") : Url("jquery-ui.timepicker-ru.js");
+                      
+        public static readonly string jquery_ui_timepicker_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui.timepicker.min.js") ? Url("jquery-ui.timepicker.min.js") : Url("jquery-ui.timepicker.js");
+                      
         public static readonly string jquery_unobtrusive_ajax_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.unobtrusive-ajax.min.js") ? Url("jquery.unobtrusive-ajax.min.js") : Url("jquery.unobtrusive-ajax.js");
                       
         public static readonly string jquery_unobtrusive_ajax_min_js = Url("jquery.unobtrusive-ajax.min.js");
@@ -341,8 +386,6 @@ namespace Links {
             public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
             public static readonly string dd_belatedpng_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/dd_belatedpng.min.js") ? Url("dd_belatedpng.min.js") : Url("dd_belatedpng.js");
                           
-            public static readonly string jquery_1_5_1_min_js = Url("jquery-1.5.1.min.js");
-            public static readonly string modernizr_1_7_min_js = Url("modernizr-1.7.min.js");
         }
     
         public static readonly string MicrosoftAjax_debug_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/MicrosoftAjax.debug.min.js") ? Url("MicrosoftAjax.debug.min.js") : Url("MicrosoftAjax.debug.js");
@@ -363,6 +406,18 @@ namespace Links {
         public static readonly string plugins_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/plugins.min.js") ? Url("plugins.min.js") : Url("plugins.js");
                       
         public static readonly string script_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/script.min.js") ? Url("script.min.js") : Url("script.js");
+                      
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public static class T4MvcJs {
+            private const string URLPATH = "~/Scripts/T4MvcJs";
+            public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+            public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+            public static readonly string T4MvcJs_tt = Url("T4MvcJs.tt");
+            public static readonly string T4MvcJs_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/T4MvcJs.min.js") ? Url("T4MvcJs.min.js") : Url("T4MvcJs.js");
+                          
+        }
+    
+        public static readonly string yepnope_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/yepnope.min.js") ? Url("yepnope.min.js") : Url("yepnope.js");
                       
     }
 
@@ -404,6 +459,7 @@ namespace Links {
                     public static readonly string ui_icons_cd0a0a_256x240_png = Url("ui-icons_cd0a0a_256x240.png");
                 }
             
+                public static readonly string jquery_ui_1_8_17_custom_css = Url("jquery-ui-1.8.17.custom.css");
                 public static readonly string jquery_ui_css = Url("jquery-ui.css");
                 public static readonly string jquery_ui_accordion_css = Url("jquery.ui.accordion.css");
                 public static readonly string jquery_ui_all_css = Url("jquery.ui.all.css");
@@ -419,6 +475,7 @@ namespace Links {
                 public static readonly string jquery_ui_slider_css = Url("jquery.ui.slider.css");
                 public static readonly string jquery_ui_tabs_css = Url("jquery.ui.tabs.css");
                 public static readonly string jquery_ui_theme_css = Url("jquery.ui.theme.css");
+                public static readonly string jquery_ui_timepicker_css = Url("jquery.ui.timepicker.css");
                 [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
                 public static class minified {
                     private const string URLPATH = "~/Content/themes/base/minified";

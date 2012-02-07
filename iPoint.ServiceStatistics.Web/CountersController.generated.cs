@@ -54,6 +54,11 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
         public System.Web.Mvc.JsonResult CounterDetails() {
             return new T4MVC_JsonResult(Area, Name, ActionNames.CounterDetails);
         }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.JsonResult CounterData() {
+            return new T4MVC_JsonResult(Area, Name, ActionNames.CounterData);
+        }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public CountersController Actions { get { return MVC.Counters; } }
@@ -74,6 +79,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public readonly string CounterNames = "CounterNames";
             public readonly string CounterDetails = "CounterDetails";
             public readonly string Index = "Index";
+            public readonly string CounterData = "CounterData";
         }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
@@ -83,6 +89,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public const string CounterNames = "CounterNames";
             public const string CounterDetails = "CounterDetails";
             public const string Index = "Index";
+            public const string CounterData = "CounterData";
         }
 
 
@@ -92,6 +99,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public class ViewNames {
             public readonly string _CounterQueryParametersControl = "~/Views/Counters/_CounterQueryParametersControl.cshtml";
+            public readonly string _CountersGraph = "~/Views/Counters/_CountersGraph.cshtml";
             public readonly string Data = "~/Views/Counters/Data.cshtml";
             public readonly string Index = "~/Views/Counters/Index.cshtml";
         }
@@ -120,7 +128,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             return callInfo;
         }
 
-        public override System.Web.Mvc.JsonResult CounterNames(string sd, string ed, string cc) {
+        public override System.Web.Mvc.JsonResult CounterNames(string sd, string ed, int cc) {
             var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.CounterNames);
             callInfo.RouteValueDictionary.Add("sd", sd);
             callInfo.RouteValueDictionary.Add("ed", ed);
@@ -128,7 +136,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             return callInfo;
         }
 
-        public override System.Web.Mvc.JsonResult CounterDetails(string sd, string ed, string cc, string cn) {
+        public override System.Web.Mvc.JsonResult CounterDetails(string sd, string ed, int cc, int cn) {
             var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.CounterDetails);
             callInfo.RouteValueDictionary.Add("sd", sd);
             callInfo.RouteValueDictionary.Add("ed", ed);
@@ -139,6 +147,18 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
 
         public override System.Web.Mvc.ActionResult Index() {
             var callInfo = new T4MVC_ActionResult(Area, Name, ActionNames.Index);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced) {
+            var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.CounterData);
+            callInfo.RouteValueDictionary.Add("sd", sd);
+            callInfo.RouteValueDictionary.Add("ed", ed);
+            callInfo.RouteValueDictionary.Add("cc", cc);
+            callInfo.RouteValueDictionary.Add("cn", cn);
+            callInfo.RouteValueDictionary.Add("cs", cs);
+            callInfo.RouteValueDictionary.Add("ci", ci);
+            callInfo.RouteValueDictionary.Add("ced", ced);
             return callInfo;
         }
 

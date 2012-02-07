@@ -74,13 +74,28 @@
     <Compile Include="Aggregation\UniversalValue.cs" />
     <Compile Include="Aggregation\UniversalValueExtensions.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="CountersAutoDiscoverer.cs" />
     <Compile Include="DataLayer\CountersDatabase.cs" />
+    <Compile Include="ExtendedDataTransformations.cs" />
     <Compile Include="MessageReceiver.cs" />
-    <Compile Include="MovingWindowSequenceGenerator.cs" />
+    <Compile Include="MovingWindowSequence.cs" />
     <Compile Include="PercentileResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="КэшСчетчиков\Cache.cs" />
+    <Compile Include="КэшСчетчиков\CounterCategoryInfoCache.cs" />
+    <Compile Include="КэшСчетчиков\CounterExtDataInfo.cs" />
+    <Compile Include="КэшСчетчиков\CounterExtDataInfoCache.cs" />
+    <Compile Include="КэшСчетчиков\CounterInstanceInfo.cs" />
+    <Compile Include="КэшСчетчиков\CounterInstanceInfoCache.cs" />
+    <Compile Include="КэшСчетчиков\CounterNameInfo.cs" />
+    <Compile Include="КэшСчетчиков\CounterNameInfoCache.cs" />
+    <Compile Include="КэшСчетчиков\CounterSourceInfo.cs" />
+    <Compile Include="КэшСчетчиков\CounterSourceInfoCache.cs" />
+    <Compile Include="КэшСчетчиков\IInfo.cs" />
+    <Compile Include="КэшСчетчиков\InfoCacheBase.cs" />
+    <Compile Include="КэшСчетчиков\CounterCategoryInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -6,11 +6,11 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
     public class CounterGroup
     {
 
-        public string CounterName { get; private set; }
         public string Source { get; private set; }
+        public string CounterName { get; private set; }
         public string Instance { get; private set; }
         public string ExtendedData { get; private set; }
-        private int _hashCode;
+        private readonly int _hashCode = Int32.MinValue;
 
 
         public CounterGroup(string counterName, string source, string instance, string extendedData)
@@ -27,10 +27,10 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
         {
             unchecked
             {
-                int result = (CounterName != null ? CounterName.GetHashCode() : 0);
-                result = (result * 397) + (Source != null ? Source.GetHashCode() : 0);
+                int result = (Source != null ? Source.GetHashCode() : 0);
                 result = (result * 397) + (Instance != null ? Instance.GetHashCode() : 0);
                 result = (result * 397) + (ExtendedData != null ? ExtendedData.GetHashCode() : 0);
+                result = (result * 397) + (CounterName != null ? CounterName.GetHashCode() : 0);
                 return result;
             }
         }
@@ -42,8 +42,8 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             return
                 (other.Source == Source)
                 && (other.Instance == Instance)
-                && (other.ExtendedData == ExtendedData)
-                && (other.CounterName == CounterName);
+                && (other.ExtendedData == ExtendedData)&&
+                (other.CounterName == CounterName);
 
         }
 

@@ -1063,7 +1063,7 @@ jQuery.bindReady = function() {
 		// Mozilla, Opera and webkit nightlies currently support this event
 		if ( document.addEventListener ) {
 			// Use the handy event callback
-			document.addEventListener( "DOMContentLoaded", DOMContentLoaded, false );
+			document.addEventListener( "DOMContentLoadCacheed", DOMContentLoaded, false );
 
 			// A fallback to window.onload, that will always work
 			window.addEventListener( "load", jQuery.ready, false );
@@ -1885,7 +1885,7 @@ jQuery.fx = function( elem, options, prop ) {
 	};
 jQuery.get = function( url, data, callback, type ) {
 /// <summary>
-///     Load data from the server using a HTTP GET request.
+///     LoadCache data from the server using a HTTP GET request.
 /// </summary>
 /// <param name="url" type="String">
 ///     A string containing the URL to which the request is sent.
@@ -1917,7 +1917,7 @@ jQuery.get = function( url, data, callback, type ) {
 	};
 jQuery.getJSON = function( url, data, callback ) {
 /// <summary>
-///     Load JSON-encoded data from the server using a GET HTTP request.
+///     LoadCache JSON-encoded data from the server using a GET HTTP request.
 /// </summary>
 /// <param name="url" type="String">
 ///     A string containing the URL to which the request is sent.
@@ -1933,7 +1933,7 @@ jQuery.getJSON = function( url, data, callback ) {
 	};
 jQuery.getScript = function( url, callback ) {
 /// <summary>
-///     Load a JavaScript file from the server using a GET HTTP request, then execute it.
+///     LoadCache a JavaScript file from the server using a GET HTTP request, then execute it.
 /// </summary>
 /// <param name="url" type="String">
 ///     A string containing the URL to which the request is sent.
@@ -2422,7 +2422,7 @@ jQuery.parseXML = function( data ) {
 	};
 jQuery.post = function( url, data, callback, type ) {
 /// <summary>
-///     Load data from the server using a HTTP POST request.
+///     LoadCache data from the server using a HTTP POST request.
 /// </summary>
 /// <param name="url" type="String">
 ///     A string containing the URL to which the request is sent.
@@ -5049,7 +5049,7 @@ jQuery.prototype.load = function( url, params, callback ) {
 ///     1: Bind an event handler to the "load" JavaScript event.
 ///     &#10;    1.1 - load(handler(eventObject)) 
 ///     &#10;    1.2 - load(eventData, handler(eventObject))
-///     &#10;2: Load data from the server and place the returned HTML into the matched element.
+///     &#10;2: LoadCache data from the server and place the returned HTML into the matched element.
 ///     &#10;    2.1 - load(url, data, complete(responseText, textStatus, XMLHttpRequest))
 /// </summary>
 /// <param name="url" type="String">
