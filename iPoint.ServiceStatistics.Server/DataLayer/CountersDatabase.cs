@@ -108,8 +108,9 @@ namespace iPoint.ServiceStatistics.Server.DataLayer
                                         {"type", counters.CounterAggregationType.ToString()},
                                         {"data", cData}
                                     };
+            Console.WriteLine(cData.ElementCount + " combinations of " + counters.CounterCategory + "." + counters.CounterName + " aggregated for " + DateTime.Now.Subtract(counters.Date).TotalMilliseconds / 1000d + " seconds. (" + counters.Date.TimeOfDay+")");
             items.Insert(data);
-            Console.WriteLine(data.ToJson());
+            
 
         }
 

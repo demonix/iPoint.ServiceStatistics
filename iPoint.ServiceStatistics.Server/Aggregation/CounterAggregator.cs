@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using ExpressionVisualizer;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
 using iPoint.ServiceStatistics.Server.Aggregation;
@@ -34,8 +36,8 @@ namespace iPoint.ServiceStatistics.Server
 
         //private CountersDatabase _db;
         private List<double> _percentileParameters;
-        public Action<IEnumerable<EventPattern<LogEventArgs>>> AggregationAction;
-        public Func<EventPattern<LogEventArgs>, bool> EventSelector;
+        public Action<IEnumerable<LogEventArgs>> AggregationAction;
+        public Func<LogEventArgs, bool> EventSelector;
         public IDisposable UnsubscriptionToken;
         public string CounterCategory { get; private set; }
         public string CounterName { get; private set; }
@@ -66,22 +68,22 @@ namespace iPoint.ServiceStatistics.Server
             //DateTime.Now, CounterCategory, CounterName, result);
         }
         
-        public Func<EventPattern<LogEventArgs>, bool> CreateEventSelector()
+        public Func<LogEventArgs, bool> CreateEventSelector()
         {
-            Expression<Func<EventPattern<LogEventArgs>, bool>> exp =
-                item =>  (item.EventArgs.LogEvent.Category == CounterCategory) &&
+            Expression<Func<LogEventArgs, bool>> exp =
+                item =>  (item.LogEvent.Category == CounterCategory) &&
                     //item.EventArgs.LogEvent.Counter.StartsWith(CounterName);
-                    (item.EventArgs.LogEvent.Counter == CounterName);
-            exp.Compile();
-               
+                    (item.LogEvent.Counter == CounterName);
             return exp.Compile();
+
+
         }
 
         
         
-        private Action<IEnumerable<EventPattern<LogEventArgs>>> CreateAggregationActionNew()
+        private Action<IEnumerable<LogEventArgs>> CreateAggregationActionNew()
         {
-            Expression<Action<IEnumerable<EventPattern<LogEventArgs>>>> actionResult;// = input => _onResult("empty");
+            Expression<Action<IEnumerable<LogEventArgs>>> actionResult;// = input => _onResult("empty");
             switch (AggregationType)
             {
                 case AggregationType.Sum: 
@@ -154,42 +156,42 @@ namespace iPoint.ServiceStatistics.Server
                                                UniversalValue.ParseFromString(_inputType, k.EventArgs.LogEvent.Value)));
         }*/
 
-        private IEnumerable<IGrouping<CounterGroup, UniversalValue>> GroupCounters(IEnumerable<EventPattern<LogEventArgs>> input)
+        private IEnumerable<IGrouping<CounterGroup, UniversalValue>> GroupCounters(IEnumerable<LogEventArgs> input)
         {
 
             return input.GroupBy(k => CreateCounterGroupByMask("111", k),
                                  k =>
-                                 UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value))
+                                 UniversalValue.ParseFromString(InputType, k.LogEvent.Value))
                 .Concat(
-                    input.GroupBy(k => CreateCounterGroupByMask("011", k),
+                    input.GroupBy(k => CreateCounterGroupByMask("001", k),
                                   k =>
-                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
                 .Concat(
                     input.GroupBy(k => CreateCounterGroupByMask("101", k),
                                   k =>
-                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
                 .Concat(
                     input.GroupBy(k => CreateCounterGroupByMask("110", k),
                                   k =>
-                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
                 .Concat(
                     input.GroupBy(k => CreateCounterGroupByMask("100", k),
                                   k =>
-                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)))
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
                 .Concat(
                     input.GroupBy(k => CreateCounterGroupByMask("000", k),
                                   k =>
-                                  UniversalValue.ParseFromString(InputType, k.EventArgs.LogEvent.Value)));
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)));
         }
 
-        private CounterGroup CreateCounterGroupByMask(string mask, EventPattern<LogEventArgs> eventPattern)
+        private CounterGroup CreateCounterGroupByMask(string mask, LogEventArgs eventArgs)
         {
             if (mask.Length !=3) throw new Exception("Mask should be exactly 3 chars length");
             return new CounterGroup(
-                eventPattern.EventArgs.LogEvent.Counter,
-                mask[0] == '0' ? "ALL_SOURCES" : eventPattern.EventArgs.LogEvent.Source,
-                mask[1] == '0' ? "ALL_INSTANCES" : eventPattern.EventArgs.LogEvent.Instance,
-                mask[2] == '0' ? "ALL_EXTDATA" : eventPattern.EventArgs.LogEvent.ExtendedData
+                eventArgs.LogEvent.Counter,
+                mask[0] == '0' ? "ALL_SOURCES" : eventArgs.LogEvent.Source,
+                mask[1] == '0' ? "ALL_INSTANCES" : eventArgs.LogEvent.Instance,
+                mask[2] == '0' ? "ALL_EXTDATA" : eventArgs.LogEvent.ExtendedData
                 );
         }
 
@@ -422,9 +424,32 @@ namespace iPoint.ServiceStatistics.Server
        }*/
         #endregion old_stuff
 
-        public void BeginAggregation(IObservable<IList<EventPattern<LogEventArgs>>> observableEvents)
+        public void BeginAggregation(IObservable<IList<LogEventArgs>> observableEvents)
         {
-            UnsubscriptionToken = observableEvents.Subscribe(AggregationAction);
+            UnsubscriptionToken = observableEvents.ObserveOn(Scheduler.ThreadPool).Subscribe(AggregationAction);
+        }
+
+        public bool Equals(CounterAggregator other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.CounterCategory, CounterCategory) && Equals(other.CounterName, CounterName);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (CounterAggregator)) return false;
+            return Equals((CounterAggregator) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((CounterCategory != null ? CounterCategory.GetHashCode() : 0)*397) ^ (CounterName != null ? CounterName.GetHashCode() : 0);
+            }
         }
     }
 }

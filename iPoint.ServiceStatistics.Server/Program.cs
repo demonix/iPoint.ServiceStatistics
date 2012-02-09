@@ -8,6 +8,7 @@ using System.Net;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
@@ -55,17 +56,21 @@ namespace iPoint.ServiceStatistics.Server
             //MovingWindowSequence.Generate(, ref bufferOpenings, ref bufferClosingSelector);
             //CountersDatabase db = CountersDatabase.Connect("127.0.0.1", null, "counters");
             CountersDatabase.InitConnection("127.0.0.1", null, "counters");
-            IObservable<IList<EventPattern<LogEventArgs>>> observableEvents = receiver.ObservableEvents.Buffer(seq.BufferOpenings, seq.ClosingWindowSequenceSelector);
-            List<CounterAggregator> aggregators = new List<CounterAggregator>();
-            Settings settings = new Settings();
-            CountersAutoDiscoverer countersAutoDiscoverer = new CountersAutoDiscoverer(receiver.ObservableEvents, observableEvents, aggregators, settings);
             
-            foreach (AggregationParameters parameters in settings.AggregationParameters)
-            {
-                CounterAggregator counterAggregator = new CounterAggregator(parameters);
-                counterAggregator.BeginAggregation(observableEvents);
-                aggregators.Add(counterAggregator);
-            }
+            var observableEvents = receiver.ObservableEvents.Buffer(seq.BufferOpenings, seq.ClosingWindowSequenceSelector).Publish();
+            observableEvents.Connect();
+
+            //var observableEvents = Observable.Empty<LogEventArgs>().Buffer(seq.BufferOpenings, seq.ClosingWindowSequenceSelector).Publish();
+            
+            Settings settings = new Settings();
+            settings.ObservableEvents = observableEvents;
+            settings.ReadAggregators();
+ 
+            CountersAutoDiscoverer countersAutoDiscoverer = new CountersAutoDiscoverer(receiver.ObservableEvents, settings);
+            countersAutoDiscoverer.StartDiscovery();
+
+            observableEvents.Subscribe(l => Console.WriteLine("Total events: " + l.Count));
+            
             ConsoleKeyInfo keyInfo;
             while ((keyInfo = Console.ReadKey()).Key!=ConsoleKey.Enter)
             {
@@ -78,6 +83,11 @@ namespace iPoint.ServiceStatistics.Server
                 {
                     seq.DecreaseInterval();
                     Console.WriteLine("Interval is {0} ms now", seq.MoveEvery);
+                }
+                if (keyInfo.Key == ConsoleKey.R)
+                {
+                    settings.ReadAggregators();
+                    Console.WriteLine("Aggregators were updated");
                 }
             }
         }

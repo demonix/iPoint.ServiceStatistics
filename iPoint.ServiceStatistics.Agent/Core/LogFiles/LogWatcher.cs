@@ -36,7 +36,7 @@ namespace iPoint.ServiceStatistics.Agent
             _fsWatcher.Created += OnFileCreated;
             DateTime now = DateTime.UtcNow;
             _timer = new Timer(NewDayHasCome);
-            _timer.Change(new DateTime(now.Year, now.Month, now.Day).AddDays(1).AddMinutes(30) - now, TimeSpan.Zero);
+            _timer.Change(new DateTime(now.Year, now.Month, now.Day).AddDays(1).AddMinutes(30) - now, TimeSpan.FromDays(1));
             _fsWatcher.EnableRaisingEvents = true;
         }
 

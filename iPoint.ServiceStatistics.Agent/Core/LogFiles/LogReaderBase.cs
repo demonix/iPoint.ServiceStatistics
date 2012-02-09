@@ -61,14 +61,23 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
             CreateWatcher();
         }
 
-
+        private FileInfo _fileInfo;
+        private Timer _fileInfoRefreshTimer;
         private void CreateWatcher()
         {
+            _fileInfo = new FileInfo(Path.GetFullPath(_logFileName));
+            _fileInfoRefreshTimer = new Timer(RefreshFileInfo);
+            _fileInfoRefreshTimer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
             _watcher = new FileSystemWatcher(Path.GetDirectoryName(Path.GetFullPath(_logFileName)),
                                              Path.GetFileName(_logFileName));
             _watcher.NotifyFilter = NotifyFilters.Size | NotifyFilters.LastWrite;
             _watcher.EnableRaisingEvents = false;
             _watcher.Changed += FileSystemWatcherFired;
+        }
+
+        private void RefreshFileInfo(object state)
+        {
+           _fileInfo.Refresh();
         }
 
         protected delegate void ReadInternalDelegate();

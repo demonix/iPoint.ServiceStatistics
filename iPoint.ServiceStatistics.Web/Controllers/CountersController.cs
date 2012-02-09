@@ -108,23 +108,48 @@ namespace iPoint.ServiceStatistics.Web.Controllers
 
         public virtual JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced)
         {
-            
             DateTime beginDate = DateTime.ParseExact(sd, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
             DateTime endDate;
-            if (!DateTime.TryParseExact(ed, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None,  out endDate))
+            if (
+                !DateTime.TryParseExact(ed, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                                        out endDate))
                 endDate = DateTime.Now.AddDays(1);
-            Dictionary<string, List<List<object>>> series = CountersDatabase.Instance.GetCounterData2(beginDate, endDate, cc, cn, cs, ci, ced);
-            DateTime dt = series.Count == 0 ? DateTime.Now : new DateTime((long)series.First().Value.Last()[0] * TimeSpan.TicksPerMillisecond);
-            var seriesData2 = series.Select(d => new 
-                                                    {
-                                                        label = d.Key,
-                                                        data = d.Value
-                                                    });
-            return Json(new { lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2 }, JsonRequestBehavior.AllowGet);
+
+            IEnumerable<CounterExtDataInfo> extDatas;
+            extDatas = ced == -1
+                           ? CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn)
+                           : new List<CounterExtDataInfo>() {new CounterExtDataInfo(ced.ToString(), ced)};
+
+            List<object> seriesData2 = new List<object>();
+            DateTime dt = DateTime.Now;
+            foreach (CounterExtDataInfo counterExtDataInfo in extDatas)
+            {
+                if (ced == -1 && counterExtDataInfo.Name =="ALL_EXTDATA" )
+                    continue;
+
+                Dictionary<string, List<List<object>>> series = CountersDatabase.Instance.GetCounterData2(beginDate,
+                                                                                                          endDate, cc,
+                                                                                                          cn, cs, ci,
+                                                                                                          counterExtDataInfo.Id);
+                dt = series.Count == 0
+                         ? dt
+                         : new DateTime((long) series.First().Value.Last()[0]*TimeSpan.TicksPerMillisecond);
+
+                seriesData2.AddRange(series.Select(d => new
+                                                            {
+                                                                label = counterExtDataInfo.Name + "_" + d.Key,
+                                                                data = d.Value
+                                                            }));
+            }
+
+
+            return Json(new {lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2},
+                        JsonRequestBehavior.AllowGet);
         }
 
 
-      
+
+
     }
 
 

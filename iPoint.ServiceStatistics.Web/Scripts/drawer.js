@@ -18,7 +18,8 @@
         pan: {
             interactive: false
         },
-        selection: { mode: "xy" }
+        selection: { mode: "xy" },
+        legend:{ container: $("#legendContainer")}
 
     };
 

@@ -8,61 +8,68 @@ namespace iPoint.ServiceStatistics.Server
 {
     public class CountersAutoDiscoverer
     {
-        private readonly IObservable<EventPattern<LogEventArgs>> _observableEvents;
-        private readonly IObservable<IList<EventPattern<LogEventArgs>>> _eventsBuffer;
-        private readonly List<CounterAggregator> _aggregators;
+        private readonly IObservable<LogEventArgs> _observableEvents;
         private readonly Settings _settings;
-        private HashSet<string> _addedCounters = new HashSet<string>();
+        private HashSet<string> _knownCounters = new HashSet<string>();
 
-        public CountersAutoDiscoverer(IObservable<EventPattern<LogEventArgs>> observableEvents, IObservable<IList<EventPattern<LogEventArgs>>> eventsBuffer, List<CounterAggregator> aggregators, Settings settings)
+        public CountersAutoDiscoverer(IObservable<LogEventArgs> observableEvents, Settings settings)
         {
-            _aggregators = aggregators;
-            foreach (CounterAggregator counterAggregator in _aggregators)
-            {
-                if (!_addedCounters.Contains(counterAggregator.CounterCategory + "\t" + counterAggregator.CounterName))
-                    _addedCounters.Add(counterAggregator.CounterCategory + "\t" + counterAggregator.CounterName);
-            }
             _observableEvents = observableEvents;
-            _eventsBuffer = eventsBuffer;
-            _observableEvents.Subscribe(DiscoverNewCounters);
             _settings = settings;
+            
+            int cnt = _settings.Aggregators.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                CounterAggregator counterAggregator = _settings.Aggregators[i];
+                if (!_knownCounters.Contains(counterAggregator.CounterCategory + "\t" + counterAggregator.CounterName))
+                    _knownCounters.Add(counterAggregator.CounterCategory + "\t" + counterAggregator.CounterName);
+            }
+            
+
+            
+        }
+        public void StartDiscovery()
+        {
+            _observableEvents.Subscribe(DiscoverNewCounters);
         }
 
         private object _lock = new object();
 
-        private void DiscoverNewCounters(EventPattern<LogEventArgs> eventPattern)
+        private void DiscoverNewCounters(LogEventArgs eventArgs)
         {
-            if (_addedCounters.Contains(eventPattern.EventArgs.LogEvent.Category + "\t" +eventPattern.EventArgs.LogEvent.Counter))
+            if (_knownCounters.Contains(eventArgs.LogEvent.Category + "\t" + eventArgs.LogEvent.Counter))
                 return;
 
-            int cnt = _aggregators.Count;
+            lock (_lock)
+            {
+                if (_knownCounters.Contains(eventArgs.LogEvent.Category + "\t" + eventArgs.LogEvent.Counter))
+                    return;
 
+                File.AppendAllText(@"settings\AutoDiscoveredCounters.list",
+                                   "\r\n" + eventArgs.LogEvent.Category + "\t" + eventArgs.LogEvent.Counter);
+                DiscoverBasedOnGenericCounters(eventArgs);
+                _knownCounters.Add(eventArgs.LogEvent.Category + "\t" + eventArgs.LogEvent.Counter);
+            }
+        }
+
+        private void DiscoverBasedOnGenericCounters(LogEventArgs eventArgs)
+        {
+            int cnt = _settings.Aggregators.Count;
             for (int i = 0; i < cnt; i++)
             {
-                CounterAggregator counterAggregator = _aggregators[i];
-                if ((eventPattern.EventArgs.LogEvent.Category == counterAggregator.CounterCategory)&&
-                    (eventPattern.EventArgs.LogEvent.Counter.StartsWith(counterAggregator.CounterName))&&
-                    (eventPattern.EventArgs.LogEvent.Counter.Length > counterAggregator.CounterName.Length))
+                CounterAggregator counterAggregator = _settings.Aggregators[i];
+                if ((eventArgs.LogEvent.Category == counterAggregator.CounterCategory) &&
+                    (eventArgs.LogEvent.Counter.StartsWith(counterAggregator.CounterName)) &&
+                    (eventArgs.LogEvent.Counter.Length > counterAggregator.CounterName.Length))
                 {
-                    lock (_addedCounters)
-                    {
-                        if (_addedCounters.Contains(eventPattern.EventArgs.LogEvent.Category + "\t" + eventPattern.EventArgs.LogEvent.Counter))
-                            return;
-
-                        CounterAggregator aggregator = new CounterAggregator(counterAggregator.CounterCategory,
-                                                                             eventPattern.EventArgs.LogEvent.Counter,
-                                                                             counterAggregator.AggregationType,
-                                                                             counterAggregator.InputType);
-                        aggregator.BeginAggregation(_eventsBuffer);
-                        _aggregators.Add(aggregator);
-                        _addedCounters.Add(eventPattern.EventArgs.LogEvent.Category + "\t" +
-                                           eventPattern.EventArgs.LogEvent.Counter);
-                        File.AppendAllText(@"settings\counters.list",
-                                           "\r\n" + aggregator.CounterCategory + "\t" + aggregator.CounterName + "\t" +
-                                           aggregator.AggregationType.ToString() + "\t" + aggregator.InputType.FullName);
-
-                    }
-                    return;
+                    CounterAggregator aggregator = new CounterAggregator(counterAggregator.CounterCategory,
+                                                                         eventArgs.LogEvent.Counter,
+                                                                         counterAggregator.AggregationType,
+                                                                         counterAggregator.InputType);
+                    _settings.AddAggregator(aggregator);
+                    File.AppendAllText(@"settings\counters.list",
+                                       "\r\n" + aggregator.CounterCategory + "\t" + aggregator.CounterName + "\t" +
+                                       aggregator.AggregationType.ToString() + "\t" + aggregator.InputType.FullName);
                 }
             }
         }
