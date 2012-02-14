@@ -9,7 +9,8 @@
             show: false
         },
         xaxis: {
-            mode: "time"
+            mode: "time",
+            autoscaleMargin : 0.02
         },
         yaxis: { max: null },
         zoom: {
@@ -104,6 +105,7 @@
         if (!disposed) {
             var maxY = self.getMax();
             self.options.yaxis.max = maxY + (maxY / 2);
+            //self.options.xaxis.max = self.options.xaxis.max + 1000*10;
             $.plot(self.drawingSurface, self.currentData, self.options);
             $.plot($("#overview"), self.currentData, self.overviewOpts);
             if (timeout) {

@@ -238,7 +238,7 @@
       <LastGenOutput>T4MVC.cs</LastGenOutput>
     </None>
     <None Include="T4MVC.tt.settings.t4" />
-    <Content Include="Views\Counters\_CountersGraph.cshtml" />
+    <Content Include="Views\Counters\CountersGraph.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

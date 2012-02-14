@@ -99,7 +99,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public class ViewNames {
             public readonly string _CounterQueryParametersControl = "~/Views/Counters/_CounterQueryParametersControl.cshtml";
-            public readonly string _CountersGraph = "~/Views/Counters/_CountersGraph.cshtml";
+            public readonly string CountersGraph = "~/Views/Counters/CountersGraph.cshtml";
             public readonly string Data = "~/Views/Counters/Data.cshtml";
             public readonly string Index = "~/Views/Counters/Index.cshtml";
         }
