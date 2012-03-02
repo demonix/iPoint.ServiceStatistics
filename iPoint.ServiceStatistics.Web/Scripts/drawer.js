@@ -1,4 +1,4 @@
-﻿var Drawer = function (drawingSurface, counterParameres) {
+﻿var Drawer = function (drawingSurface, overviewSurface, legendContainer, counterParameres) {
     "use strict";
     var self = this;
     this.options = {
@@ -20,7 +20,7 @@
             interactive: false
         },
         selection: { mode: "xy" },
-        legend:{ container: $("#legendContainer")}
+        legend: { container: legendContainer }
 
     };
 
@@ -37,13 +37,15 @@
     };
 
     this.drawingSurface = drawingSurface;
+    this.overviewSurface = overviewSurface;
     this.dateStarted = new Date();
     this.currentData = [[]];
     this.parameters = counterParameres;
     var timeoutHandler;
     var disposed = false;
+    
     var plot = $.plot(self.drawingSurface, self.currentData, self.options);
-    var overview = $.plot($("#overview"), self.currentData, self.overviewOpts);
+    var overview = $.plot(self.overviewSurface, self.currentData, self.overviewOpts);
 
      self.drawingSurface.bind("plotselected", function (event, ranges) {
         // clamp the zooming to prevent eternal zoom
@@ -52,7 +54,7 @@
         if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
             ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 
-        plot = $.plot($("#placeholder"), getData(ranges.xaxis.from, ranges.xaxis.to),
+        plot = $.plot(self.drawingSurface, getData(ranges.xaxis.from, ranges.xaxis.to),
                       $.extend(true, {}, options, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
                           yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
@@ -61,8 +63,8 @@
         // don't fire event on the overview to prevent eternal loop
         overview.setSelection(ranges, true);
     });
-    
-    $("#overview").bind("plotselected", function (event, ranges) {
+
+    self.overviewSurface.bind("plotselected", function (event, ranges) {
         plot.setSelection(ranges);
     });
     
@@ -107,7 +109,7 @@
             self.options.yaxis.max = maxY + (maxY / 2);
             //self.options.xaxis.max = self.options.xaxis.max + 1000*10;
             $.plot(self.drawingSurface, self.currentData, self.options);
-            $.plot($("#overview"), self.currentData, self.overviewOpts);
+            $.plot(self.overviewSurface, self.currentData, self.overviewOpts);
             if (timeout) {
                 timeoutHandler = setTimeout(function () { self.UpdateAndDraw(timeout); }, timeout);
             }

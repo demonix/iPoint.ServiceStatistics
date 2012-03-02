@@ -26,6 +26,7 @@ namespace CountersDbCleanup
                     CountersDatabase.Instance.New_GetCounterNamesInCategory(counterCategoryInfo.Id).ToList();
                 foreach (CounterNameInfo counterNameInfo in counterNames)
                 {
+                    Console.WriteLine("Чистим " + counterCategoryInfo.Name + "." + counterNameInfo.Name);
                     DateTime left, right;
                     left = right = GetLastProcessedDateForCounter(counterCategoryInfo, counterNameInfo);
                     while (right < DateTime.Now.AddMinutes(-20))
@@ -47,6 +48,7 @@ namespace CountersDbCleanup
                         items.Remove(dq, SafeMode.True);
                         //left = right.AddSeconds(1);
                     }
+                    Console.WriteLine("Почистили " + counterCategoryInfo.Name + "." + counterNameInfo.Name);
                     File.AppendAllText("lastDates", counterCategoryInfo.Name + "\t" + counterNameInfo.Name + "\t" + left+"\r\n");
                 }
             }

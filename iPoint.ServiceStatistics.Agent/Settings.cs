@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NLog;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
 
 namespace iPoint.ServiceStatistics.Agent
@@ -9,6 +10,7 @@ namespace iPoint.ServiceStatistics.Agent
     public class Settings
     {
         public List<LogDescription> LogDescriptions;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         public Settings()
         {
@@ -21,12 +23,13 @@ namespace iPoint.ServiceStatistics.Agent
             FileInfo[] fileInfos = new DirectoryInfo("./settings/LogDescriptions").GetFiles("*.logDescription");
             foreach (FileInfo fileInfo in fileInfos)
             {
+                _logger.Info("Processing log description from " + fileInfo.FullName);
                 result.AddRange(ProcessLogDescription(fileInfo.FullName));
             }
             return result;
         }
 
-        static string GetConfigParam(string[] config, string paramName)
+        private static string GetConfigParam(string[] config, string paramName)
         {
             string result = null;
             foreach (string line in config)
@@ -44,7 +47,7 @@ namespace iPoint.ServiceStatistics.Agent
             return result;
         }
 
-        static List<string> GetConfigParams(string[] config, string paramName)
+        private static List<string> GetConfigParams(string[] config, string paramName)
         {
             List<string> result = new List<string>();
             foreach (string line in config)
@@ -62,22 +65,37 @@ namespace iPoint.ServiceStatistics.Agent
 
         private static IEnumerable<LogDescription> ProcessLogDescription(string fileName)
         {
+            _logger.Info("Processing LogDescription "+ fileName);
             string[] data = File.ReadAllLines(fileName);
             string fileMask = GetConfigParam(data, "FileMask");
             string encoding = GetConfigParam(data, "Encoding");
             List<string> logDirectories = GetConfigParams(data, "LogDirectory");
-            List<LogEventDescription> logEventDescriptions = GetLogEventDescrptions(Path.ChangeExtension(fileName, "EventDescripions"));
+            List<LogEventDescription> logEventDescriptions =
+                GetLogEventDescrptions(Path.ChangeExtension(fileName, "EventDescripions"));
+            _logger.Info("Total " + logDirectories.Count + " log directories");
+
             foreach (string logDirectory in logDirectories)
             {
+
+
                 if (Directory.Exists(logDirectory))
-                    yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, logDirectory);
-                if (logDirectory.Contains("*"))
                 {
+                    _logger.Info("Using " + logDirectory + " for LogDescription");
+                    yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, logDirectory);
+                }
+                else if (logDirectory.Contains("*"))
+                {
+                    _logger.Info("Log directory has mask: " + logDirectory);
                     List<string> paths = GetMultiplePaths("", logDirectory);
                     foreach (string path in paths)
                     {
+                        _logger.Info("Using " + path + " for LogDescription");
                         yield return new LogDescription(fileName, fileMask, encoding, logEventDescriptions, path);
                     }
+                }
+                else
+                {
+                    _logger.Info("Directory " + logDirectory + " not exists");
                 }
             }
         }
@@ -111,7 +129,7 @@ namespace iPoint.ServiceStatistics.Agent
                                                  String.Join(new string(Path.DirectorySeparatorChar, 1),
                                                              parts.Skip(1).ToArray())));
             }
-            
+
             return result;
 
         }
@@ -140,7 +158,8 @@ namespace iPoint.ServiceStatistics.Agent
             string dateTime = GetConfigParam(data, "DateTime");
             string dateFormat = GetConfigParam(data, "DateFormat");
             string regex = GetConfigParam(data, "Regex");
-            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance,extendedData, value, dateTime, dateFormat);
+            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance,
+                                                                 extendedData, value, dateTime, dateFormat);
             return result;
 
         }

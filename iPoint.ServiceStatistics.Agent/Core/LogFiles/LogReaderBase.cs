@@ -19,9 +19,12 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
         private object _locker = new object();
         protected FileSystemWatcher _watcher;
         public event EventHandler<LineReadedEventArgs> LineReaded;
+        public event EventHandler<LogEventArgs> OnLogEvent;
+
         public event EventHandler<EventArgs> FinishedReading;
         private readonly LogDescription _logDescription;
         protected readonly LogEventMatcher LogEventMatcher;
+        private EventWaitHandle _mayStopFlag = new EventWaitHandle(true, EventResetMode.ManualReset);
 
         public LogDescription LogDescription
         {
@@ -83,6 +86,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
         protected delegate void ReadInternalDelegate();
 
         private ReadInternalDelegate _readInternal;
+        private bool _stopRequested;
 
         public void BeginRead()
         {
@@ -103,23 +107,37 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
             lock (_locker)
             {
                 if (_reading) return;
+                _mayStopFlag.Reset();
                 _reading = true;
                 _watcher.EnableRaisingEvents = false;
                 string line;
-                while ((line = _logFileStreamReader.ReadLine()) != null)
+                while (((line = _logFileStreamReader.ReadLine()) != null) && !_stopRequested)
                 {
                     _currentPosition = _logFileStreamReader.GetRealPosition();
                     if (LineReaded != null)
                     {
                         LineReaded(this, new LineReadedEventArgs(_logFileName, line, LogEventMatcher));
+                        
+                    }
+                    if (OnLogEvent != null)
+                    {
+                        foreach (LogEvent logEvent in LogEventMatcher.FindMatches(_logFileName, line))
+                        {
+                            OnLogEvent(this, new LogEventArgs(logEvent));
+                        }
                     }
                 }
-            }
-            if (FinishedReading != null)
-                FinishedReading(this, new EventArgs());
 
-            _watcher.EnableRaisingEvents = true;
-            _reading = false;
+                if (FinishedReading != null)
+                    FinishedReading(this, new EventArgs());
+                if (!_stopRequested)
+                    _watcher.EnableRaisingEvents = true;
+                _reading = false;
+                _mayStopFlag.Set();
+            }
+
+           
+
         }
 
 
@@ -127,10 +145,14 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
 
         public void Close()
         {
-            if (_watcher != null)
-                _watcher.Dispose();
+            _watcher.EnableRaisingEvents = false;
+            _stopRequested = true;
+            _mayStopFlag.WaitOne();
             if (_logFileStreamReader != null)
                 _logFileStreamReader.Dispose();
+            if (_watcher != null)
+                _watcher.Dispose();
+            _mayStopFlag.Close();
         }
     }
 }

@@ -1,21 +1,22 @@
-﻿
-<div id="placeholder" style="width:600px;height:300px;float:left;"></div>
-<div id="legendContainer" style="float:left;margin-left:10px"></div>
-<div id="overview" style="width:300px;height:150px;float:left;margin-left:20px"></div>
-<p id="choices" style="float:left;margin-left:20px">Show:</p>
+﻿@model iPoint.ServiceStatistics.Web.Models.CounterDrawingParameters
+<div id="drawer-@Html.DisplayTextFor(m => m.Id)">
+<div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"></div>
+<div id="legendContainer-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:10px"></div>
+<div id="overview-@Html.DisplayTextFor(m => m.Id)" style="width:300px;height:150px;float:left;margin-left:20px"></div>
+    <p id="choices" style="float:left;margin-left:20px">Show:</p>
+     <input id="drawBtn" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />
 <div style="clear:both"></div>
-
-<script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
+</div>
 
 <script type="text/javascript">
-    $(function() {
-        yepnope([{
-            test: Modernizr.canvas,
-            nope: "@Url.Content("~/Scripts/flot/excanvas.js")"
-        }]);
-    })
+    draw("@Html.DisplayTextFor(m => m.Id)",
+        {
+            sd: "@Html.DisplayTextFor(m => m.StartDate)",
+            ed: "@Html.DisplayTextFor(m => m.EndDate)",
+            cc: @(Html.DisplayTextFor(m => m.CounterCategory)),
+            cn: @(Html.DisplayTextFor(m => m.CounterName)),
+            cs: @(Html.DisplayTextFor(m => m.CounterSource)),
+            ci: @(Html.DisplayTextFor(m => m.CounterInstance)),
+            ced: @(Html.DisplayTextFor(m => m.CounterExtData))
+        });
 </script>
-<!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
-<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>

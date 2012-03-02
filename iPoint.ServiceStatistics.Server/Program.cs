@@ -52,7 +52,7 @@ namespace iPoint.ServiceStatistics.Server
             MessageReceiver receiver = new MessageReceiver(srv);
             //IObservable<long> bufferOpenings = null;
             //Func<long, IObservable<long>> bufferClosingSelector = null;
-            MovingWindowSequence seq = new MovingWindowSequence(1000*30, 1000*5*60);
+            MovingWindowSequence seq = new MovingWindowSequence(1000*60, 1000*5*60);
             //MovingWindowSequence.Generate(, ref bufferOpenings, ref bufferClosingSelector);
             //CountersDatabase db = CountersDatabase.Connect("127.0.0.1", null, "counters");
             CountersDatabase.InitConnection("127.0.0.1", null, "counters");

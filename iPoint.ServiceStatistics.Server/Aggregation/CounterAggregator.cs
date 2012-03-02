@@ -170,6 +170,10 @@ namespace iPoint.ServiceStatistics.Server
                     input.GroupBy(k => CreateCounterGroupByMask("101", k),
                                   k =>
                                   UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
+                 .Concat(
+                    input.GroupBy(k => CreateCounterGroupByMask("010", k),
+                                  k =>
+                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value)))
                 .Concat(
                     input.GroupBy(k => CreateCounterGroupByMask("110", k),
                                   k =>

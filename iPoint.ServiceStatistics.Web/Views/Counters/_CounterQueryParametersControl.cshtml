@@ -12,6 +12,24 @@
 <link rel="stylesheet" href="@Url.Content("~/Content/themes/base/jquery.ui.slider.css")"  />
 <link rel="stylesheet" href="@Url.Content("~/Content/themes/base/jquery.ui.timepicker.css")"  />
 
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>
+@*
+<!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
+
+<!--script type="text/javascript">
+    $(function() {
+        yepnope([{
+            test: Modernizr.canvas,
+            nope: "@Url.Content("~/Scripts/flot/excanvas.js")"
+        }]);
+    })
+</script-->
+*@
+
+
 <script type="text/javascript">
     $(function () {
 
@@ -109,17 +127,17 @@
                 @*<input name="rightDateDDL" type="text" id="rightDateDDL" value="@DateTime.Now.ToString(CultureInfo.InvariantCulture)" />*@
             </td>
             <td>
-                <input id="drawBtn" type="button" value="Draw" onclick="draw()" />
+                <input id="drawBtn" type="button" value="Draw" onclick="load()" />
                 <!--input id="drawBtn" type="button" value="Update" onclick="update()" /-->
             </td>
         </tr>
     </table>
 </div>
-<script language="javascript">
+<script  type="text/javascript">
+    var drawers = { };
     $("#StartDate").datetimepicker({showSecond: true});
-    $("#EndDate").datetimepicker({showSecond: true});
-    var dr;
-    function draw() {
+    $("#EndDate").datetimepicker({ showSecond: true });
+    function load() {
         var sd = $("#StartDate").val();
         var ed = $("#EndDate").val();
         var cc = $("#CounterCategory").val();
@@ -127,25 +145,24 @@
         var cs = $("#CounterSource").val();
         var ci = $("#CounterInstance").val();
         var ced = $("#CounterExtData").val();
-        if (dr)
-            dr.Dispose();
-        dr = new Drawer($("#placeholder"), { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced });
-        dr.UpdateAndDraw(5000);
-    }
-    function update() {
-        dr.UpdateAndDraw();
+        $.get("/Counters/CountersGraph", { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced}, function (data) {
+            $("#drawings").append(data);
+        });
+        
     }
 
+    function draw(id, data) {
+        drawers[id] = new Drawer($("#placeholder-"+id), $("#overview-"+id), $("#legendContainer-"+id), data);
+        drawers[id].UpdateAndDraw(5000);
+    }
+    function remove(id) {
+        drawers[id].Dispose();
+        delete drawers[id];
+        $("#drawings > #drawer-" + id).remove();
+    }
+
+   
 </script>
-@Html.Partial(@MVC.Counters.Views.CountersGraph)
+<div id ="drawings"/>
+@* @Html.Partial(@MVC.Counters.Views.CountersGraph)*@
 
-
-@*
-@Html.EditorFor(model => model.StartDate)<br/>
-@Html.EditorFor(model => model.EndDate)<br/>
-@Html.DropDownListFor(model => model.CounterCategory, new SelectList(new List<string>()))<br/>
-@Html.EditorFor(model => model.CounterName)<br/>
-@Html.EditorFor(model => model.CounterInstance)<br/>
-@Html.EditorFor(model => model.CounterExtData)<br/>
-
-*@

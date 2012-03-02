@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace iPoint.ServiceStatistics.Web.Models
@@ -13,11 +14,11 @@ namespace iPoint.ServiceStatistics.Web.Models
         {
             StartDate = DateTime.Now.AddMinutes(-15);
             EndDate= DateTime.Now;
-            CounterCategories = new SelectList(new List<string> { "Cat1", "Cat2" }, "Cat2");
-            CounterNames = new SelectList(new List<string> { "Name1", "Name2" });
-            CounterSources = new SelectList(new List<string> { "Source1", "Source2" });
-            CounterInstances = new SelectList(new List<string> { "Instance1", "Instance2" });
-            CounterExtDatas = new SelectList(new List<string> { "ExtData1", "ExtData2" });
+            CounterCategories = new SelectList(Enumerable.Empty<string>());
+            CounterNames = new SelectList(Enumerable.Empty<string>());
+            CounterSources = new SelectList(Enumerable.Empty<string>());
+            CounterInstances = new SelectList(Enumerable.Empty<string>());
+            CounterExtDatas = new SelectList(Enumerable.Empty<string>());
         }
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy HH:mm:ss}")]

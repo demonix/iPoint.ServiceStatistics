@@ -76,6 +76,7 @@
     <Compile Include="HomeController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CounterDrawingParameters.cs" />
     <Compile Include="Models\CounterQueryParameters.cs" />
     <Compile Include="Models\FakeCountersDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -269,7 +270,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>39929</DevelopmentServerPort>
+          <DevelopmentServerPort>18474</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

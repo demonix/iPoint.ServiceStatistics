@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using NLog;
 
 namespace iPoint.ServiceStatistics.Agent
 {
     internal class LogWatcher
     {
+        private Logger _logger = LogManager.GetCurrentClassLogger();
         private FileSystemWatcher _fsWatcher;
+        private FileSystemWatcher _fileChangeWatcher;
         public Regex FileMaskRegex { get; private set; }
         public event EventHandler<LogWatcherEventArgs> NewLogFileCreated;
         public event EventHandler<LogWatcherEventArgs> LogFileCompleted;
@@ -31,10 +34,12 @@ namespace iPoint.ServiceStatistics.Agent
         {
             _fsWatcher = new FileSystemWatcher();
             _fsWatcher.Path = directory;
+            _fileChangeWatcher = new FileSystemWatcher();
+            _fileChangeWatcher.Filter = "";
             Id = id;
             FileMaskRegex = fileMask;
             _fsWatcher.Created += OnFileCreated;
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.Now;
             _timer = new Timer(NewDayHasCome);
             _timer.Change(new DateTime(now.Year, now.Month, now.Day).AddDays(1).AddMinutes(30) - now, TimeSpan.FromDays(1));
             _fsWatcher.EnableRaisingEvents = true;
@@ -46,8 +51,10 @@ namespace iPoint.ServiceStatistics.Agent
             int logsCount = _logsUnderWatch.Count;
             for (int i = logsCount - 1; i >= 0; i--)
             {
-                if (new FileInfo(_logsUnderWatch[i]).LastWriteTimeUtc < DateTime.UtcNow.AddMinutes(-30))
+                FileInfo fileInfo = new FileInfo(_logsUnderWatch[i]);
+                if ((fileInfo.LastWriteTime < DateTime.Now.Date.AddSeconds(15)) && (fileInfo.CreationTimeUtc.Date < DateTime.Now.Date))
                 {
+                    _logger.Info(String.Format("Log file {0} completed", _logsUnderWatch[i]) );
                     InvokeLogFileCompleted(new LogWatcherEventArgs(_logsUnderWatch[i]));
                     _logsUnderWatch.RemoveAt(i);
                 }

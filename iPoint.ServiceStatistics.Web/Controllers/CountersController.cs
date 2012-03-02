@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
+using iPoint.ServiceStatistics.Server;
 using iPoint.ServiceStatistics.Server.DataLayer;
 using iPoint.ServiceStatistics.Server.КэшСчетчиков;
 using iPoint.ServiceStatistics.Web.Models;
@@ -59,44 +61,34 @@ namespace iPoint.ServiceStatistics.Web.Controllers
 
         public virtual JsonResult CounterDetails(string sd, string ed, int cc, int cn)
         {
-            DateTime beginDate = DateTime.ParseExact(sd,"dd.MM.yyyy HH:mm:ss",CultureInfo.InvariantCulture);
-            DateTime endDate = DateTime.ParseExact(ed,"dd.MM.yyyy HH:mm:ss",CultureInfo.InvariantCulture);
-            //List<CounterDetail> list = CountersDatabase.Instance.GetCounterDetails(beginDate, endDate, cc, cn).ToList();
+            DateTime beginDate = DateTime.ParseExact(sd, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime endDate = DateTime.ParseExact(ed, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
+            IEnumerable<SelectListItem> sourcesListItems =
+                CountersDatabase.Instance.New_GetCounterSources(cc, cn).Select(s => new SelectListItem()
+                                                                                        {
+                                                                                            Text = s.Name,
+                                                                                            Value = s.Id.ToString(CultureInfo.InvariantCulture)
+                                                                                        });
+            IEnumerable<SelectListItem> instancesListItems =
+                CountersDatabase.Instance.New_GetCounterInstances(cc, cn).Select(s => new SelectListItem()
+                                                                                          {
+                                                                                              Text = s.Name,
+                                                                                              Value = s.Id.ToString(CultureInfo.InvariantCulture)
+                                                                                          });
+            IEnumerable<SelectListItem> extDatasListItems =
+                CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn).Select(s => new SelectListItem()
+                                                                                         {
+                                                                                             Text = s.Name,
+                                                                                             Value = s.Id.ToString(CultureInfo.InvariantCulture)
+                                                                                         });
             var data = new
                            {
-                               Sources = CountersDatabase.Instance.New_GetCounterSources(cc,cn).Select(s => new SelectListItem()
-                                                              {
-                                                                  Text = s.Name,
-                                                                  Value = s.Id.ToString()
-                                                              }),
-                               Instances = CountersDatabase.Instance.New_GetCounterInstances(cc, cn).Select(s => new SelectListItem()
-                               {
-                                   Text = s.Name,
-                                   Value = s.Id.ToString()
-                               }),
-                               ExtDatas = CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn).Select(s => new SelectListItem()
-                               {
-                                   Text = s.Name,
-                                   Value = s.Id.ToString()
-                               }),
-                               /*Sources = list.Select(i => i.Source).Distinct().Select(s => new SelectListItem()
-                                                              {
-                                                                  Text = s,
-                                                                  Value = s
-                                                              }),
-                               Instances = list.Select(i => i.Instance).Distinct().Select(i => new SelectListItem()
-                                                                {
-                                                                    Text = i,
-                                                                    Value = i
-                                                                }),
-                               ExtDatas = list.Where(i => i.ExtData !=null).Select(i => i.ExtData).Distinct().Select(e => new SelectListItem()
-                                                               {
-                                                                   Text = e,
-                                                                   Value = e
-                                                               })*/
+                               Sources = sourcesListItems,
+                               Instances = instancesListItems,
+                               ExtDatas = extDatasListItems
                            };
-            
+
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -106,52 +98,70 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             return View(new CounterQueryParameters());
         }
 
+        [OutputCache(Location =  OutputCacheLocation.None)]
+        public virtual ActionResult CountersGraph(string sd, string ed, int cc, int cn, int cs, int ci, int ced)
+        {
+            DateTime beginDate = ParseDate(sd, DateTime.Now.AddHours(-1)); 
+            DateTime endDate = ParseDate(ed, DateTime.Now.AddHours(1));
+            Guid id = Guid.NewGuid();
+
+            return PartialView(new CounterDrawingParameters(id, beginDate,endDate,cc,cn,cs,ci,ced));
+        }
+
+        private DateTime ParseDate(string dateString, DateTime defaultDate)
+        {
+            DateTime date;
+            if (!DateTime.TryParseExact(dateString, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                date = defaultDate;
+            return date;
+        }
+        
+        [OutputCache(Location = OutputCacheLocation.None)]
         public virtual JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced)
         {
-            DateTime beginDate = DateTime.ParseExact(sd, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            DateTime endDate;
-            if (
-                !DateTime.TryParseExact(ed, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None,
-                                        out endDate))
-                endDate = DateTime.Now.AddDays(1);
+            DateTime beginDate = ParseDate(sd, DateTime.Now.AddHours(-1));
+            DateTime endDate = ParseDate(ed, DateTime.Now.AddHours(1));
 
-            IEnumerable<CounterExtDataInfo> extDatas;
-            extDatas = ced == -1
-                           ? CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn)
-                           : new List<CounterExtDataInfo>() {new CounterExtDataInfo(ced.ToString(), ced)};
+            List<CounterExtDataInfo> extDatas;
+            List<CounterInstanceInfo> insts;
+            List<CounterSourceInfo> sources;
+            extDatas =
+                CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn).Where(
+                    d => (ced == -1 && d.Name != "ALL_EXTDATA") || (ced != -1 && d.Id == ced)).ToList();
+            insts =
+                CountersDatabase.Instance.New_GetCounterInstances(cc, cn).Where(
+                    d => (ci == -1 && d.Name != "ALL_INSTANCES") || (ci != -1 && d.Id == ci)).ToList();
+            sources =
+                CountersDatabase.Instance.New_GetCounterSources(cc, cn).Where(
+                    d => (cs == -1 && d.Name != "ALL_SOURCES") || (cs != -1 && d.Id == cs)).ToList();
 
             List<object> seriesData2 = new List<object>();
             DateTime dt = DateTime.Now;
-            foreach (CounterExtDataInfo counterExtDataInfo in extDatas)
+            foreach (CounterSourceInfo source in sources)
             {
-                if (ced == -1 && counterExtDataInfo.Name =="ALL_EXTDATA" )
-                    continue;
+                foreach (CounterInstanceInfo instance in insts)
+                {
+                    foreach (CounterExtDataInfo extData in extDatas)
+                    {
+                        Dictionary<string, List<CounterData>> series = CountersDatabase.Instance.GetCounterData2(beginDate,
+                                                                                                                  endDate, cc,
+                                                                                                                  cn, source.Id, instance.Id,
+                                                                                                                  extData.Id);
 
-                Dictionary<string, List<List<object>>> series = CountersDatabase.Instance.GetCounterData2(beginDate,
-                                                                                                          endDate, cc,
-                                                                                                          cn, cs, ci,
-                                                                                                          counterExtDataInfo.Id);
-                dt = series.Count == 0
-                         ? dt
-                         : new DateTime((long) series.First().Value.Last()[0]*TimeSpan.TicksPerMillisecond);
+                        dt = series.Count == 0
+                                 ? dt
+                                 : series.First().Value.Last().DateTime.ToLocalTime();
 
-                seriesData2.AddRange(series.Select(d => new
-                                                            {
-                                                                label = counterExtDataInfo.Name + "_" + d.Key,
-                                                                data = d.Value
-                                                            }));
+                        seriesData2.AddRange(series.Select(d => new
+                        {
+                            label = source.Name + "_"+ instance.Name +"_" + extData.Name + "_" + d.Key,
+                            data = d.Value.Select(v => new List<object> {v.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, v.Value })
+                        }));
+                    }
+                }
             }
-
-
-            return Json(new {lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2},
-                        JsonRequestBehavior.AllowGet);
+            
+            return Json(new {lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2}, JsonRequestBehavior.AllowGet);
         }
-
-
-
-
     }
-
-
-    
 }

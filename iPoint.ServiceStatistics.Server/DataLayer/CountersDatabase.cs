@@ -340,13 +340,18 @@ case UniversalValue.UniversalClassType.String:
 
                     d => new List<object>()
                              {
-                              (d["date"].AsNullableDateTime.Value.Ticks/TimeSpan.TicksPerMillisecond), d["value"].AsBsonDocument["value"].ToDouble()
+                              (d["date"].AsNullableDateTime.Value.Ticks/TimeSpan.TicksPerMillisecond), 
+                              d["value"].AsBsonDocument["value"].ToDouble()
                              });
         }
 
-        public Dictionary<string, List<List<object>>> GetCounterData2(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId,
+
+
+
+        public Dictionary<string, List<CounterData>> GetCounterData2(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId,
            int counterSourceId, int counterInstanceId, int counterExtDataId)
         {
+            Dictionary<string, List<CounterData>> resultData = new Dictionary<string, List<CounterData>>();
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
             QueryComplete qb2 = Query.EQ("counterCategory", Settings.CountersMapper.GetMappedCategoryName(counterCategoryId));
@@ -356,44 +361,26 @@ case UniversalValue.UniversalClassType.String:
             var cursor = items.Find(Query.And(qb, qb2, qb3));
             cursor.SetSortOrder(sort);
             string key = counterSourceId + "/" + counterInstanceId + "/" + counterExtDataId;
-            cursor.SetFields(Fields.Include("type","date", "data." + key));
-            Dictionary<string, List<List<object>>> result = new Dictionary<string, List<List<object>>>();
+            cursor.SetFields(Fields.Include("type", "date", "data." + key));
+
             foreach (BsonDocument cnt in cursor)
             {
                 var data = cnt["data"].AsBsonDocument;
-                
                 if (!data.Contains(key))
                 {
-                    foreach (string dicKey in result.Keys)
-                    {
-                        result[dicKey].Add(new List<object>
-                                               {
-                                                   cnt["date"].AsDateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond,
-                                                   "null"
-                                               });
-
-                    }
+                    foreach (string valueLabel in resultData.Keys)
+                        resultData[valueLabel].Add(new CounterData(cnt["date"].AsDateTime, null));
                     continue;
                 }
                 var values = data[key].AsBsonDocument;
-                
                 foreach (BsonElement bsonElement in values)
                 {
-                    if (!result.ContainsKey(bsonElement.Name))
-                        result.Add(bsonElement.Name, new List<List<object>>());
-
-                    result[bsonElement.Name].Add(
-                        new List<object>
-                            {
-                                cnt["date"].AsDateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond,
-                                bsonElement.Value.IsString? TimeSpan.Parse(bsonElement.Value.AsString).TotalMilliseconds: bsonElement.Value.ToDouble()
-                            });
+                    if (!resultData.ContainsKey(bsonElement.Name))
+                        resultData.Add(bsonElement.Name, new List<CounterData>());
+                    resultData[bsonElement.Name].Add(new CounterData(cnt["date"].AsDateTime, bsonElement.Value.IsString ? TimeSpan.Parse(bsonElement.Value.AsString).TotalMilliseconds : bsonElement.Value.ToDouble()));
                 }
-
             }
-
-
-            return result;
+            return resultData;
         }
 
         

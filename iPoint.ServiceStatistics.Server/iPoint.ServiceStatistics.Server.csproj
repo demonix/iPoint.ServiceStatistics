@@ -74,6 +74,7 @@
     <Compile Include="Aggregation\UniversalValue.cs" />
     <Compile Include="Aggregation\UniversalValueExtensions.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="CounterData.cs" />
     <Compile Include="CountersAutoDiscoverer.cs" />
     <Compile Include="DataLayer\CountersDatabase.cs" />
     <Compile Include="ExtendedDataTransformations.cs" />

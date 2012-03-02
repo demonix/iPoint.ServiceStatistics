@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
@@ -32,7 +33,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
             if (rule.ToLower() == "$host")
                 return (logFileName, match) => Environment.MachineName;
             if (rule.ToLower() == "$datetime")
-                return (logFileName, match) => DateTime.Now.ToString();
+                return (logFileName, match) => DateTime.Now.ToString(CultureInfo.InvariantCulture);
             if (rule.ToLower().StartsWith("$path:"))
                 return (logFileName, match) => logFileName.Split('/','\\')[Convert.ToInt32(rule.Split(':')[1])];
             if (rule.ToLower() == "$rate")
