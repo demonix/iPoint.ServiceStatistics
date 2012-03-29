@@ -116,7 +116,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             return date;
         }
         
-        [OutputCache(Location = OutputCacheLocation.None)]
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public virtual JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced)
         {
             DateTime beginDate = ParseDate(sd, DateTime.Now.AddHours(-1));
@@ -160,8 +160,8 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                     }
                 }
             }
-            
-            return Json(new {lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2}, JsonRequestBehavior.AllowGet);
+
+            return Json(new { osd = sd, oed = ed, originalBegin = beginDate.ToString("dd.MM.yyyy HH:mm:ss"), originalEnd = endDate.ToString("dd.MM.yyyy HH:mm:ss"), lastDate = dt.ToString("dd.MM.yyyy HH:mm:ss"), seriesData = seriesData2 }, JsonRequestBehavior.AllowGet);
         }
     }
 }

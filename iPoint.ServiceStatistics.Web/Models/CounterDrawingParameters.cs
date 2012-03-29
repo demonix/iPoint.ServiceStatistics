@@ -25,8 +25,15 @@ namespace iPoint.ServiceStatistics.Web.Models
 
         public string DrawerVariableName { get; private set; }
         public Guid Id { get; private set; }
+        private DateTime _startDate;
+
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy HH:mm:ss}")]
-        public DateTime StartDate { get; private set; }
+        public DateTime StartDate
+        {
+            get { return _startDate; }
+            private set { _startDate = value; }
+        }
+
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy HH:mm:ss}")]
         public DateTime EndDate { get; private set; }
         [DisplayName("Counter Category")]

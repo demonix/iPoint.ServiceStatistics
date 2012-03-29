@@ -7,4 +7,4 @@ ExtendedData =
 Value={value}
 DateTime = {date}
 dateFormat = yyyy-MM-dd HH:mm:ss,fff
-Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+INFO.*?\s+STAT\s+END\s+GET\s+(?<instance>.*?/mr/reports/live)\s+(?<value>[\d.:,]+)\s+LIVE
+Regex=^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+INFO.*?\s+STAT\s+END\s+GET\s+(?<instance>.*?/mr/reports/stale)\s+(?<value>[\d.:,]+)\s+STALE

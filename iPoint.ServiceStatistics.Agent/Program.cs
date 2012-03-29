@@ -30,6 +30,7 @@ namespace iPoint.ServiceStatistics.Agent
 
         static void Main(string[] args)
         {
+            
             _logger.Info("Starting App...");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(args[0]), Int32.Parse(args[1])));
@@ -136,7 +137,14 @@ namespace iPoint.ServiceStatistics.Agent
             ms.Seek(0, SeekOrigin.Begin);
             byte[] data = new byte[ms.Length];
             ms.Read(data, 0, data.Length);
-            _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
+            try
+            {
+                _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Error while sending", ex);
+            }
         }
 
         private static void OutToConsole(object sender, LogEventArgs e)
@@ -169,7 +177,14 @@ namespace iPoint.ServiceStatistics.Agent
                 ms.Seek(0, SeekOrigin.Begin);
                 byte[] data = new byte[ms.Length];
                 ms.Read(data, 0, data.Length);
-                _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
+                try
+                {
+                    _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
+                }
+                catch(Exception ex)
+                {
+                    _logger.ErrorException("Error while sending", ex);
+                }
             }
         }
 

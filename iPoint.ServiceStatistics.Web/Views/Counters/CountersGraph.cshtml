@@ -8,15 +8,24 @@
 <div style="clear:both"></div>
 </div>
 
+@{ 
+    var sd = Html.DisplayFor(m => m.StartDate);
+    var ed = Html.DisplayFor(m => m.EndDate);
+    var cc = Html.DisplayFor(m => m.CounterCategory);
+    var cn = Html.DisplayFor(m => m.CounterName);
+    var cs = Html.DisplayFor(m => m.CounterSource);
+    var ci = Html.DisplayFor(m => m.CounterInstance);
+    var ced = Html.DisplayFor(m => m.CounterExtData);
+}
 <script type="text/javascript">
     draw("@Html.DisplayTextFor(m => m.Id)",
         {
-            sd: "@Html.DisplayTextFor(m => m.StartDate)",
-            ed: "@Html.DisplayTextFor(m => m.EndDate)",
-            cc: @(Html.DisplayTextFor(m => m.CounterCategory)),
-            cn: @(Html.DisplayTextFor(m => m.CounterName)),
-            cs: @(Html.DisplayTextFor(m => m.CounterSource)),
-            ci: @(Html.DisplayTextFor(m => m.CounterInstance)),
-            ced: @(Html.DisplayTextFor(m => m.CounterExtData))
+            sd: "@(sd)",
+            ed: "@(ed)",
+            cc: @(cc),
+            cn: @(cn),
+            cs: @(cs),
+            ci: @(ci),
+            ced: @(ced)
         });
 </script>

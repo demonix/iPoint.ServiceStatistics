@@ -7,6 +7,7 @@
         Max,
         Avg,
         ValueDistributionGroups,
-        Percentile
+        Percentile,
+        Count
     }
 }
