@@ -34,9 +34,9 @@ namespace iPoint.ServiceStatistics.Agent
             string result = null;
             foreach (string line in config)
             {
-                string key = line.Split('=')[0].Trim();
+                string key = line.Split(new []{'='},2)[0].Trim();
                 if (key.ToLower() != paramName.ToLower()) continue;
-                string value = line.Split('=')[1].Trim();
+                string value = line.Split(new[] { '=' }, 2)[1].Trim();
 
                 if (!String.IsNullOrEmpty(result))
                     throw new Exception(paramName + " specified miltiple times in config");
@@ -55,7 +55,10 @@ namespace iPoint.ServiceStatistics.Agent
                 string key = line.Split('=')[0].Trim();
                 if (key.ToLower() != paramName.ToLower()) continue;
                 string value = line.Split('=')[1].Trim();
-                result.Add(value);
+                if (!result.Contains(value))
+                    result.Add(value);
+                else
+                    _logger.Warn("Parameter {0} has duplicates values: {1}", paramName, value);
             }
             if (result.Count == 0)
                 throw new Exception(paramName + " not specified in config");

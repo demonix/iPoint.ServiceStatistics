@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
 {
@@ -16,7 +17,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
         
         public override string ToString()
         {
-            return string.Format("Type: {0}, DateTime: {1}, Source: {2}, Category: {3}, Counter: {4}, Instance: {5}, ExtendedData: {6}, Value: {7}", Type, DateTime, Source, Category, Counter, Instance, ExtendedData, Value);
+            return string.Format("Type: {0}, DateTime: {1}, Source: {2}, Category: {3}, Counter: {4}, Instance: {5}, ExtendedData: {6}, Value: {7}", Type, DateTime.ToLocalTime().ToString(CultureInfo.InvariantCulture), Source, Category, Counter, Instance, ExtendedData, Value);
         }
     }
 

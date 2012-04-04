@@ -71,6 +71,47 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             }
         }
 
+       
+        public static IEnumerable<Tuple<string, UniversalValue>> Distribution(this IEnumerable<UniversalValue> input, List<Tuple<UniversalValue,UniversalValue>> groups)
+        {
+            if (input == null)
+                throw new ArgumentNullException("input");
+            UniversalValue first = input.FirstOrDefault();
+            double totalCount = input.Count();
+            if (first == null)
+                throw new Exception("Sequence contains no elements");
+            if (first.Type != groups.First().Item1.Type)
+                throw new Exception("Input type not equals to group type");
+
+            switch (first.Type)
+            {
+                case UniversalValue.UniversalClassType.Numeric:
+                    return groups.AsParallel().AsOrdered().Select(
+                        g =>
+                        new Tuple<string, UniversalValue>(("From " + g.Item1 + " to " + g.Item2).Replace(".",","),
+                                                          new UniversalValue(
+                                                              (input.Count(i => i.DoubleValue >= g.Item1.DoubleValue && i.DoubleValue < g.Item2.DoubleValue)
+                                                              / totalCount)*100)));
+                case UniversalValue.UniversalClassType.String:
+                    return groups.AsParallel().AsOrdered().Select(
+                        g =>
+                        new Tuple<string, UniversalValue>(g.Item1.StringValue,
+                                                          new UniversalValue(
+                                                              (input.Count(i => i.StringValue == g.Item1.StringValue)
+                                                              / totalCount) * 100)));
+                case UniversalValue.UniversalClassType.TimeSpan:
+                    return groups.AsParallel().AsOrdered().Select(
+                        g =>
+                            new Tuple<string, UniversalValue>(("From " + g.Item1 + " to " + g.Item2).Replace(".",","),
+                                                          new UniversalValue(
+                                                              (input.Count(i => i.TimespanValue >= g.Item1.TimespanValue && i.TimespanValue < g.Item2.TimespanValue)
+                                                              / totalCount) * 100)));
+                default:
+                    throw new Exception("Percentile operarion not supported for " + first.Type);
+
+            }
+        }
+
 
         public static IEnumerable<Tuple<string,UniversalValue>> Percentile(this IEnumerable<UniversalValue> input, List<double> percents)
         {
@@ -163,5 +204,6 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             }
         }
 
+       
     }
 }

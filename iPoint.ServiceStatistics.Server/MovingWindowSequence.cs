@@ -11,21 +11,13 @@ namespace iPoint.ServiceStatistics.Server
 
         public MovingWindowSequence(int moveEvery, int windowLength)
         {
-
             MoveEvery = moveEvery;
             WindowLength = windowLength;
-            BufferOpenings = Observable.Generate((long)1, x => true, x => Interlocked.Increment(ref x), x =>
-                                                                                     {
-                                                                                         Console.WriteLine(x );
-                                                                                         return x;
-                                                                                     }
-                                                                                     ,
-                                                                                     x => TimeSpan.FromMilliseconds(x * MoveEvery <= WindowLength ? 0 : MoveEvery));
+            BufferOpenings = Observable.Generate((long) 1, x => true, x => Interlocked.Increment(ref x), x => x,
+                                                 x => TimeSpan.FromMilliseconds(x*MoveEvery <= WindowLength ? 0 : MoveEvery));
             ClosingWindowSequenceSelector = delegate(long i)
             {
-                
                 long actualLength = i * MoveEvery <= WindowLength ? i * MoveEvery : WindowLength;
-                Console.WriteLine("begin new window with length of "+ actualLength+ " ms.");
                 return Observable.Timer(TimeSpan.FromMilliseconds(actualLength));
             };
         }
@@ -47,14 +39,14 @@ namespace iPoint.ServiceStatistics.Server
         }
 
 
-        public void IncreaseInterval()
+        public void IncreaseInterval(int miliseconds)
         {
-            Interlocked.Add(ref _moveEvery, 1000);
+            Interlocked.Add(ref _moveEvery, miliseconds);
         }
 
-        public void DecreaseInterval()
+        public void DecreaseInterval(int miliseconds)
         {
-            Interlocked.Add(ref _moveEvery, -1000);
+            Interlocked.Add(ref _moveEvery, -miliseconds);
         }
     }
 }

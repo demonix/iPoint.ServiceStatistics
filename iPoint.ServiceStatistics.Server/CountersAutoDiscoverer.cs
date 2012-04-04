@@ -65,7 +65,7 @@ namespace iPoint.ServiceStatistics.Server
                     CounterAggregator aggregator = new CounterAggregator(counterAggregator.CounterCategory,
                                                                          eventArgs.LogEvent.Counter,
                                                                          counterAggregator.AggregationType,
-                                                                         counterAggregator.InputType);
+                                                                         counterAggregator.InputType,"");
                     _settings.AddAggregator(aggregator);
                     File.AppendAllText(@"settings\counters.list",
                                        "\r\n" + aggregator.CounterCategory + "\t" + aggregator.CounterName + "\t" +

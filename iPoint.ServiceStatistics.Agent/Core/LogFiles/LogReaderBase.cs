@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
+using NLog;
 using iPoint.ServiceStatistics.Agent.Core.LogEvents;
 
 namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
@@ -80,7 +81,19 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
 
         private void RefreshFileInfo(object state)
         {
-           _fileInfo.Refresh();
+            try
+            {
+                //NOTE: винда обновляет информациию о файле при закрытии хендла. Поэтому открываем и тут же закрываем хендл :)
+                _fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite).Close();
+                _fileInfo.Refresh();
+            }
+            catch(Exception ex)
+            {
+                LogManager.GetCurrentClassLogger().Debug("Something went wrong during refreshing FileInfo data:\r\n" + ex );
+            }
+
+           
+
         }
 
         protected delegate void ReadInternalDelegate();
@@ -97,7 +110,6 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
 
         protected void FileSystemWatcherFired(object sender, FileSystemEventArgs fileSystemEventArgs)
         {
-            //Console.Out.WriteLine("FileSystemWatcher Fired");
             _readInternal.Invoke();
         }
 
@@ -135,8 +147,6 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
                 _reading = false;
                 _mayStopFlag.Set();
             }
-
-           
 
         }
 

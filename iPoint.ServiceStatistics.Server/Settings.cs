@@ -38,7 +38,8 @@ namespace iPoint.ServiceStatistics.Server
                 {
                     AggregationType at;
                     Enum.TryParse(paramerers[2], out at);
-                    AddAggregator(new CounterAggregator(paramerers[0], paramerers[1], at, System.Type.GetType(paramerers[3])));
+
+                    AddAggregator(new CounterAggregator(paramerers[0], paramerers[1], at, System.Type.GetType(paramerers[3]), paramerers.Length>4?paramerers[4]:""));
                 }
                 catch (Exception ex)
                 { Console.WriteLine(ex); }

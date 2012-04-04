@@ -14,10 +14,27 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
 
 
         public UniversalClassType Type { get; private set; }
-
         public Double DoubleValue { get; private set; }
         public TimeSpan TimespanValue { get; private set; }
         public string StringValue { get; private set; }
+
+        public static UniversalClassType UniversalClassTypeByType(Type type)
+        {
+            switch (type.Name)
+            {
+                case "Int32":
+                case "Int64":
+                case "Double":
+                    return UniversalClassType.Numeric;
+                case "TimeSpan":
+                    return UniversalClassType.TimeSpan;
+                case "String":
+                    return UniversalClassType.String;
+                default:
+                    throw new Exception("Unknown type " + type.FullName);
+            }
+        }
+
 
         public static UniversalValue ParseFromString(Type type, string value)
         {
@@ -67,7 +84,7 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             switch (Type)
             {
                 case UniversalClassType.Numeric:
-                    return DoubleValue.ToString();
+                    return DoubleValue.ToString(CultureInfo.InvariantCulture);
                 case UniversalClassType.TimeSpan:
                     return TimespanValue.ToString();
                 case UniversalClassType.String:

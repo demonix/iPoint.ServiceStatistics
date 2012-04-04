@@ -25,14 +25,15 @@ namespace iPoint.ServiceStatistics.Agent
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            _logger.Fatal("Unhandled Exception was thrown\r\n"+ e.ExceptionObject);
+            LogManager.GetCurrentClassLogger().Fatal("Unhandled Exception was thrown\r\n" + e.ExceptionObject);
         }
 
         static void Main(string[] args)
         {
             
             _logger.Info("Starting App...");
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+           AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            
             _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(args[0]), Int32.Parse(args[1])));
             _settings = new Settings();
             _logDescriptions = _settings.LogDescriptions;
@@ -99,7 +100,7 @@ namespace iPoint.ServiceStatistics.Agent
          {
              _logger.Info("Begin reading of " + filePath);
              ILogReader lr = new TextLogReader(filePath, position, Encoding.Default, null, logEventMatcher);
-             lr.OnLogEvent += OutToConsole;
+             //lr.OnLogEvent += OutToConsole;
              lr.OnLogEvent += OutToServer;
              lr.OnLogEvent += CountEvents;
 
@@ -113,6 +114,7 @@ namespace iPoint.ServiceStatistics.Agent
 
         private static void CountEvents(object sender, LogEventArgs e)
         {
+            _logger.Debug(e.LogEvent);
             if (_lastCountEventsCheckPoint.AddMinutes(5) > DateTime.Now)
                 Interlocked.Increment(ref _totalEvents);
             else
