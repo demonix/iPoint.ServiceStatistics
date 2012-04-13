@@ -14,7 +14,6 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
         protected string _logFileName;
         protected long _currentPosition;
         protected StreamReader _logFileStreamReader;
-        private byte[] _clrfCheck = new byte[2];
         protected Encoding _logFileEncoding;
         private bool _reading = false;
         private object _locker = new object();
@@ -155,6 +154,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
 
         public void Close()
         {
+            
             _watcher.EnableRaisingEvents = false;
             _stopRequested = true;
             _mayStopFlag.WaitOne();
@@ -162,6 +162,8 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
                 _logFileStreamReader.Dispose();
             if (_watcher != null)
                 _watcher.Dispose();
+            if (_fileInfoRefreshTimer != null)
+                _fileInfoRefreshTimer.Dispose();
             _mayStopFlag.Close();
         }
     }

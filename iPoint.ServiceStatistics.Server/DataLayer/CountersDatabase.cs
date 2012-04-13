@@ -322,36 +322,14 @@ case UniversalValue.UniversalClassType.String:
         }*/
 
 
-        public IEnumerable<List<object>> GetCounterData(DateTime beginDate, DateTime endDate, string counterCategory, string counterName,
-            string counterSource, string counterInstance, string counterExtData)
+     
+
+        public Dictionary<string, List<CounterData>> GetCounterData(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId, int counterSourceId, int counterInstanceId, int counterExtDataId, List<string> series)
         {
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
-            QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
-            QueryComplete qb2 = Query.EQ("counterCategory", counterCategory);
-            QueryComplete qb3 = Query.EQ("counterName", counterName);
-            QueryComplete qb4 = Query.EQ("source", counterSource);
-            QueryComplete qb5 = Query.EQ("instance", counterInstance);
-            QueryComplete qb6 = Query.EQ("extendedData", counterExtData);
-            var cursor = items.Find(Query.And(qb, qb2, qb3,qb4,qb5,qb6));
-            cursor.SetFields(Fields.Include("date","value"));
-            return
-                cursor.Select(
-
-
-                    d => new List<object>()
-                             {
-                              (d["date"].AsNullableDateTime.Value.Ticks/TimeSpan.TicksPerMillisecond), 
-                              d["value"].AsBsonDocument["value"].ToDouble()
-                             });
-        }
-
-
-
-
-        public Dictionary<string, List<CounterData>> GetCounterData2(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId,
-           int counterSourceId, int counterInstanceId, int counterExtDataId)
-        {
+            
             Dictionary<string, List<CounterData>> resultData = new Dictionary<string, List<CounterData>>();
+            if (series.Count == 0)
+                return resultData;
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
             QueryComplete qb2 = Query.EQ("counterCategory", Settings.CountersMapper.GetMappedCategoryName(counterCategoryId));
@@ -369,15 +347,20 @@ case UniversalValue.UniversalClassType.String:
                 if (!data.Contains(key))
                 {
                     foreach (string valueLabel in resultData.Keys)
-                        resultData[valueLabel].Add(new CounterData(cnt["date"].AsDateTime, null));
+                        if (series[0] == "*" || series.Contains(valueLabel)) 
+                            resultData[valueLabel].Add(new CounterData(cnt["date"].AsDateTime, null));
                     continue;
                 }
                 var values = data[key].AsBsonDocument;
                 foreach (BsonElement bsonElement in values)
                 {
+                    if (series[0] != "*" && !series.Contains(bsonElement.Name)) continue;
                     if (!resultData.ContainsKey(bsonElement.Name))
                         resultData.Add(bsonElement.Name, new List<CounterData>());
-                    resultData[bsonElement.Name].Add(new CounterData(cnt["date"].AsDateTime, bsonElement.Value.IsString ? TimeSpan.Parse(bsonElement.Value.AsString).TotalMilliseconds : bsonElement.Value.ToDouble()));
+                    resultData[bsonElement.Name].Add(new CounterData(cnt["date"].AsDateTime,
+                                              bsonElement.Value.IsString ? 
+                                              TimeSpan.Parse(bsonElement.Value.AsString).TotalMilliseconds 
+                                              : bsonElement.Value.ToDouble()));
                 }
             }
             return resultData;

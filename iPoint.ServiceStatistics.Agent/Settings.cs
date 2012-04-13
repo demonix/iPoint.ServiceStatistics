@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using NLog;
@@ -72,15 +73,17 @@ namespace iPoint.ServiceStatistics.Agent
             string[] data = File.ReadAllLines(fileName);
             string fileMask = GetConfigParam(data, "FileMask");
             string encoding = GetConfigParam(data, "Encoding");
-            List<string> logDirectories = GetConfigParams(data, "LogDirectory");
+            List<string> logDirectories = GetConfigParams(data, "LogDirectory").SelectMany(
+                p => Path.GetPathRoot(p) == Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture)
+                         ? DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed).Select(d => d.Name.TrimEnd('\\') + p)
+                         : new List<string>() {p}).ToList();
+
             List<LogEventDescription> logEventDescriptions =
                 GetLogEventDescrptions(Path.ChangeExtension(fileName, "EventDescripions"));
-            _logger.Info("Total " + logDirectories.Count + " log directories");
+            _logger.Info("Total " + logDirectories.Count + " log directories: " + String.Join("\r\n", logDirectories.ToArray()));
 
             foreach (string logDirectory in logDirectories)
             {
-
-
                 if (Directory.Exists(logDirectory))
                 {
                     _logger.Info("Using " + logDirectory + " for LogDescription");

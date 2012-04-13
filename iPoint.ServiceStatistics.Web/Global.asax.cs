@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using iPoint.ServiceStatistics.Server;
 using iPoint.ServiceStatistics.Server.DataLayer;
+using iPoint.ServiceStatistics.Web.Models;
 
 namespace iPoint.ServiceStatistics.Web
 {
@@ -34,7 +35,9 @@ namespace iPoint.ServiceStatistics.Web
 
         protected void Application_Start()
         {
-            
+            ViewEngines.Engines.Clear();
+            ViewEngines.Engines.Add(new RazorViewEngine());
+            //ModelBinders.Binders[typeof(CounterQueryParameters)] = new CounterQueryParametersBinder();
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);

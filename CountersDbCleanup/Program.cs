@@ -17,7 +17,7 @@ namespace CountersDbCleanup
         static void Main(string[] args)
         {
             ReadLastDates();
-            CountersDatabase.InitConnection("91.142.140.253", null, "counters");
+            CountersDatabase.InitConnection("127.0.0.1", null, "counters");
             MongoCollection<BsonDocument> items = CountersDatabase.Instance.Database.GetCollection("countersData");
             List<CounterCategoryInfo> categories = CountersDatabase.Instance.New_GetCounterCategories().ToList();
             foreach (CounterCategoryInfo counterCategoryInfo in categories)

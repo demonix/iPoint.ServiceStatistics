@@ -1,4 +1,3 @@
-FileMask=log(\d\d\d\d.\d\d.\d\d)+
+FileMask=^log(\d\d\d\d.\d\d.\d\d)+$
 Encoding=Windows-1251
-LogDirectory=c:\prj\iPoint.ServiceStatistics\iPoint.ServiceStatistics.Agent\bin\Debug\logs_d\
-LogDirectory=c:\prj\iPoint.ServiceStatistics\iPoint.ServiceStatistics.Agent\bin\Debug\logs_d2\
+LogDirectory=C:\kontur-extern\server\FT\logs\

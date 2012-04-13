@@ -1,0 +1,10 @@
+Type=Counter
+Source=$host
+Category = KeWeb
+Counter = Error_Count
+instance = $path:2
+ExtendedData =
+Value=1
+DateTime = {date}
+dateFormat = yyyy-MM-dd HH:mm:ss,fff
+Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?)\s+?\d+?\s+ERROR\s+(?!2ndfl script error)(?!connecting to)

@@ -315,9 +315,13 @@ namespace Links {
         private const string URLPATH = "~/Scripts";
         public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
         public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+        public static readonly string countersDataUpdater_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/countersDataUpdater.min.js") ? Url("countersDataUpdater.min.js") : Url("countersDataUpdater.js");
+                      
         public static readonly string drawer_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/drawer.min.js") ? Url("drawer.min.js") : Url("drawer.js");
                       
         public static readonly string drawing_stuff_js_ = Url("drawing_stuff.js_");
+        public static readonly string drawingSurface_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/drawingSurface.min.js") ? Url("drawingSurface.min.js") : Url("drawingSurface.js");
+                      
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public static class flot {
             private const string URLPATH = "~/Scripts/flot";

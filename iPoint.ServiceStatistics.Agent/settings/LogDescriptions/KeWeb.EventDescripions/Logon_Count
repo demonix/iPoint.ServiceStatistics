@@ -1,0 +1,10 @@
+Type=Counter
+Source=$host
+Category = KeWeb
+Counter = Logon_Count
+instance = $path:2
+Value=1
+DateTime = {date}
+ExtendedData =
+dateFormat = yyyy-MM-dd HH:mm:ss,fff
+Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+?User successfully logged in with token

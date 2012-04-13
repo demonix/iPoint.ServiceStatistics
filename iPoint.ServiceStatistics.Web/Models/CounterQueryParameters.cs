@@ -21,6 +21,19 @@ namespace iPoint.ServiceStatistics.Web.Models
             CounterExtDatas = new SelectList(Enumerable.Empty<string>());
         }
 
+        public CounterQueryParameters(string sd, string ed, int cc, int cn, int cs, int ci, int ced)
+        {
+            StartDate = Helpers.ParseDate(sd, DateTime.Now.AddHours(-1));
+            EndDate = Helpers.ParseDate(ed, DateTime.Now.AddHours(1));
+
+            CounterCategories = new SelectList(Enumerable.Empty<string>());
+            CounterNames = new SelectList(Enumerable.Empty<string>());
+            CounterSources = new SelectList(Enumerable.Empty<string>());
+            CounterInstances = new SelectList(Enumerable.Empty<string>());
+            CounterExtDatas = new SelectList(Enumerable.Empty<string>());
+        }
+
+
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy HH:mm:ss}")]
         public DateTime StartDate { get; private set; }
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy HH:mm:ss}")]

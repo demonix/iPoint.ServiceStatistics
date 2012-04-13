@@ -1,74 +1,14 @@
 ﻿var Drawer = function (drawingSurface, overviewSurface, legendContainer, counterParameres) {
     "use strict";
     var self = this;
-    this.options = {
-        lines: {
-            show: true
-        },
-        points: {
-            show: false
-        },
-        xaxis: {
-            mode: "time",
-            autoscaleMargin : 0.02
-        },
-        yaxis: { max: null },
-        zoom: {
-            interactive: false
-        },
-        pan: {
-            interactive: false
-        },
-        selection: { mode: "xy" },
-        legend: { container: legendContainer }
 
-    };
-
-    this.overviewOpts = { legend: { show: false },
-        xaxis: { ticks: 4, mode: "time" },
-        yaxis: { ticks: 3 },
-        grid: { color: "#999" },
-        selection: { mode: "xy" },
-        series: {
-            lines: { show: true, lineWidth: 1 },
-            shadowSize: 0
-        }
-        
-    };
-
-    this.drawingSurface = drawingSurface;
-    this.overviewSurface = overviewSurface;
     this.dateStarted = new Date();
     this.currentData = [[]];
     this.parameters = counterParameres;
     var timeoutHandler;
     var disposed = false;
-    
-    var plot = $.plot(self.drawingSurface, self.currentData, self.options);
-    var overview = $.plot(self.overviewSurface, self.currentData, self.overviewOpts);
 
-     self.drawingSurface.bind("plotselected", function (event, ranges) {
-        // clamp the zooming to prevent eternal zoom
-        if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
-            ranges.xaxis.to = ranges.xaxis.from + 0.00001;
-        if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
-            ranges.yaxis.to = ranges.yaxis.from + 0.00001;
-
-        plot = $.plot(self.drawingSurface, getData(ranges.xaxis.from, ranges.xaxis.to),
-                      $.extend(true, {}, options, {
-                          xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-                      }));
-
-        // don't fire event on the overview to prevent eternal loop
-        overview.setSelection(ranges, true);
-    });
-
-    self.overviewSurface.bind("plotselected", function (event, ranges) {
-        plot.setSelection(ranges);
-    });
-    
-    this.getMax = function (run) {
+    self.getMax = function (run) {
         if (!run) {
             run = 1;
         }
@@ -103,20 +43,14 @@
         return max;
     };
 
-    this.Draw = function (timeout) {
-        if (!disposed) {
-            var maxY = self.getMax();
-            self.options.yaxis.max = maxY + (maxY / 2);
-            //self.options.xaxis.max = self.options.xaxis.max + 1000*10;
-            $.plot(self.drawingSurface, self.currentData, self.options);
-            $.plot(self.overviewSurface, self.currentData, self.overviewOpts);
-            if (timeout) {
-                timeoutHandler = setTimeout(function () { self.UpdateAndDraw(timeout); }, timeout);
-            }
-        }
+    self.Draw = function () {
+        var maxY = self.getMax();
+        self.options.yaxis.max = maxY + (maxY / 2);
+        $.plot(self.drawingSurface, self.currentData, self.options);
+        $.plot(self.overviewSurface, self.currentData, self.overviewOpts);
     };
 
-    this.Update = function (data) {
+    self.Update = function (data) {
         self.parameters.sd = data.lastDate;
         self.parameters.ed = "";
         $.each(data.seriesData, function (index, series) {
@@ -130,24 +64,27 @@
             });
 
         });
-
-        //currentData[0].push(data.seriesData[0]);
     };
-    var onDataReceived = function (data, timeout) {
-        self.Update(data);
-        self.Draw(timeout);
+    
+    var onDataReceived = function(data, timeout) {
+        if (!disposed) {
+            self.Update(data);
+            self.Draw();
+            if (timeout) {
+                timeoutHandler = setTimeout(function() { self.UpdateAndDraw(timeout); }, timeout);
+            }
+        }
     };
 
-    this.UpdateAndDraw = function (timeout) {
+    self.UpdateAndDraw = function (timeout) {
         console.log("Updating drawer started at " + self.dateStarted);
-
         var caller = this;
         $.getJSON("/Counters/CounterData", caller.parameters, function (data) {
             onDataReceived(data, timeout);
         });
     };
 
-    this.Dispose = function () {
+    self.Dispose = function () {
         disposed = true;
         self.timeout = undefined;
         clearTimeout(timeoutHandler);

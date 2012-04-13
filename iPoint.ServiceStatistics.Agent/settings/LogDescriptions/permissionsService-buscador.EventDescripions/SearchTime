@@ -1,0 +1,10 @@
+Type=Counter
+Source=$host
+Category = PermissionsService
+Counter = SearchTime
+instance =
+ExtendedData =
+Value={value}
+DateTime = {date}
+dateFormat = yyyy-MM-dd HH:mm:ss,fff
+Regex =^(?<date>\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?>(?>,|\.)\d+)?).+?INFO\s+SearchTime:\s+(?<value>[\d.:,]+),

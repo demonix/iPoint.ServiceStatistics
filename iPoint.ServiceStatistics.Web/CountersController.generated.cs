@@ -79,6 +79,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public readonly string CounterNames = "CounterNames";
             public readonly string CounterDetails = "CounterDetails";
             public readonly string Index = "Index";
+            public readonly string CountersGraph = "CountersGraph";
             public readonly string CounterData = "CounterData";
         }
 
@@ -89,6 +90,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public const string CounterNames = "CounterNames";
             public const string CounterDetails = "CounterDetails";
             public const string Index = "Index";
+            public const string CountersGraph = "CountersGraph";
             public const string CounterData = "CounterData";
         }
 
@@ -150,7 +152,12 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             return callInfo;
         }
 
-        public override System.Web.Mvc.JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced) {
+        public override System.Web.Mvc.JsonResult CountersGraph() {
+            var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.CountersGraph);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced, string series) {
             var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.CounterData);
             callInfo.RouteValueDictionary.Add("sd", sd);
             callInfo.RouteValueDictionary.Add("ed", ed);
@@ -159,6 +166,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             callInfo.RouteValueDictionary.Add("cs", cs);
             callInfo.RouteValueDictionary.Add("ci", ci);
             callInfo.RouteValueDictionary.Add("ced", ced);
+            callInfo.RouteValueDictionary.Add("series", series);
             return callInfo;
         }
 

@@ -16,6 +16,8 @@
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/countersDataUpdater.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/drawingSurface.js")" type="text/javascript"></script>
 @*
 <!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
 
@@ -112,31 +114,97 @@
                 @Html.LabelFor(cModel => cModel.CounterExtData)
                 @Html.DropDownListFor(cModel => cModel.CounterExtData, Model.CounterExtDatas, new { @class = "queryParameter" })
             </td>
+            <td>
+                @Html.Label("Series")
+                @Html.TextBox("Series","*", new { @class = "queryParameter"})
+            </td>
         </tr>
     </table>
-    <table>
+    <table width="100%">
         <tr>
             <td>
                 @Html.LabelFor(cModel => cModel.StartDate)
                 @Html.EditorFor(cModel => cModel.StartDate)
-                @*<input name="leftDateDDL" type="text" id="leftDateDDL" value="@DateTime.Now.AddDays(-1).ToString(CultureInfo.InvariantCulture)" />*@
             </td>
             <td>
                 @Html.LabelFor(cModel => cModel.EndDate)
                 @Html.EditorFor(cModel => cModel.EndDate)
-                @*<input name="rightDateDDL" type="text" id="rightDateDDL" value="@DateTime.Now.ToString(CultureInfo.InvariantCulture)" />*@
             </td>
             <td>
-                <input id="drawBtn" type="button" value="Draw" onclick="load()" />
-                <!--input id="drawBtn" type="button" value="Update" onclick="update()" /-->
+                <!--input id="drawBtn" type="button" value="Draw" onclick="load()" /-->
+                <input id="addCounterBtn" type="button" value="Add Counter" onclick="addCounter()" />
+                <br/>
+                @Html.Label("Создать на отдельном графике")
+                @Html.CheckBox("createOnNewSurfaceChk",true )
+                <br/>
+                @Html.Label("Автообновление")
+                @Html.CheckBox("enableAutoUpdateChk",true )
             </td>
+            <td>
+                <select id="drawingSurfaces" name="drawingSurfaces" />
+                <input id="addDrawingSurfaceBtn" type="button" value="Add Surface" onclick="addSurface()" />
+            </td>
+              
         </tr>
     </table>
 </div>
 <script  type="text/javascript">
-    var drawers = { };
+    var drawers = {};
+    var drawingSurfaces = {};
     $("#StartDate").datetimepicker({showSecond: true});
     $("#EndDate").datetimepicker({ showSecond: true });
+
+    function addSurface() {
+        var name = prompt('Enter name', '');
+        if (name && name != '' && name != null && !drawingSurfaces[name]) {
+            createSurface(name);
+        }
+    }
+
+
+    function createSurface(name, callback) {
+        $.get("/Counters/CountersGraph")
+            .success(function(data) {
+                onCountersGraphReceived(data, name);
+                if (callback)
+                    callback(data);
+            })
+            .error(function(data) { alert("error"); });
+    }
+
+
+    function addCounter() {
+        var sd = $("#StartDate").val();
+        var ed = $("#EndDate").val();
+        var cc = $("#CounterCategory").val();
+        var cn = $("#CounterName").val();
+        var cs = $("#CounterSource").val();
+        var ci = $("#CounterInstance").val();
+        var ced = $("#CounterExtData").val();
+        var series = $("#Series").val();
+        var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced, series: series };
+        var test = $(params).serializeArray();
+        var surfaceId = $("#drawingSurfaces").val();
+        var enableAutoUpdate = $("#enableAutoUpdateChk").is(':checked');
+        if (surfaceId == null || $("#createOnNewSurfaceChk").is(':checked')) {
+            createSurface(cc + "_" + cn + "_" + cs + "_" + ci, function (data) {
+                createCounterAndAddToSurface(params, data.id, enableAutoUpdate);
+            });
+        } else {
+            createCounterAndAddToSurface(params, surfaceId, enableAutoUpdate);
+        }
+    }
+
+    function createCounterAndAddToSurface(params, surfaceId, enableAutoUpdate) {
+        var dataUpdater = new CountersDataUpdater(params);
+        if (enableAutoUpdate)
+            dataUpdater.StartAutoUpdate();
+        else
+            dataUpdater.StartAutoUpdate(5000);
+        drawingSurfaces[surfaceId].RegisterDataUpdater(dataUpdater);
+    }
+    
+    
     function load() {
         var sd = $("#StartDate").val();
         var ed = $("#EndDate").val();
@@ -145,24 +213,41 @@
         var cs = $("#CounterSource").val();
         var ci = $("#CounterInstance").val();
         var ced = $("#CounterExtData").val();
-        $.get("/Counters/CountersGraph", { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced}, function (data) {
-            $("#drawings").append(data);
-        });
-        
+        var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced };
+        $.get("/Counters/CountersGraph", params)
+            .success(function (data) { onCountersGraphReceived(data, params); })
+            .error(function (data) { alert("error"); });
+
+    }
+
+    function onCountersGraphReceived(data, name) {
+        $("#drawings").append(data.graphingSurface);
+        $("#drawingSurfaces").append($("<option/>", { value: data.id, text: name }));
+        drawingSurfaces[data.id] = new DrawingSurface(name, data.id,
+            $("#placeholder-" + data.id),
+            $("#overview-" + data.id),
+            $("#legendContainer-" + data.id));
+     
     }
 
     function draw(id, data) {
         drawers[id] = new Drawer($("#placeholder-"+id), $("#overview-"+id), $("#legendContainer-"+id), data);
         drawers[id].UpdateAndDraw(5000);
+        drawers[id] = new CountersDataUpdater(data);
+        drawers[id].StartAutoUpdate(1000);
     }
+
     function remove(id) {
-        drawers[id].Dispose();
-        delete drawers[id];
+        $("#drawingSurfaces").find('option[value=' + id + ']').remove();
+        drawingSurfaces[id].Dispose();
+        //drawers[id].Dispose();
+        //delete drawers[id];
+        delete drawingSurfaces[id];
         $("#drawings > #drawer-" + id).remove();
     }
 
    
 </script>
 <div id ="drawings"/>
-@* @Html.Partial(@MVC.Counters.Views.CountersGraph)*@
+
 

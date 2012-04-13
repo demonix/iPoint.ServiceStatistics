@@ -1,31 +1,11 @@
-﻿@model iPoint.ServiceStatistics.Web.Models.CounterDrawingParameters
-<div id="drawer-@Html.DisplayTextFor(m => m.Id)">
-<div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"></div>
-<div id="legendContainer-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:10px"></div>
-<div id="overview-@Html.DisplayTextFor(m => m.Id)" style="width:300px;height:150px;float:left;margin-left:20px"></div>
-    <p id="choices" style="float:left;margin-left:20px">Show:</p>
-     <input id="drawBtn" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />
-<div style="clear:both"></div>
-</div>
+﻿@model iPoint.ServiceStatistics.Web.Models.CounterGraphModel
 
-@{ 
-    var sd = Html.DisplayFor(m => m.StartDate);
-    var ed = Html.DisplayFor(m => m.EndDate);
-    var cc = Html.DisplayFor(m => m.CounterCategory);
-    var cn = Html.DisplayFor(m => m.CounterName);
-    var cs = Html.DisplayFor(m => m.CounterSource);
-    var ci = Html.DisplayFor(m => m.CounterInstance);
-    var ced = Html.DisplayFor(m => m.CounterExtData);
-}
-<script type="text/javascript">
-    draw("@Html.DisplayTextFor(m => m.Id)",
-        {
-            sd: "@(sd)",
-            ed: "@(ed)",
-            cc: @(cc),
-            cn: @(cn),
-            cs: @(cs),
-            ci: @(ci),
-            ced: @(ced)
-        });
-</script>
+<div id="drawer-@Html.DisplayTextFor(m => m.Id)">
+    <p id="caption"></p>
+    <div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"></div>
+    <div id="legendContainer-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:10px"></div>
+    <div id="overview-@Html.DisplayTextFor(m => m.Id)" style="width:300px;height:150px;float:left;margin-left:20px"></div>
+    <p id="choices" style="float:left;margin-left:20px">Show:</p>
+    <input id="drawBtn" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />
+    <div style="clear:both"></div>
+</div>

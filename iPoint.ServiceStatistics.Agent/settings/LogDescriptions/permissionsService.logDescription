@@ -1,0 +1,3 @@
+FileMask=^log(\d\d\d\d.\d\d.\d\d)+$
+Encoding=Windows-1251
+LogDirectory=c:\kontur-extern\PermissionsService\logs\

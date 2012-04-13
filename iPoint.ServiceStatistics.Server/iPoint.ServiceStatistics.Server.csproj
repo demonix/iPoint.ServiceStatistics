@@ -77,6 +77,7 @@
     <Compile Include="CounterData.cs" />
     <Compile Include="CountersAutoDiscoverer.cs" />
     <Compile Include="DataLayer\CountersDatabase.cs" />
+    <Compile Include="DeadCountersDetector.cs" />
     <Compile Include="ExtendedDataTransformations.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MovingWindowSequence.cs" />

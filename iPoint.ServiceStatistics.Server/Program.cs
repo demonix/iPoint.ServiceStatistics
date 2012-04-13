@@ -33,6 +33,10 @@ namespace iPoint.ServiceStatistics.Server
             settings.ReadAggregators();
             CountersAutoDiscoverer countersAutoDiscoverer = new CountersAutoDiscoverer(receiver.ObservableEvents, settings);
             countersAutoDiscoverer.StartDiscovery();
+
+            DeadCountersDetector deadCountersDetector = new DeadCountersDetector(receiver.ObservableEvents, settings);
+
+
             observableEvents.Subscribe(l => Console.WriteLine("Total events: " + l.Count));
             ConsoleKeyInfo keyInfo;
             while ((keyInfo = Console.ReadKey()).Key !=ConsoleKey.Enter)
@@ -51,6 +55,10 @@ namespace iPoint.ServiceStatistics.Server
                 {
                     settings.ReadAggregators();
                     Console.WriteLine("Aggregators were updated");
+                }
+                if (keyInfo.Key == ConsoleKey.A)
+                {
+                    Console.WriteLine(deadCountersDetector.GetCounterFreshnessTimeStats());
                 }
             }
         }
