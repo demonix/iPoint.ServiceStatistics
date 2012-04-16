@@ -15,9 +15,10 @@
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/countersDataUpdater.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/drawingSurface.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+@*<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>*@
 @*
 <!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
 
@@ -183,7 +184,6 @@
         var ced = $("#CounterExtData").val();
         var series = $("#Series").val();
         var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced, series: series };
-        var test = $(params).serializeArray();
         var surfaceId = $("#drawingSurfaces").val();
         var enableAutoUpdate = $("#enableAutoUpdateChk").is(':checked');
         if (surfaceId == null || $("#createOnNewSurfaceChk").is(':checked')) {
@@ -198,9 +198,9 @@
     function createCounterAndAddToSurface(params, surfaceId, enableAutoUpdate) {
         var dataUpdater = new CountersDataUpdater(params);
         if (enableAutoUpdate)
-            dataUpdater.StartAutoUpdate();
-        else
             dataUpdater.StartAutoUpdate(5000);
+        else
+            dataUpdater.StartAutoUpdate();
         drawingSurfaces[surfaceId].RegisterDataUpdater(dataUpdater);
     }
     
@@ -230,12 +230,12 @@
      
     }
 
-    function draw(id, data) {
+   @* function draw(id, data) {
         drawers[id] = new Drawer($("#placeholder-"+id), $("#overview-"+id), $("#legendContainer-"+id), data);
         drawers[id].UpdateAndDraw(5000);
         drawers[id] = new CountersDataUpdater(data);
         drawers[id].StartAutoUpdate(1000);
-    }
+    }*@
 
     function remove(id) {
         $("#drawingSurfaces").find('option[value=' + id + ']').remove();
@@ -246,6 +246,9 @@
         $("#drawings > #drawer-" + id).remove();
     }
 
+    function showParameters(id) {
+        alert(drawingSurfaces[id].DataUpdaterSettingsToString());
+    }    
    
 </script>
 <div id ="drawings"/>

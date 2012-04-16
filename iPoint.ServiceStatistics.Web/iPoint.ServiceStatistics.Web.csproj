@@ -192,6 +192,7 @@
     <Content Include="Scripts\jquery-ui.datepicker-ru.js" />
     <Content Include="Scripts\jquery-ui.timepicker-ru.js" />
     <Content Include="Scripts\jquery-ui.timepicker.js" />
+    <Content Include="Scripts\jquery.base64.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -247,6 +248,7 @@
     </None>
     <None Include="T4MVC.tt.settings.t4" />
     <Content Include="Views\Counters\CountersGraph.cshtml" />
+    <Content Include="Views\Counters\SingleGraph.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

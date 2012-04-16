@@ -31,6 +31,14 @@ namespace iPoint.ServiceStatistics.Web
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
             );
 
+
+            /*routes.MapRoute(
+                "SingleGraphDefaultDimensions", // Route name
+                "{controller}/{action}/{param}", // URL with parameters
+                new { controller = "Counters", action = "SingleGraph"} // Parameter defaults
+            );*/
+
+
         }
 
         protected void Application_Start()

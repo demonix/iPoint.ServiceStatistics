@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "SingleGraph";
+    string[] dps = ViewBag.Temp;
+    string parameters = "[" + String.Join(",", dps) + "]"; 
+    Layout = "~/Views/Shared/_Html5Boilerplate.cshtml";
+}
+
+<h2>SingleGraph</h2>
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/countersDataUpdater.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/drawingSurface.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+
+<div id="drawersParameters">
+@for (int i = 0; i < dps.Length; i++)
+{
+    @Html.TextBox("dps." + i, dps[i], new { @class = "dps" })
+    <br/>
+}
+</div>
+
+<div id ="drawings"/>
+
+
+
+<script  type="text/javascript">
+    var parameters = @Html.Raw(parameters);
+    var drawers = {};
+    var drawingSurfaces = {};
+
+    function createSurface(name, callback) {
+        $.get("/Counters/CountersGraph")
+            .success(function (data) {
+                onCountersGraphReceived(data, name);
+                if (callback)
+                    callback(data);
+            })
+            .error(function (data) { alert("error"); });
+    }
+
+
+    function addCounter() {
+        var sd = $("#StartDate").val();
+        var ed = $("#EndDate").val();
+        var cc = $("#CounterCategory").val();
+        var cn = $("#CounterName").val();
+        var cs = $("#CounterSource").val();
+        var ci = $("#CounterInstance").val();
+        var ced = $("#CounterExtData").val();
+        var series = $("#Series").val();
+        var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced, series: series };
+        createSurface(params.cc + "_" + params.cn + "_" + params.cs + "_" + params.ci, function (data) {
+                createCounterAndAddToSurface(params, data.id, true);
+            });
+    }
+
+    function createCounterAndAddToSurface(params, surfaceId, enableAutoUpdate) {
+        var dataUpdater = new CountersDataUpdater(params);
+        if (enableAutoUpdate)
+            dataUpdater.StartAutoUpdate(5000);
+        else
+            dataUpdater.StartAutoUpdate();
+        drawingSurfaces[surfaceId].RegisterDataUpdater(dataUpdater);
+    }
+
+    function onCountersGraphReceived(data, name) {
+        $("#drawings").append(data.graphingSurface);
+        $("#placeholder-" + data.id).width(@ViewBag.PlotWidth).height(@ViewBag.PlotHeight);
+        $("#legendContainer-" + data.id).hide();
+        $("#overview-" + data.id).hide();
+        $("#choices-" + data.id).hide();
+        $("#drawBtn-" + data.id).hide();
+        $("#showParamsBtn-" + data.id).hide();
+        drawingSurfaces[data.id] = new DrawingSurface(name, data.id,
+            $("#placeholder-" + data.id));
+
+    }
+    
+    
+    createSurface("counters", function(data) {
+        $.each(parameters, function(idx, params) {
+            createCounterAndAddToSurface(params, data.id, true);
+        });
+    });
+   
+    
+
+
+</script>

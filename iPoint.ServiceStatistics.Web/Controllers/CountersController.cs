@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
@@ -33,7 +34,10 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             }
         }
 
+
+
         
+
         public virtual JsonResult Data(string sd, string ed, string cc, string cn, string cs, string ci, string ced)
         {
             return Json(new
@@ -59,7 +63,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             var data = dl.Select(i => new SelectListItem()
             {
                 Text = i.Name,
-                Value =  i.Id.ToString()
+                Value =  i.Id.ToString(CultureInfo.InvariantCulture)
             });
 
             return Json(data , JsonRequestBehavior.AllowGet);
@@ -193,6 +197,17 @@ namespace iPoint.ServiceStatistics.Web.Controllers
 #endregion
 
             return Json(new { lastDate = allSeriesRawData.Max(s => s.Item4.Count == 0 ? dt : s.Item4.Last().Value.Max(v => v.DateTime)).ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss"), seriesData = allSeriesData }, JsonRequestBehavior.AllowGet);
+        }
+
+        public virtual ActionResult SingleGraph(string param, int width = 800, int height = 600)
+        {
+            
+            string[] drawersParameters = Encoding.UTF8.GetString(Convert.FromBase64String(param)).Split(new []{"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+            ViewBag.Temp = drawersParameters;
+            ViewBag.PlotWidth = width;
+            ViewBag.PlotHeight = height;
+
+            return View();
         }
 
         

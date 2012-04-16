@@ -47,7 +47,7 @@
     };
 
 
-    self.RegisterDrawingSurface = function(drawingSurface) {
+    self.RegisterDrawingSurface = function (drawingSurface) {
         self.drawingSurfaces.push(drawingSurface);
     };
 
@@ -62,5 +62,13 @@
         self.timeout = undefined;
         clearTimeout(timeoutHandler);
     };
-    this.UpdateOnce = function () { setTimeout(function () { self.UpdateInternal(); }, 0); };
+
+    self.UpdateOnce = function () { setTimeout(function () { self.UpdateInternal(); }, 0); };
+
+    self.ParamsToString = function () {
+        return JSON.stringify(counterParameres);
+
+    };
+
+
 }
