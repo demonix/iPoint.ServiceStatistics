@@ -168,7 +168,6 @@ namespace iPoint.ServiceStatistics.Server
     
         private IEnumerable<IGrouping<CounterGroup, UniversalValue>> GroupCounters(IEnumerable<LogEventArgs> input)
         {
-
             return input.GroupBy(k => CreateCounterGroupByMask("111", k),
                                  k =>
                                  UniversalValue.ParseFromString(InputType, k.LogEvent.Value))

@@ -166,7 +166,8 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="robots.txt" />
     <Content Include="Scripts\countersDataUpdater.js" />
-    <Content Include="Scripts\drawer.js" />
+    <Content Include="Scripts\date-ru-RU.js" />
+    <Content Include="Scripts\date.js" />
     <Content Include="Scripts\drawingSurface.js" />
     <Content Include="Scripts\flot\excanvas.js" />
     <Content Include="Scripts\flot\excanvas.min.js" />

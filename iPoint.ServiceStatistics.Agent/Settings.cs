@@ -118,8 +118,6 @@ namespace iPoint.ServiceStatistics.Agent
                     result.Add(currentPath);
                 return result;
             }
-
-
             if (!parts[0].Contains("*"))
             {
                 possibleDirectories = new string[1];

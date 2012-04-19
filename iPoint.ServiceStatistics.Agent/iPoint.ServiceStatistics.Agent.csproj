@@ -69,6 +69,7 @@
     <Compile Include="Core\StringReaderExtensions.cs" />
     <Compile Include="Core\LogFiles\LogWatcher.cs" />
     <Compile Include="Core\LogFiles\LogWatcherEventArgs.cs" />
+    <Compile Include="FilePathHelpers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />

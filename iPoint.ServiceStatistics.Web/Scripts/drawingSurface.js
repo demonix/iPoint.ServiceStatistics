@@ -100,7 +100,7 @@
         self.drawingAreaPlot = $.plot(self.drawingArea, currentData, self.drawingOptions);
         if (self.overviewAreaPlot)
             self.overviewAreaPlot = $.plot(self.overviewArea, currentData, self.overviewOptions);
-        timeoutHandler = setTimeout(function () { self.UpdateInternal(); }, 1000);
+        timeoutHandler = setTimeout(function () { self.UpdateInternal(); }, 5000);
     };
 
     self.DataUpdaterSettingsToString = function () {

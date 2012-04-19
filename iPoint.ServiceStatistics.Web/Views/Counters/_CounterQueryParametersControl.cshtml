@@ -18,6 +18,8 @@
 <script src="@Url.Content("~/Scripts/countersDataUpdater.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/drawingSurface.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+<!--script src="@Url.Content("~/Scripts/date.js")" type="text/javascript"></script-->
+<script src="@Url.Content("~/Scripts/date-ru-RU.js")" type="text/javascript"></script>
 @*<script src="@Url.Content("~/Scripts/drawer.js")" type="text/javascript"></script>*@
 @*
 <!--script src="@Url.Content("~/Scripts/flot/excanvas.js")" type="text/javascript"></script-->
@@ -183,7 +185,7 @@
         var ci = $("#CounterInstance").val();
         var ced = $("#CounterExtData").val();
         var series = $("#Series").val();
-        var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced, series: series };
+        var params = {initialSd: sd, sd: sd, initialEd: ed, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced, series: series };
         var surfaceId = $("#drawingSurfaces").val();
         var enableAutoUpdate = $("#enableAutoUpdateChk").is(':checked');
         if (surfaceId == null || $("#createOnNewSurfaceChk").is(':checked')) {
@@ -213,7 +215,7 @@
         var cs = $("#CounterSource").val();
         var ci = $("#CounterInstance").val();
         var ced = $("#CounterExtData").val();
-        var params = { sd: sd, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced };
+        var params = { initialSd: sd, sd: sd, initialEd: ed, ed: ed, cc: cc, cn: cn, cs: cs, ci: ci, ced: ced };
         $.get("/Counters/CountersGraph", params)
             .success(function (data) { onCountersGraphReceived(data, params); })
             .error(function (data) { alert("error"); });
