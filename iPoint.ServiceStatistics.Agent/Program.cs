@@ -65,18 +65,8 @@ namespace iPoint.ServiceStatistics.Agent
             {
                 
                if (logDescription.FileMask.IsMatch(fileInfo.Name) && fileInfo.LastWriteTime >= now.Date)
-               {
-                   _logger.Info("File " + fileInfo.FullName + " complies conditions");
                    CreateNewReader(fileInfo.FullName, fileInfo.Length, _logEventMatchers[logWatcher.Id]);
-               }
-               else
-               {
-                   _logger.Info("File " + fileInfo.FullName + " does not comply conditions");
-               }
             }
-
-            
-
         }
 
         static void logWatcher_LogFileCompleted(object sender, LogWatcherEventArgs e)

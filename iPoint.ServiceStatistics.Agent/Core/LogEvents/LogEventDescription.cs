@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
 {
   
     public class LogEventDescription
     {
+       
         public Regex Rule { get; private set; }
         public LogEventType EventType { get; private set; }
         public string DateFormat { get; private set; }
@@ -56,7 +58,27 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
                 return (logFileName, match) => match.Groups[regexGroupName].Value;
             return (logFileName, match) => rule;
         }
-        
+
+
+        public static LogEventDescription LoadFromConfigFile(string fileName)
+        {
+            SettingsReader settingsReader = new SettingsReader(fileName);
+            string type = settingsReader.GetConfigParam("Type");
+            string source = settingsReader.GetConfigParam("Source");
+            string category = settingsReader.GetConfigParam( "Category");
+            string counter = settingsReader.GetConfigParam("Counter");
+            string instance = settingsReader.GetConfigParam("Instance", false);
+            string extendedData = settingsReader.GetConfigParam("ExtendedData", false);
+            string value = settingsReader.GetConfigParam("Value");
+            string dateTime = settingsReader.GetConfigParam("DateTime");
+            string dateFormat = settingsReader.GetConfigParam("DateFormat");
+            string regex = settingsReader.GetConfigParam("Regex");
+            LogEventDescription result = new LogEventDescription(regex, type, source, category, counter, instance,
+                                                                 extendedData, value, dateTime, dateFormat);
+            return result;
+
+        }
+
         public LogEventDescription(string regexRule, string logEventType, string sourceRule, string categoryRule, string counterRule, string instanceRule, string extendedDataRule, string valueRule, string dateTimeRule, string dateFormat)
         {
             Rule = new Regex(regexRule, RegexOptions.Compiled);

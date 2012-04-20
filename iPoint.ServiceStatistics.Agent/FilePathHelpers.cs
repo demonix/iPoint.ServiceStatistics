@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -48,6 +49,7 @@ namespace iPoint.ServiceStatistics.Agent
         {
             if (!String.IsNullOrEmpty(begining) && !Directory.Exists(begining))
                 yield break;
+            
 
             string[] possibleDirectories;
             string[] parts = pathTailwithMask.Split(
@@ -77,7 +79,15 @@ namespace iPoint.ServiceStatistics.Agent
             }
             else
             {
-                possibleDirectories = Directory.GetDirectories(begining, parts[0]);
+                try
+                {
+                    possibleDirectories = Directory.GetDirectories(begining, parts[0]);
+                }
+                catch(Exception ex)
+                {
+                    yield break;
+                }
+
             }
             foreach (string possibleDirectory in possibleDirectories)
             {
@@ -89,6 +99,14 @@ namespace iPoint.ServiceStatistics.Agent
                     yield return directory;
                 }
             }
+        }
+
+        public static IEnumerable<string> FindDirectoriesOnFixedDisks(string p)
+        {
+            return Path.GetPathRoot(p) == Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture)
+                       ? DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed).Select(
+                           d => d.Name.TrimEnd('\\') + p)
+                       : new List<string>() {p};
         }
     }
 }
