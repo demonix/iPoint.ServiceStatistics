@@ -16,7 +16,8 @@
         if (seriesData.data.length > 0) {
             while (seriesData.data[seriesData.data.length - 1][0] - totalInterval > seriesData.data[0][0]) {
                 seriesData.data.splice(0, 1);
-                seriesData.lastNonstrippedPointIdx--;
+                if (seriesData.lastNonstrippedPointIdx > 0)
+                    seriesData.lastNonstrippedPointIdx--;
             }
         }
 
@@ -34,7 +35,7 @@
                 seriesData.data.splice(seriesData.lastNonstrippedPointIdx + 1, toRemove);
                 toRemove = 0;
                 seriesData.lastNonstrippedPointIdx++;
-                i = seriesData.lastNonstrippedPointIdx ;
+                i = seriesData.lastNonstrippedPointIdx;
             }
         }
     };
@@ -53,7 +54,7 @@
             $.each(series.data, function (idx2, seriesValues) {
                 self.currentData[index].data.push(seriesValues);
             });
-            removeUnneededPoints(self.currentData[index], 300000 /*5 min*/, 600000*3 /*10 min*/, Date.parse(self.parameters.initialEd) - Date.parse(self.parameters.initialSd));
+            removeUnneededPoints(self.currentData[index], 300000 /*5 min*/, 600000 * 3 /*10 min*/, Date.parse(self.parameters.initialEd) - Date.parse(self.parameters.initialSd));
         });
     };
 
