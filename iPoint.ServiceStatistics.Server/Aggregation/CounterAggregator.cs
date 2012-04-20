@@ -87,7 +87,7 @@ namespace iPoint.ServiceStatistics.Server
                     throw new Exception("Cannot convert list of string distribution pararameters to intervals");
             }
             distributionParametersIntervals.Add(new Tuple<UniversalValue, UniversalValue>(min,distributionParameters[0]));
-            for (int i = 1; i < distributionParameters.Count-1; i++)
+            for (int i = 0; i < distributionParameters.Count-1; i++)
             {
                 distributionParametersIntervals.Add(new Tuple<UniversalValue, UniversalValue>(distributionParameters[i], distributionParameters[i+1]));
             }
