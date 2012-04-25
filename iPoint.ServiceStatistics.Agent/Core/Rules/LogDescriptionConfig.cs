@@ -16,6 +16,7 @@ namespace iPoint.ServiceStatistics.Agent.Core.Rules
         public Encoding Encoding { get; private set; }
         public string Id { get; private set; }
         public List<string> LogDirectories { get; private set; }
+        Dictionary<string, LogWatcher>  _logWatchers = new Dictionary<string, LogWatcher>();
       
         private EvaluatorRuleManager _ruleManager;
         
@@ -33,10 +34,6 @@ namespace iPoint.ServiceStatistics.Agent.Core.Rules
         }
 
        
-
-
-       
-
         public new void Dispose()
         {
             base.Dispose();
