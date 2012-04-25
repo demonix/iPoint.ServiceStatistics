@@ -8,14 +8,14 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
     public sealed class GzLogReader : LogReaderBase
     {
         private GZipInputStream _logFileStream;
-        public GzLogReader(string logFileName, Encoding encoding, LogDescription logDescription, LogEventMatcher logEventMatcher)
-            : base(logFileName, 0, encoding, logDescription,logEventMatcher)
+        public GzLogReader(string logFileName, Encoding encoding, LogDescription logDescription/*, LogEventEvaluator logEventEvaluator*/)
+            : base(logFileName, 0, encoding, logDescription/*,logEventEvaluator*/)
         {
             CreateReader();
         }
 
-        public GzLogReader(string logFileName, long currentPosition, Encoding encoding, LogDescription logDescription, LogEventMatcher logEventMatcher)
-            : base(logFileName, currentPosition, encoding, logDescription,logEventMatcher)
+        public GzLogReader(string logFileName, long currentPosition, Encoding encoding, LogDescription logDescription/*, LogEventEvaluator logEventEvaluator*/)
+            : base(logFileName, currentPosition, encoding, logDescription/*,logEventEvaluator*/)
         {
             CreateReader();
         }

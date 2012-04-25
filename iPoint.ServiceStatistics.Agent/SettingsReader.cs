@@ -10,13 +10,16 @@ namespace iPoint.ServiceStatistics.Agent
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private Dictionary<string, List<string>> _settings= new Dictionary<string, List<string>>();
-        
+
+        private string _fileName;
         public SettingsReader(string fileName)
         {
+            _fileName = fileName;
             string[] config = File.ReadAllLines(fileName);
             foreach (string line in config)
             {
                 string key = line.Split('=')[0].Trim();
+                if (key.StartsWith("#") || key.Length == 0) continue;
                 string loweredKey = key.ToLower();
                 string value = line.Split(new[] {'='}, 2)[1].Trim();
 
@@ -27,7 +30,7 @@ namespace iPoint.ServiceStatistics.Agent
                     _settings[loweredKey].Add(value);
                 else
                 {
-                    _logger.Warn("Parameter {0} has duplicates values: {1}", key, value);
+                    _logger.Warn(String.Format("Parameter {0} in config {2} has duplicates values: {1}", key, value, _fileName));
                 }
             }
         }
@@ -36,18 +39,18 @@ namespace iPoint.ServiceStatistics.Agent
         {
 
             if (!_settings.ContainsKey(paramName.ToLower()) && required)
-                throw new Exception(paramName + " not specified in config");
+                throw new Exception(String.Format("{0} not specified in config {1}", paramName, _fileName));
             if (!_settings.ContainsKey(paramName.ToLower()))
                 return "";
             if (_settings[paramName.ToLower()].Count > 1)
-                throw new Exception(paramName + " specified miltiple times in config");
+                throw new Exception(String.Format("{0} specified miltiple times in config {1}", paramName, _fileName));
             return _settings[paramName.ToLower()][0];
         }
 
         public List<string> GetConfigParams(string paramName, bool required = true)
         {
             if (!_settings.ContainsKey(paramName.ToLower()) && required)
-                throw new Exception(paramName + " not specified in config");
+                throw new Exception(String.Format("{0} not specified in config {1}", paramName, _fileName));
             if (!_settings.ContainsKey(paramName.ToLower()))
                 return new List<string>{""};
             return _settings[paramName.ToLower()];

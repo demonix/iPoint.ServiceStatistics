@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using iPoint.ServiceStatistics.Agent;
 using iPoint.ServiceStatistics.Server.DataLayer;
 using iPoint.ServiceStatistics.Server.КэшСчетчиков;
 
@@ -16,6 +18,9 @@ namespace CountersDbCleanup
         private static Dictionary<string, DateTime> _lastDates = new Dictionary<string, DateTime>();
         static void Main(string[] args)
         {
+
+            List<string> s = FilePathHelpers.GetDirectoriesByMaskedPath(@"c:\s*\m*").ToList();
+
             ReadLastDates();
             CountersDatabase.InitConnection("127.0.0.1", null, "counters");
             MongoCollection<BsonDocument> items = CountersDatabase.Instance.Database.GetCollection("countersData");

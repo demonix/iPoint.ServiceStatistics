@@ -60,6 +60,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\iPoint.ServiceStatistics.Agent\iPoint.ServiceStatistics.Agent.csproj">
+      <Project>{CDBA75D7-087B-4B3F-A34E-FBB45BB3DD12}</Project>
+      <Name>iPoint.ServiceStatistics.Agent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\iPoint.ServiceStatistics.Server\iPoint.ServiceStatistics.Server.csproj">
       <Project>{EAD971AD-38A8-459B-AA7B-802C574161AE}</Project>
       <Name>iPoint.ServiceStatistics.Server</Name>
