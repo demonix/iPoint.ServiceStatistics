@@ -3,7 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using EventEvaluationLib;
+
 
 namespace iPoint.ServiceStatistics.Server
 {

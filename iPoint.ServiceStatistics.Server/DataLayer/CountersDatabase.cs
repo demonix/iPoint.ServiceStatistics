@@ -36,6 +36,25 @@ namespace iPoint.ServiceStatistics.Server.DataLayer
                         Instance = Connect(host, port, dbName);
         }
 
+        public static void InitConnection(string mongoUrl)
+        {
+            if (Instance == null)
+                lock (_locker)
+                    if (Instance == null)
+                        Instance = Connect(mongoUrl);
+        }
+
+        public static CountersDatabase Connect(string mongoUrl)
+        {
+            MongoUrlBuilder builder = new MongoUrlBuilder(mongoUrl);
+            builder.SocketTimeout = new TimeSpan(0, 30, 0);
+            //builder.Server = port.HasValue ? new MongoServerAddress(host, port.Value) : new MongoServerAddress(host);
+            MongoServer server = MongoServer.Create(builder.ToServerSettings());
+            server.Connect();
+            MongoDatabase db = server.GetDatabase(builder.DatabaseName);
+            return new CountersDatabase(server, db);
+        }
+
         public static CountersDatabase Connect(string host, int? port, string dbName)
         {
             MongoConnectionStringBuilder builder = new MongoConnectionStringBuilder();
@@ -322,22 +341,81 @@ case UniversalValue.UniversalClassType.String:
         }*/
 
 
-     
-
-        public Dictionary<string, List<CounterData>> GetCounterData(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId, int counterSourceId, int counterInstanceId, int counterExtDataId, List<string> series)
+        public List<CounterSeriesData> GetCounterDataNew(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId, int counterSourceId, int counterInstanceId, int counterExtDataId, List<string> seriesFilter)
         {
-            
-            Dictionary<string, List<CounterData>> resultData = new Dictionary<string, List<CounterData>>();
-            if (series.Count == 0)
+            List<CounterSeriesData> resultData = new List<CounterSeriesData>();
+            if (seriesFilter.Count == 0)
                 return resultData;
+            bool getAllSeries = seriesFilter.Contains("*");
+            List<string> seriesNames = new List<string>();
+
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
+            string mappedCategoryName = Settings.CountersMapper.GetMappedCategoryName(counterCategoryId);
+            string mappedCounterName = Settings.CountersMapper.GetMappedCounterName(counterCategoryId, counterNameId);
+            string mappedCounterInstance = Settings.CountersMapper.GetMappedCounterInstanceName(counterCategoryId, counterNameId, counterInstanceId);
+            string mappedCounterSource = Settings.CountersMapper.GetMappedCounterSourceName(counterCategoryId, counterNameId, counterSourceId);
+            string mappedCounterExtData = Settings.CountersMapper.GetMappedCounterExtDataName(counterCategoryId, counterNameId, counterExtDataId);
+           
+
+            QueryComplete qb = Query.GT("date", beginDate).LTE(endDate);
+            QueryComplete qb2 = Query.EQ("counterCategory", mappedCategoryName);
+            QueryComplete qb3 = Query.EQ("counterName", mappedCounterName);
+            SortByBuilder sortOrder = new SortByBuilder().Ascending("date");
+            var cursor = items.Find(Query.And(qb, qb2, qb3));
+            cursor.SetSortOrder(sortOrder);
+            string counterDescription = counterSourceId + "/" + counterInstanceId + "/" + counterExtDataId;
+            cursor.SetFields(Fields.Include("type", "date", "data." + counterDescription));
+
+            foreach (BsonDocument cnt in cursor)
+            {
+                var dateTime = cnt["date"].AsDateTime;
+                var countersData = cnt["data"].AsBsonDocument;
+                if (!countersData.Contains(counterDescription))
+                {
+                    foreach (string seriesName in seriesNames)
+                        if (getAllSeries || seriesFilter.Contains(seriesName))
+                            resultData.Find(f => f.SeriesName == seriesName).AddSeriesPoint(null);
+                    continue;
+                }
+                var seriesPoints = countersData[counterDescription].AsBsonDocument;
+
+                foreach (BsonElement seriesPoint in seriesPoints)
+                {
+                    string seriesName = seriesPoint.Name;
+                    
+                    if (!getAllSeries && !seriesFilter.Contains(seriesName)) continue;
+                    var value = seriesPoint.Value.IsString
+                                    ? new UniversalValue(
+                                          TimeSpan.Parse(seriesPoint.Value.AsString))
+                                    : new UniversalValue(
+                                          seriesPoint.Value.ToDouble());
+
+                    var a = resultData.Find(f => f.SeriesName == seriesName);
+                    if (a == null)
+                    {
+                        a = new CounterSeriesData(seriesName,value.Type,mappedCategoryName,mappedCounterName,mappedCounterSource,mappedCounterInstance,mappedCounterExtData);
+                        resultData.Add(a);
+                    }
+                    a.AddSeriesPoint(new SeriesPoint(dateTime,value));
+                }
+            }
+            return resultData;
+        }
+
+
+        public Dictionary<string, List<CounterData>> GetCounterData(DateTime beginDate, DateTime endDate, int counterCategoryId, int counterNameId, int counterSourceId, int counterInstanceId, int counterExtDataId, List<string> seriesFilter)
+        {
+            Dictionary<string, List<CounterData>> resultData = new Dictionary<string, List<CounterData>>();
+            if (seriesFilter.Count == 0)
+                return resultData;
+            bool getAllSeries = seriesFilter.Contains("*");
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
             QueryComplete qb2 = Query.EQ("counterCategory", Settings.CountersMapper.GetMappedCategoryName(counterCategoryId));
             QueryComplete qb3 = Query.EQ("counterName", Settings.CountersMapper.GetMappedCounterName(counterCategoryId,counterNameId));
-            SortByBuilder sort = new SortByBuilder();
-            sort.Ascending("date");
+            SortByBuilder sortOrder = new SortByBuilder().Ascending("date");
             var cursor = items.Find(Query.And(qb, qb2, qb3));
-            cursor.SetSortOrder(sort);
+            cursor.SetSortOrder(sortOrder);
             string key = counterSourceId + "/" + counterInstanceId + "/" + counterExtDataId;
             cursor.SetFields(Fields.Include("type", "date", "data." + key));
 
@@ -347,20 +425,19 @@ case UniversalValue.UniversalClassType.String:
                 if (!data.Contains(key))
                 {
                     foreach (string valueLabel in resultData.Keys)
-                        if (series[0] == "*" || series.Contains(valueLabel)) 
+                        if (getAllSeries || seriesFilter.Contains(valueLabel)) 
                             resultData[valueLabel].Add(new CounterData(cnt["date"].AsDateTime, null));
                     continue;
                 }
                 var values = data[key].AsBsonDocument;
                 foreach (BsonElement bsonElement in values)
                 {
-                    if (series[0] != "*" && !series.Contains(bsonElement.Name)) continue;
+                    if (!getAllSeries && !seriesFilter.Contains(bsonElement.Name)) continue;
                     if (!resultData.ContainsKey(bsonElement.Name))
                         resultData.Add(bsonElement.Name, new List<CounterData>());
                     resultData[bsonElement.Name].Add(new CounterData(cnt["date"].AsDateTime,
-                                              bsonElement.Value.IsString ? 
-                                              TimeSpan.Parse(bsonElement.Value.AsString).TotalMilliseconds 
-                                              : bsonElement.Value.ToDouble()));
+                                              bsonElement.Value.IsString ? new UniversalValue(TimeSpan.Parse(bsonElement.Value.AsString))
+                                              : new UniversalValue(bsonElement.Value.ToDouble())));
                 }
             }
             return resultData;

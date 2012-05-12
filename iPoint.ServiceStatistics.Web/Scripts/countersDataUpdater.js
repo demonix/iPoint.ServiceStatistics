@@ -1,12 +1,14 @@
 ﻿var CountersDataUpdater = function (counterParameres) {
     "use strict";
     var self = this;
-    self.drawingSurfaces = [];
+
+    //    self.drawingSurfaces = [];
     self.dateStarted = new Date();
-    self.currentData = [[]];
+    self.currentData = [];
     self.parameters = counterParameres;
     self.parameters.sd = self.parameters.initialSd;
     self.parameters.ed = self.parameters.initialEd;
+    self.DataType = undefined;
     var timeoutHandler;
     var disposed = false;
 
@@ -43,10 +45,12 @@
     self.UpdateCurrentData = function (data) {
         self.parameters.sd = data.lastDate;
         self.parameters.ed = "";
+        self.DataType = data.dataType;
         $.each(data.seriesData, function (index, series) {
             if (self.currentData.length - 1 < index)
                 self.currentData.push([]);
             self.currentData[index].label = series.source + "_" + series.instance + "_" + series.extData + "_" + series.seriesName;
+            self.currentData[index].yaxis = series.yaxis;
             if (!self.currentData[index].data) {
                 self.currentData[index].data = [];
                 self.currentData[index].lastNonstrippedPointIdx = 0;
@@ -54,13 +58,14 @@
             $.each(series.data, function (idx2, seriesValues) {
                 self.currentData[index].data.push(seriesValues);
             });
-            removeUnneededPoints(self.currentData[index], 300000 /*5 min*/, 600000 * 3 /*10 min*/, Date.parse(self.parameters.initialEd) - Date.parse(self.parameters.initialSd));
+            removeUnneededPoints(self.currentData[index], 300000 /*5 min*/, 600000 * 3 /*30 min*/, Date.parse(self.parameters.initialEd) - Date.parse(self.parameters.initialSd));
         });
     };
 
     var onDataReceived = function (data, timeout) {
         if (!disposed) {
-            self.UpdateCurrentData(data);
+            if (data && data.success)
+                self.UpdateCurrentData(data);
             if (timeout) {
                 timeoutHandler = setTimeout(function () { self.UpdateInternal(); }, self.timeout);
             }
@@ -82,9 +87,9 @@
     };
 
 
-    self.RegisterDrawingSurface = function (drawingSurface) {
-        self.drawingSurfaces.push(drawingSurface);
-    };
+    /*   self.RegisterDrawingSurface = function (drawingSurface) {
+    self.drawingSurfaces.push(drawingSurface);
+    };*/
 
     self.StopAutoUpdate = function () {
         console.log("Stopping autoupdate of updater started at " + self.dateStarted.toString());

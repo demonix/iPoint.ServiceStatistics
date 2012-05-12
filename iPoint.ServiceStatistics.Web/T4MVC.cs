@@ -317,7 +317,9 @@ namespace Links {
         public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
         public static readonly string countersDataUpdater_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/countersDataUpdater.min.js") ? Url("countersDataUpdater.min.js") : Url("countersDataUpdater.js");
                       
-        public static readonly string drawer_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/drawer.min.js") ? Url("drawer.min.js") : Url("drawer.js");
+        public static readonly string date_ru_RU_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/date-ru-RU.min.js") ? Url("date-ru-RU.min.js") : Url("date-ru-RU.js");
+                      
+        public static readonly string date_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/date.min.js") ? Url("date.min.js") : Url("date.js");
                       
         public static readonly string drawing_stuff_js_ = Url("drawing_stuff.js_");
         public static readonly string drawingSurface_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/drawingSurface.min.js") ? Url("drawingSurface.min.js") : Url("drawingSurface.js");
@@ -371,6 +373,8 @@ namespace Links {
         public static readonly string jquery_ui_timepicker_ru_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui.timepicker-ru.min.js") ? Url("jquery-ui.timepicker-ru.min.js") : Url("jquery-ui.timepicker-ru.js");
                       
         public static readonly string jquery_ui_timepicker_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery-ui.timepicker.min.js") ? Url("jquery-ui.timepicker.min.js") : Url("jquery-ui.timepicker.js");
+                      
+        public static readonly string jquery_base64_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.base64.min.js") ? Url("jquery.base64.min.js") : Url("jquery.base64.js");
                       
         public static readonly string jquery_unobtrusive_ajax_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.unobtrusive-ajax.min.js") ? Url("jquery.unobtrusive-ajax.min.js") : Url("jquery.unobtrusive-ajax.js");
                       

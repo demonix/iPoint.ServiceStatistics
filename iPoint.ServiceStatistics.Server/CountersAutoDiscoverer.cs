@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using EventEvaluationLib;
 
 namespace iPoint.ServiceStatistics.Server
 {

@@ -29,7 +29,56 @@ namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
             _extDataCache.Load();
         }
 
-      
+        public string GetMappedCounterInstance(int counterInstanceId)
+        {
+            var instanceInfo = GetMappedCounterInstanceInfo(counterInstanceId);
+            return instanceInfo == null ? "Unknown" : instanceInfo.Name;
+        }
+
+        public CounterInstanceInfo GetMappedCounterInstanceInfo(int counterInstanceId)
+        {
+            CounterInstanceInfo instanceInfo = _instanceCache.FindById(counterInstanceId);
+            if (instanceInfo == null)
+            {
+                UpdateInstanceCache();
+                instanceInfo = _instanceCache.FindById(counterInstanceId);
+            }
+            return instanceInfo;
+        }
+
+        public string GetMappedCounterSource(int counterInstanceId)
+        {
+            var sourceInfo = GetMappedCounterSourceInfo(counterInstanceId);
+            return sourceInfo == null ? "Unknown" : sourceInfo.Name;
+        }
+
+        public CounterSourceInfo GetMappedCounterSourceInfo(int counterInstanceId)
+        {
+            CounterSourceInfo sourceInfo = _sourceCache.FindById(counterInstanceId);
+            if (sourceInfo == null)
+            {
+                UpdateSourceCache();
+                sourceInfo = _sourceCache.FindById(counterInstanceId);
+            }
+            return sourceInfo;
+        }
+
+        public string GetMappedCounterExtData(int counterInstanceId)
+        {
+            var extDataInfo = GetMappedCounterExtDataInfo(counterInstanceId);
+            return extDataInfo == null ? "Unknown" : extDataInfo.Name;
+        }
+
+        public CounterExtDataInfo GetMappedCounterExtDataInfo(int counterInstanceId)
+        {
+            CounterExtDataInfo extDataInfo = _extDataCache.FindById(counterInstanceId);
+            if (extDataInfo == null)
+            {
+                UpdateExtDataCache();
+                extDataInfo = _extDataCache.FindById(counterInstanceId);
+            }
+            return extDataInfo;
+        }
 
         public CounterSourceInfo GetOrCreateSourceInfo(string name)
         {

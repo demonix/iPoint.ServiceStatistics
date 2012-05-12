@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -55,7 +56,8 @@ namespace iPoint.ServiceStatistics.Web
 
         private void InitDatabase()
         {
-            CountersDatabase.InitConnection("91.142.140.253",null,"counters");
+            string mongoUrl = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"settings\\mongoConnection"));
+            CountersDatabase.InitConnection(mongoUrl);
         }
     }
 }

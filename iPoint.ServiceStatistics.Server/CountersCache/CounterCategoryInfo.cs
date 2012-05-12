@@ -53,13 +53,20 @@ namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
 
         public string GetMappedCounterName(int counterNameId)
         {
-            CounterNameInfo catInfo = _cache.FindById(counterNameId);
-            if (catInfo == null)
+           var nameInfo = GetMappedCounterNameInfo(counterNameId);
+           return nameInfo == null ? "Unknown" : nameInfo.Name;
+        }
+
+        public CounterNameInfo GetMappedCounterNameInfo(int counterNameId)
+        {
+            CounterNameInfo nameInfo = _cache.FindById(counterNameId);
+            if (nameInfo == null)
             {
                 UpdateCache();
-                catInfo = _cache.FindById(counterNameId);
+                nameInfo = _cache.FindById(counterNameId);
             }
-            return catInfo == null ? "Unknown" : catInfo.Name;
+            return nameInfo;
         }
+
     }
 }

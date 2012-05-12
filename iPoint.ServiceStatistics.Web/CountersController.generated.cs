@@ -59,6 +59,11 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
         public System.Web.Mvc.JsonResult CounterData() {
             return new T4MVC_JsonResult(Area, Name, ActionNames.CounterData);
         }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.ActionResult SingleGraph() {
+            return new T4MVC_ActionResult(Area, Name, ActionNames.SingleGraph);
+        }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public CountersController Actions { get { return MVC.Counters; } }
@@ -81,6 +86,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public readonly string Index = "Index";
             public readonly string CountersGraph = "CountersGraph";
             public readonly string CounterData = "CounterData";
+            public readonly string SingleGraph = "SingleGraph";
         }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
@@ -92,6 +98,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public const string Index = "Index";
             public const string CountersGraph = "CountersGraph";
             public const string CounterData = "CounterData";
+            public const string SingleGraph = "SingleGraph";
         }
 
 
@@ -104,6 +111,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public readonly string CountersGraph = "~/Views/Counters/CountersGraph.cshtml";
             public readonly string Data = "~/Views/Counters/Data.cshtml";
             public readonly string Index = "~/Views/Counters/Index.cshtml";
+            public readonly string SingleGraph = "~/Views/Counters/SingleGraph.cshtml";
         }
     }
 
@@ -167,6 +175,14 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             callInfo.RouteValueDictionary.Add("ci", ci);
             callInfo.RouteValueDictionary.Add("ced", ced);
             callInfo.RouteValueDictionary.Add("series", series);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult SingleGraph(string param, int width, int height) {
+            var callInfo = new T4MVC_ActionResult(Area, Name, ActionNames.SingleGraph);
+            callInfo.RouteValueDictionary.Add("param", param);
+            callInfo.RouteValueDictionary.Add("width", width);
+            callInfo.RouteValueDictionary.Add("height", height);
             return callInfo;
         }
 

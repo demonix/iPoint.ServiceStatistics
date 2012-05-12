@@ -9,6 +9,19 @@
     self.overviewAreaPlot = undefined;
     var timeoutHandler;
 
+    self.millisecondsToDuration = function (ticks, axis) {
+        var hms = "";
+        var dtm = new Date();
+        dtm.setTime(ticks);
+        var h = "0" + Math.floor(ticks / 3600000);
+        var m = "0" + dtm.getMinutes();
+        var s = "0" + dtm.getSeconds();
+        var cs = "00" + Math.round(dtm.getMilliseconds() / 10);
+        hms = h.substr(h.length - 4) + ":" + m.substr(m.length - 2) + ":";
+        hms += s.substr(s.length - 2) + "." + cs.substr(cs.length - 3);
+        return hms;
+    };
+    
     self.drawingOptions = {
         lines: {
             show: true
@@ -20,21 +33,22 @@
             mode: "time",
             autoscaleMargin: 0.02
         },
-        yaxis: { max: null },
+        yaxis: { max: null,alignTicksWithAxis:1 },
+        yaxes: [{}, { position: "right", tickFormatter: self.millisecondsToDuration}],
         zoom: {
             interactive: false
         },
         pan: {
             interactive: false
         },
-        selection: { mode: "xy" },
+        //selection: { mode: "xy" },
         legend: { container: legendArea }
     };
 
     if (!legendArea)
         $.extend(true, self.drawingOptions, { legend: { show: false} });
-        
-    
+
+
 
     self.overviewOptions = {
         legend: { show: false },
@@ -48,7 +62,7 @@
         }
     };
     var getCurrentData = function () {
-        var result = [[]];
+        var result = [];
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
                 result.push(dataSeries);
@@ -57,31 +71,34 @@
         return result;
     };
 
+
     timeoutHandler = setTimeout(function () { self.UpdateInternal(); }, 0);
 
 
-    self.drawingArea.bind("plotselected", function (event, ranges) {
-        // clamp the zooming to prevent eternal zoom
-        if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
-            ranges.xaxis.to = ranges.xaxis.from + 0.00001;
-        if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
-            ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+    /* self.drawingArea.bind("plotselected", function (event, ranges) {
+    // clamp the zooming to prevent eternal zoom
+    if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
+    ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+    if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
+    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 
-        self.drawingAreaPlot = $.plot(self.drawingArea, getData(ranges.xaxis.from, ranges.xaxis.to),
-            $.extend(true, {}, options, {
-                xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-            }));
+    self.drawingAreaPlot = $.plot(self.drawingArea, getData(ranges.xaxis.from, ranges.xaxis.to),
+    $.extend(true, {}, options, {
+    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+    yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+    }));
 
-        // don't fire event on the overview to prevent eternal loop
-        if (self.overviewAreaPlot)
-            self.overviewAreaPlot.setSelection(ranges, true);
+    // don't fire event on the overview to prevent eternal loop
+    if (self.overviewAreaPlot)
+    self.overviewAreaPlot.setSelection(ranges, true);
     });
 
     if (self.overviewAreaPlot)
-        self.overviewArea.bind("plotselected", function (event, ranges) {
-            self.drawingAreaPlot.setSelection(ranges);
-        });
+    self.overviewArea.bind("plotselected", function (event, ranges) {
+    self.drawingAreaPlot.setSelection(ranges);
+    });
+        
+    */
 
     self.Dispose = function () {
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
@@ -108,4 +125,6 @@
         $.each(dataUpdaters, function (idx, dataUpdater) { result = result + dataUpdater.ParamsToString() + "\n"; });
         return $.base64.encode(result);
     };
+
+    
 }

@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using ExpressionVisualizer;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using EventEvaluationLib;
 using iPoint.ServiceStatistics.Server.Aggregation;
 using iPoint.ServiceStatistics.Server.DataLayer;
-using Microsoft.VisualStudio.DebuggerVisualizers;
 
 namespace iPoint.ServiceStatistics.Server
 {
@@ -104,7 +99,6 @@ namespace iPoint.ServiceStatistics.Server
         public string CounterName { get; private set; }
         public AggregationType AggregationType { get; private set; }
         public Type InputType { get; private set; }
-        private Func<string, object> _parser;
         private Action<TotalAggregationResult> _onResult;
 
         /*public CounterAggregator(AggregationParameters aggregationParameters)

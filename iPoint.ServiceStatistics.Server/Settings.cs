@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using EventEvaluationLib;
 using iPoint.ServiceStatistics.Server.КэшСчетчиков;
 
 
