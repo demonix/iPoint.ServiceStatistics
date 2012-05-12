@@ -115,20 +115,20 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="КэшСчетчиков\Cache.cs" />
-    <Compile Include="КэшСчетчиков\CacheMonad.cs" />
-    <Compile Include="КэшСчетчиков\CounterCategoryInfoCache.cs" />
-    <Compile Include="КэшСчетчиков\CounterExtDataInfo.cs" />
-    <Compile Include="КэшСчетчиков\CounterExtDataInfoCache.cs" />
-    <Compile Include="КэшСчетчиков\CounterInstanceInfo.cs" />
-    <Compile Include="КэшСчетчиков\CounterInstanceInfoCache.cs" />
-    <Compile Include="КэшСчетчиков\CounterNameInfo.cs" />
-    <Compile Include="КэшСчетчиков\CounterNameInfoCache.cs" />
-    <Compile Include="КэшСчетчиков\CounterSourceInfo.cs" />
-    <Compile Include="КэшСчетчиков\CounterSourceInfoCache.cs" />
-    <Compile Include="КэшСчетчиков\IInfo.cs" />
-    <Compile Include="КэшСчетчиков\InfoCacheBase.cs" />
-    <Compile Include="КэшСчетчиков\CounterCategoryInfo.cs" />
+    <Compile Include="CountersCache\Cache.cs" />
+    <Compile Include="CountersCache\CacheMonad.cs" />
+    <Compile Include="CountersCache\CounterCategoryInfoCache.cs" />
+    <Compile Include="CountersCache\CounterExtDataInfo.cs" />
+    <Compile Include="CountersCache\CounterExtDataInfoCache.cs" />
+    <Compile Include="CountersCache\CounterInstanceInfo.cs" />
+    <Compile Include="CountersCache\CounterInstanceInfoCache.cs" />
+    <Compile Include="CountersCache\CounterNameInfo.cs" />
+    <Compile Include="CountersCache\CounterNameInfoCache.cs" />
+    <Compile Include="CountersCache\CounterSourceInfo.cs" />
+    <Compile Include="CountersCache\CounterSourceInfoCache.cs" />
+    <Compile Include="CountersCache\IInfo.cs" />
+    <Compile Include="CountersCache\InfoCacheBase.cs" />
+    <Compile Include="CountersCache\CounterCategoryInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

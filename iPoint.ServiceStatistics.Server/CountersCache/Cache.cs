@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
+namespace iPoint.ServiceStatistics.Server.CountersCache
 {
     public class Cache
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using iPoint.ServiceStatistics.Server.DataLayer;
 
-namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
+namespace iPoint.ServiceStatistics.Server.CountersCache
 {
     public class CounterCategoryInfo
     {

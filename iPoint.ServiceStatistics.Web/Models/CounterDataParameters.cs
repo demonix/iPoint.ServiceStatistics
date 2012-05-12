@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Server.CountersCache;
 
 namespace iPoint.ServiceStatistics.Web.Models
 {

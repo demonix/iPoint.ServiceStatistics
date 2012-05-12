@@ -10,7 +10,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using iPoint.ServiceStatistics.Agent;
 using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Server.CountersCache;
 
 namespace CountersDbCleanup
 {

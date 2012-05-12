@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
+namespace iPoint.ServiceStatistics.Server.CountersCache
 {
     public class InfoCacheBase<T> where T:class
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using iPoint.ServiceStatistics.Server.DataLayer;
 
-namespace iPoint.ServiceStatistics.Server.КэшСчетчиков
+namespace iPoint.ServiceStatistics.Server.CountersCache
 {
     public class CounterCategoryInfoCache : InfoCacheBase<CounterCategoryInfo>
     {

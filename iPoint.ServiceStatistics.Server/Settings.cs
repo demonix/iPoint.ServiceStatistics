@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
 using EventEvaluationLib;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Server.CountersCache;
 
 
 namespace iPoint.ServiceStatistics.Server

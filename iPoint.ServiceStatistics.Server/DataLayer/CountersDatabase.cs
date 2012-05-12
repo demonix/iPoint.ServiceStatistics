@@ -8,7 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using MongoDB.Driver.Builders;
 using iPoint.ServiceStatistics.Server.Aggregation;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Server.CountersCache;
 
 namespace iPoint.ServiceStatistics.Server.DataLayer
 {

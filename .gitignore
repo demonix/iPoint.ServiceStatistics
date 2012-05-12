@@ -3,4 +3,4 @@ _ReSharper*
 */obj
 *.suo
 *.user
-*/WebSiteDeploy
+/WebSiteDeploy

@@ -11,7 +11,7 @@ using System.Web.UI;
 using iPoint.ServiceStatistics.Server;
 using iPoint.ServiceStatistics.Server.Aggregation;
 using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Server.CountersCache;
 using iPoint.ServiceStatistics.Web.Models;
 
 namespace iPoint.ServiceStatistics.Web.Controllers
