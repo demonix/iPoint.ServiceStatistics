@@ -27,7 +27,7 @@
 
     self.formatLabel = function (label, s) {
         var action = s.lines.show ? 'hide' : 'show';
-        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label + '\')">' + action + '</a>)';
+        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label + '\'); return false;">' + action + '</a>)';
     };
 
     //<a href="#" onclick="javascript:drawingSurfaces["bff1b2c3-4109-46d3-bf5b-1b0133eee675"].toggleseries("ft:="" error_count="" (app103)");"="">FT: Error_Count (APP103)</a>
