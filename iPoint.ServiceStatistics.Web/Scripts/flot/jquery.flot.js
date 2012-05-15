@@ -953,7 +953,7 @@
                 }
             }
             else {
-                lw += padding;
+                lw += padding+10;
                 
                 if (pos == "left") {
                     axis.box = { left: plotOffset.left + axisMargin, width: lw };
