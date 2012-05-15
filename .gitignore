@@ -4,3 +4,5 @@ _ReSharper*
 *.suo
 *.user
 /WebSiteDeploy
+*/aspnet_client
+/iPoint.ServiceStatistics.Web/savedGraphs/
