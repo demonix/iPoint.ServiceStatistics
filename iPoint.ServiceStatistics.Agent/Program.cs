@@ -6,105 +6,134 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using EventEvaluationLib;
 using NLog;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+/*using iPoint.ServiceStatistics.Agent.Core.LogEvents;
 using iPoint.ServiceStatistics.Agent.Core.LogFiles;
+using iPoint.ServiceStatistics.Agent.Core.Rules;
+using LogDescription = iPoint.ServiceStatistics.Agent.Core.LogEvents.LogDescription;
+ */
+
 using MyLib.ClientSide.Networking;
+
+
 
 namespace iPoint.ServiceStatistics.Agent
 {
-    class Program
+    internal class Program
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
-        private static List<LogDescription> _logDescriptions;
-        private static Dictionary<string,LogEventMatcher> _logEventMatchers = new Dictionary<string, LogEventMatcher>();
-        private static Dictionary<string, ILogReader> _logReaders = new Dictionary<string, ILogReader>();
-        private static Settings _settings;
-        private static TcpClient _tcpClient;
+        private static TcpClient _tcpClient = null;
+        private static bool _debug;
+        static IPAddress _currentServerIpAddress = null;
+        static int _currentServerPort = -1;
 
-
-        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             LogManager.GetCurrentClassLogger().Fatal("Unhandled Exception was thrown\r\n" + e.ExceptionObject);
         }
 
-        static void Main(string[] args)
+        static ReaderWriterLockSlim _tcpClientLocker = new ReaderWriterLockSlim();
+        private static void Main(string[] args)
         {
-            
             _logger.Info("Starting App...");
-           AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            
-            _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(args[0]), Int32.Parse(args[1])));
-            _settings = new Settings();
-            _logDescriptions = _settings.LogDescriptions;
-            List<LogWatcher> lw = new List<LogWatcher>();
-            _logger.Info("Total active log descriptions: " + _logDescriptions.Count);
-            foreach (LogDescription logDescription in _logDescriptions)
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            if (args.Length > 0 && args[0].ToLower() == "debug")
+                _debug = true;
+
+            MultiDirectoryFileChangeMonitor serverConfig = null;
+            if (!_debug)
             {
-                _logger.Info("Creating watchers for " + logDescription.ConfigFileName);
-                if (!_logEventMatchers.ContainsKey(logDescription.ConfigFileName))
-                    _logEventMatchers.Add(logDescription.ConfigFileName, new LogEventMatcher(logDescription.LogEventDescriptions));
-                LogWatcher logWatcher = new LogWatcher(logDescription.ConfigFileName, logDescription.LogDirectory, logDescription.FileMask);
-                logWatcher.NewLogFileCreated += logWatcher_NewLogFileCreated;
-                logWatcher.LogFileCompleted += logWatcher_LogFileCompleted;
-                //TODO: dirty hack
-                CreateReadersForCurrentLogs(logDescription, logWatcher);
-            }
-            Console.ReadKey();
-
-
-        }
-
-
-        static void CreateReadersForCurrentLogs(LogDescription logDescription, LogWatcher logWatcher)
-        {
-            DateTime now = DateTime.Now;
-            FileInfo[] files = new DirectoryInfo(logDescription.LogDirectory).GetFiles();
-            _logger.Info("Found " + files.Length + " files in log directory " + logDescription.LogDirectory);
-            foreach (FileInfo fileInfo in files)
-            {
+                CreateTcpClient("settings\\ServerAddress");
+                serverConfig = new MultiDirectoryFileChangeMonitor(Path.GetFullPath("settings\\"), CreateTcpClient, null, ConfigChanged, null);
                 
-               if (logDescription.FileMask.IsMatch(fileInfo.Name) && fileInfo.LastWriteTime >= now.Date)
-                   CreateNewReader(fileInfo.FullName, fileInfo.Length, _logEventMatchers[logWatcher.Id]);
             }
+
+            LogWatcherManager logWatcherManager = new LogWatcherManager(".\\settings\\LogDescriptions\\");
+
+
+            if (_debug)
+                logWatcherManager.EventFromLog +=
+                    (s, ev) => OutToConsole(null, ev.LogEvent);
+            else
+            {
+                logWatcherManager.EventFromLog +=
+                    (s, ev) => CountEvents(null, ev.LogEvent);
+                logWatcherManager.EventFromLog +=
+                    (s, ev) => OutToServer(null, ev.LogEvent);
+            }
+
+            Console.ReadKey();
+            if (serverConfig != null) 
+                serverConfig.Dispose();
         }
 
-        static void logWatcher_LogFileCompleted(object sender, LogWatcherEventArgs e)
+        private static void ConfigChanged(string filePath)
         {
-            _logger.Info("Log file readed to end: "+e.FullPath);
+            if (Path.GetFileName(filePath).ToLower() == "serveraddress")
+                CreateTcpClient(filePath);
+        }
+
+        private static void CreateTcpClient(string configPath)
+        {
+            if (!File.Exists(configPath))
+            {
+                _logger.Error("Server address config not exists");
+                return;
+            }
+
+            string[] file = File.ReadAllLines(configPath);
+            if (file.Length == 0)
+            {
+                _logger.Error("Server address config file is invalid");
+                return;
+            }
+            string[] addressAndPort = file[0].Split(':');
+
+            if (addressAndPort.Length != 2)
+            {
+                _logger.Error("Server address config is invalid: " + file[0]);
+                return;
+            }
+
+            IPAddress ipAddress;
+            int port;
             try
             {
-                _logReaders[e.FullPath].Close();
-                _logReaders[e.FullPath].LineReaded -= OutToConsole;
-                _logReaders[e.FullPath].LineReaded -= OutToServer;
-                _logReaders[e.FullPath] = null;
-                _logReaders.Remove(e.FullPath);
-            }catch(Exception ex)
-            {
-                _logger.FatalException(String.Format("Ошибка при завершении обработки файла {0}", e.FullPath), ex);
-                throw;
+                ipAddress = IPAddress.Parse(addressAndPort[0]);
+                port = Int32.Parse(addressAndPort[1]);
+                if (_currentServerIpAddress == ipAddress && _currentServerPort == port)
+                    return;
             }
+            catch (Exception ex)
+            {
+                _logger.Error("Server address config is invalid: " + file[0]);
+                return;
+            }
+            
+            _tcpClientLocker.EnterWriteLock();
+            try
+            {
+                _logger.Info("Server address is " + ipAddress+":"+port);
+                _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0),
+                                           new IPEndPoint(ipAddress, port));
+                _currentServerIpAddress = ipAddress;
+                _currentServerPort = port;
+            }
+            finally
+            {
+                _tcpClientLocker.ExitWriteLock();
+            }
+
         }
-
-         static void CreateNewReader(string filePath, long position, LogEventMatcher logEventMatcher)
-         {
-             _logger.Info("Begin reading of " + filePath);
-             ILogReader lr = new TextLogReader(filePath, position, Encoding.Default, null, logEventMatcher);
-             //lr.OnLogEvent += OutToConsole;
-             lr.OnLogEvent += OutToServer;
-             lr.OnLogEvent += CountEvents;
-
-             lr.BeginRead();
-             _logReaders.Add(filePath, lr);
-         }
 
         private static int _totalEvents;
         private static DateTime _lastCountEventsCheckPoint = DateTime.Now;
         private static object _eLock = new object();
 
-        private static void CountEvents(object sender, LogEventArgs e)
+        private static void CountEvents(object sender, LogEvent e)
         {
-            _logger.Debug(e.LogEvent);
+            _logger.Debug(e);
             if (_lastCountEventsCheckPoint.AddMinutes(5) > DateTime.Now)
                 Interlocked.Increment(ref _totalEvents);
             else
@@ -113,7 +142,7 @@ namespace iPoint.ServiceStatistics.Agent
                 {
                     if (_lastCountEventsCheckPoint.AddMinutes(5) <= DateTime.Now)
                     {
-                        _logger.Info(_totalEvents +" events generated");
+                        _logger.Info(_totalEvents + " events generated");
                         _totalEvents = 0;
                         _lastCountEventsCheckPoint = DateTime.Now;
                     }
@@ -121,11 +150,146 @@ namespace iPoint.ServiceStatistics.Agent
             }
         }
 
-        private static void OutToServer(object sender, LogEventArgs e)
+        private static void OutToServer(object sender, LogEvent e)
+        {
+            if (_tcpClient == null) return;
+            byte[] data = e.Serialize();
+            _tcpClientLocker.EnterReadLock();
+            try
+            {
+                _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Error while sending", ex);
+            }
+            finally
+            {
+                _tcpClientLocker.ExitReadLock();
+            }
+
+        }
+
+        private static void OutToConsole(object sender, LogEvent e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+
+    /*internal class Program
+    {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static Settings _settings;
+        private static TcpClient _tcpClient;
+
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            LogManager.GetCurrentClassLogger().Fatal("Unhandled Exception was thrown\r\n" + e.ExceptionObject);
+        }
+
+        private static bool _debug;
+
+        private static void Main(string[] args)
+        {
+            LogDescriptionManager logDescriptionManager = new LogDescriptionManager(".\\settings\\LogDescriptions\\");
+            Console.ReadKey();
+        }
+
+        private static void OldMain(string[] args)
+        {
+            
+            _logger.Info("Starting App...");
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            if (args.Length > 0 && args[0].ToLower() == "debug")
+                _debug = true;
+
+            if (!_debug)
+                _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Any, 0),
+                                           new IPEndPoint(IPAddress.Parse(args[0]), Int32.Parse(args[1])));
+            _settings = new Settings();
+            _logger.Info("Total active log descriptions: " + _settings.LogDescriptions.Count);
+            foreach (LogDescription ld in _settings.LogDescriptions)
+            {
+                WatchOnLogDescription(ld);
+            }
+
+            _settings.LogDescriptionChangeDetected += OnLogDescriptionChangeDetected;
+
+            Console.ReadKey();
+        }
+
+        private static void OnLogDescriptionChangeDetected(object sender,
+                                                           LogDescriptionChangeEventArgs logDescriptionChangeEventArgs)
+        {
+            _logger.Info(String.Format("log descriptions settings {0} detected",
+                                       logDescriptionChangeEventArgs.ChangeType));
+            _logger.Info("Total active log descriptions now: " + _settings.LogDescriptions.Count);
+            LogDescription ld = logDescriptionChangeEventArgs.LogDescription;
+            if (logDescriptionChangeEventArgs.ChangeType == ChangeType.Created)
+                WatchOnLogDescription(ld);
+            else if (logDescriptionChangeEventArgs.ChangeType == ChangeType.Deleted)
+                StopWatchOnLogDescription(ld);
+        }
+
+        private static void StopWatchOnLogDescription(LogDescription ld)
+        {
+            _watchers[ld.Id].Dispose();
+            _watchers.Remove(ld.Id);
+        }
+
+        private static Dictionary<string, LogWatcher> _watchers = new Dictionary<string, LogWatcher>();
+
+        private static void WatchOnLogDescription(LogDescription ld)
+        {
+            LogEventEvaluator eventEvaluator = new LogEventEvaluator(ld.LogEventDescriptions);
+            LogWatcher logWatcher = new LogWatcher(ld);
+
+            if (_debug)
+                logWatcher.OnEventFromReader +=
+                    (s, e) =>
+                        { foreach (var ev in eventEvaluator.Evaluate(e.LogFileName, e.Line)) OutToConsole(null, ev); };
+            else
+            {
+                logWatcher.OnEventFromReader +=
+                    (s, e) =>
+                        { foreach (var ev in eventEvaluator.Evaluate(e.LogFileName, e.Line)) CountEvents(null, ev); };
+                logWatcher.OnEventFromReader +=
+                    (s, e) =>
+                        { foreach (var ev in eventEvaluator.Evaluate(e.LogFileName, e.Line)) OutToServer(null, ev); };
+            }
+            _watchers.Add(ld.Id, logWatcher);
+        }
+
+        private static int _totalEvents;
+        private static DateTime _lastCountEventsCheckPoint = DateTime.Now;
+        private static object _eLock = new object();
+
+        private static void CountEvents(object sender, LogEvent e)
+        {
+            _logger.Debug(e);
+            if (_lastCountEventsCheckPoint.AddMinutes(5) > DateTime.Now)
+                Interlocked.Increment(ref _totalEvents);
+            else
+            {
+                lock (_eLock)
+                {
+                    if (_lastCountEventsCheckPoint.AddMinutes(5) <= DateTime.Now)
+                    {
+                        _logger.Info(_totalEvents + " events generated");
+                        _totalEvents = 0;
+                        _lastCountEventsCheckPoint = DateTime.Now;
+                    }
+                }
+            }
+        }
+
+        private static void OutToServer(object sender, LogEvent e)
         {
             MemoryStream ms = new MemoryStream();
             BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(ms, e.LogEvent);
+            bf.Serialize(ms, e);
             ms.Seek(0, SeekOrigin.Begin);
             byte[] data = new byte[ms.Length];
             ms.Read(data, 0, data.Length);
@@ -139,56 +303,9 @@ namespace iPoint.ServiceStatistics.Agent
             }
         }
 
-        private static void OutToConsole(object sender, LogEventArgs e)
+        private static void OutToConsole(object sender, LogEvent e)
         {
-                Console.WriteLine(e.LogEvent);
+            Console.WriteLine(e);
         }
-
-        static void CreateNewReader(string filePath, LogEventMatcher logEventMatcher)
-        {
-            CreateNewReader(filePath, 0, logEventMatcher);
-        }
-
-        static void logWatcher_NewLogFileCreated(object sender, LogWatcherEventArgs e)
-        {
-            _logger.Info("New log file creation detected: "+e.FullPath);
-            LogWatcher lw = (LogWatcher) sender;
-            CreateNewReader(e.FullPath, _logEventMatchers[lw.Id]);
-        }
-
-        private static void OutToServer(object sender, LineReadedEventArgs e)
-        {
-            string line = e.Line;
-            string logFileName = e.LogFileName;
-            LogEventMatcher matcher = e.LogEventMatcher;
-            foreach (LogEvent logEvent in matcher.FindMatches(logFileName, line))
-            {
-                MemoryStream ms = new MemoryStream();
-                BinaryFormatter bf = new BinaryFormatter();
-                bf.Serialize(ms, logEvent);
-                ms.Seek(0, SeekOrigin.Begin);
-                byte[] data = new byte[ms.Length];
-                ms.Read(data, 0, data.Length);
-                try
-                {
-                    _tcpClient.Send(new MessagePacket(data).GetBytesForTransfer());
-                }
-                catch(Exception ex)
-                {
-                    _logger.ErrorException("Error while sending", ex);
-                }
-            }
-        }
-
-        private static void OutToConsole(object sender, LineReadedEventArgs e)
-        {
-            string line = e.Line;
-            string logFileName = e.LogFileName;
-            LogEventMatcher matcher = e.LogEventMatcher;
-            foreach (LogEvent logEvent in matcher.FindMatches(logFileName, line))
-            {
-                Console.WriteLine(logEvent);
-            }
-        }
-    }
+    }*/
 }

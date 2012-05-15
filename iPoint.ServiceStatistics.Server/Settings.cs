@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using Aggregation;
+using CountersDataLayer.CountersCache;
+using EventEvaluationLib;
+using iPoint.ServiceStatistics.Server.Aggregation;
 
 
 namespace iPoint.ServiceStatistics.Server
 {
     public class Settings
     {
-        public static Cache CountersMapper { get; private set; }
+       
 
         public static ExtendedDataTransformations ExtendedDataTransformations  = new ExtendedDataTransformations();
         public IConnectableObservable<IList<LogEventArgs>> ObservableEvents;
@@ -22,7 +24,7 @@ namespace iPoint.ServiceStatistics.Server
         {
             Aggregators = new List<CounterAggregator>();
           //  AggregationParameters = new List<AggregationParameters>();
-            CountersMapper = new Cache();
+          
             //ExtendedDataTransformations = new ExtendedDataTransformations();
         }
 

@@ -8,9 +8,10 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using Aggregation;
+using CountersDataLayer;
+using CountersDataLayer.CountersCache;
 using iPoint.ServiceStatistics.Server;
-using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
 using iPoint.ServiceStatistics.Web.Models;
 
 namespace iPoint.ServiceStatistics.Web.Controllers
@@ -137,66 +138,79 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             return date;
         }
 
-        
-        
+
+
         [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public virtual JsonResult CounterData(string sd, string ed, int cc, int cn, int cs, int ci, int ced, string series)
-        //public virtual JsonResult CounterData([Bind(Exclude = "")]CounterDataParameters parameters)
         {
             CounterDataParameters parameters = new CounterDataParameters(sd, ed, cc, cn, cs, ci, ced, series);
 
             List<object> allSeriesData = new List<object>();
             DateTime dt = DateTime.Now;
 
-
-            var allSeriesRawData = parameters.Sources.AsParallel().SelectMany(
+            List<CounterSeriesData> allCounterSeriesData = parameters.Sources.AsParallel().SelectMany(
                 source => parameters.Instances.AsParallel().SelectMany(
-                instance => parameters.ExtendedDatas.AsParallel().Select(
-                extData => 
-                    new Tuple<string, string, string, Dictionary<string, List<CounterData>>> (source.Name, instance.Name,extData.Name,
-                    CountersDatabase.Instance.GetCounterData(parameters.BeginDate,parameters.EndDate,
-                    parameters.CounterCategoryId,parameters.CounterNameId,source.Id,instance.Id,extData.Id, parameters.Series))))).ToList();
+                    instance => parameters.ExtendedDatas.AsParallel().SelectMany(
+                        extData =>
+                        CountersDatabase.Instance.GetCounterDataNew(parameters.BeginDate, parameters.EndDate,
+                                                                    parameters.CounterCategoryId,
+                                                                    parameters.CounterNameId, source.Id, instance.Id,
+                                                                    extData.Id, parameters.Series)
+                                    ))).ToList();
 
-            foreach (var seriesRawData in allSeriesRawData)
+            foreach (var counterSeriesData in allCounterSeriesData)
             {
-                allSeriesData.AddRange(seriesRawData.Item4.Select(d => new
-                {
-                    source = seriesRawData.Item1,
-                    instance = seriesRawData.Item2,
-                    extData = seriesRawData.Item3,
-                    seriesName = d.Key,
-                    data = d.Value.Select(v => new List<object> { v.DateTime.ToLocalTime().Ticks / TimeSpan.TicksPerMillisecond, v.Value })
-                }));
-            }
-            #region todelete
-            /*
-            foreach (CounterSourceInfo source in parameters.Sources)
-            {
-                foreach (CounterInstanceInfo instance in parameters.Instances)
-                {
-                    foreach (CounterExtDataInfo extData in parameters.ExtendedDatas)
-                    {
-                        Dictionary<string, List<CounterData>> series =
-                            CountersDatabase.Instance.GetCounterData(parameters.BeginDate,
-                                                                     parameters.EndDate, parameters.CounterCategoryId,
-                                                                     parameters.CounterNameId, source.Id, instance.Id,
-                                                                     extData.Id);
-
-                        dt = series.Count == 0
-                                 ? dt
-                                 : series.First().Value.Last().DateTime.ToLocalTime();
-
-                        allSeriesData.AddRange(series.Select(d => new
+                allSeriesData.Add(
+                    new
                         {
-                            label = source.Name + "_"+ instance.Name +"_" + extData.Name + "_" + d.Key,
-                            data = d.Value.Select(v => new List<object> {v.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, v.Value })
-                        }));
-                    }
-                }
-            }*/
-#endregion
+                            yaxis = counterSeriesData.ValueType == UniversalValue.UniversalClassType.TimeSpan ? 2 : 1,
+                            source = counterSeriesData.CounterSource,
+                            instance = counterSeriesData.CounterInstance,
+                            extData = counterSeriesData.CounterExtData,
+                            counterName = counterSeriesData.CounterName,
+                            counterCategory = counterSeriesData.CounterCategory,
+                            seriesName = counterSeriesData.SeriesName,
+                            data = counterSeriesData.Points.Select(p => new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
+                            uniqId = counterSeriesData.UniqId
+                        });
+            }
+            if (allSeriesData.Count == 0)
+                return Json(null, JsonRequestBehavior.AllowGet);
+            return
+                Json(
+                    new
+                        {
+                            success = true,
+                            lastDate =
+                        (dt < parameters.EndDate ? dt : parameters.EndDate).ToString("dd.MM.yyyy HH:mm:ss"),
+                            seriesData = allSeriesData
+                        }, JsonRequestBehavior.AllowGet);
+        }
 
-            return Json(new { lastDate = allSeriesRawData.Max(s => s.Item4.Count == 0 ? dt : s.Item4.Last().Value.Max(v => v.DateTime)).ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss"), seriesData = allSeriesData }, JsonRequestBehavior.AllowGet);
+        [HttpPost]
+        public virtual JsonResult SaveGraph(string data)
+        {
+            Guid gd = Guid.NewGuid();
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\" + gd.ToString());
+            System.IO.File.WriteAllText(path, data);
+            return Json(new {id = gd.ToString()});
+        }
+
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
+        public virtual JsonResult SavedGraph(string id)
+        {
+            if (id.Contains("..\\") || id.Contains(".\\") || id.Contains("\\")) return Json(null,JsonRequestBehavior.AllowGet);
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\"+id);
+            if (!System.IO.File.Exists(path)) return Json(null, JsonRequestBehavior.AllowGet);
+            string[] savedData = System.IO.File.ReadAllLines(path);
+            List<object> result = new List<object>();
+            for (int i = 0; i <= savedData.Length - 2; i = i + 2)
+            {
+                string surfaceName = savedData[i];
+                string parameters = "[" + String.Join(",", Encoding.UTF8.GetString(Convert.FromBase64String(savedData[i + 1])).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)) + "]";
+                result.Add(new { surfaceName = surfaceName, parameters = parameters });
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public virtual ActionResult SingleGraph(string param, int width = 800, int height = 600)

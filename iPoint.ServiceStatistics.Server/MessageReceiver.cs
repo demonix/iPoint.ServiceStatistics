@@ -4,7 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.Serialization.Formatters.Binary;
-using iPoint.ServiceStatistics.Agent.Core.LogEvents;
+using EventEvaluationLib;
 using MyLib.Networking;
 
 namespace iPoint.ServiceStatistics.Server
@@ -25,7 +25,6 @@ namespace iPoint.ServiceStatistics.Server
 
         private void InvokeOnLogEvent(LogEventArgs e)
         {
-
             string counterNameReplacement = Settings.ExtendedDataTransformations.GetCounterNameReplacement(e.LogEvent.ExtendedData);
             e.LogEvent.Counter += counterNameReplacement;
             _eventSubject.OnNext(e);
@@ -33,9 +32,7 @@ namespace iPoint.ServiceStatistics.Server
 
         void srv_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream(e.Message.MessageData);
-            LogEvent le = (LogEvent)bf.Deserialize(ms);
+            LogEvent le = LogEvent.Deserialize(e.Message.MessageData);
             InvokeOnLogEvent(new LogEventArgs(le));
         }
 

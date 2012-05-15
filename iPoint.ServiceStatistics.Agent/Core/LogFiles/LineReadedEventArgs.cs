@@ -7,13 +7,13 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
     {
         public string LogFileName { get; private set; }
         public string Line { get; private set; }
-        public LogEventMatcher LogEventMatcher { get; private set; }
+        //public LogEventEvaluator LogEventEvaluator { get; private set; }
 
-        public LineReadedEventArgs(string logFileName, string line, LogEventMatcher logEventMatcher)
+        public LineReadedEventArgs(string logFileName, string line/*, LogEventEvaluator logEventEvaluator*/)
         {
             LogFileName = logFileName;
             Line = line;
-            LogEventMatcher = logEventMatcher;
+            //LogEventEvaluator = logEventEvaluator;
         }
     }
 }

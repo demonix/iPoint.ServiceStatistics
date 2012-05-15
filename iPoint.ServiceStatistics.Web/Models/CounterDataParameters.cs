@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using CountersDataLayer;
+using CountersDataLayer.CountersCache;
 
 namespace iPoint.ServiceStatistics.Web.Models
 {
     public class CounterDataParameters
     {
-        public CounterDataParameters(string sd, string ed, int cc, int cn, int cs, int ci, int ced,string series)
+        public CounterDataParameters(string sd, string ed, int cc, int cn, int cs, int ci, int ced, string series)
         {
             BeginDate = Helpers.ParseDate(sd, DateTime.Now.AddHours(-1));
             EndDate = Helpers.ParseDate(ed, DateTime.Now.AddHours(1));
@@ -29,9 +29,9 @@ namespace iPoint.ServiceStatistics.Web.Models
                     d => (ced == -1 && d.Name != "ALL_EXTDATA") || (ced != -1 && d.Id == ced)).ToList();
         }
 
-       
 
-        
+
+
 
         public DateTime BeginDate { get; private set; }
         public DateTime EndDate { get; private set; }
@@ -40,12 +40,12 @@ namespace iPoint.ServiceStatistics.Web.Models
         public int CounterSourceId { get; private set; }
         public int CounterInstanceId { get; private set; }
         public int CounterExtendedDataId { get; private set; }
-        public List<string> Series { get; private set; } 
-            public List<CounterExtDataInfo> ExtendedDatas { get; private set; }
-            public List<CounterInstanceInfo> Instances{ get; private set; }
-            public List<CounterSourceInfo> Sources{ get; private set; }
-            
-         
-         
+        public List<string> Series { get; private set; }
+        public List<CounterExtDataInfo> ExtendedDatas { get; private set; }
+        public List<CounterInstanceInfo> Instances { get; private set; }
+        public List<CounterSourceInfo> Sources { get; private set; }
+
+
+
     }
 }

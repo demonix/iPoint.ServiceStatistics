@@ -72,12 +72,12 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogEvents
 
             ILogEventType d = (ILogEventType)b;
 
-            var c = GetCounter(d, default());
+            var c = GetCounterName(d, default());
 
 
         }
 
-        ILogEvent<T> GetCounter<T>(ILogEventType cnt, T defaultValue)
+        ILogEvent<T> GetCounterName<T>(ILogEventType cnt, T defaultValue)
         {
             
         }

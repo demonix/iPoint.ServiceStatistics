@@ -19,11 +19,11 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
         private object _locker = new object();
         protected FileSystemWatcher _watcher;
         public event EventHandler<LineReadedEventArgs> LineReaded;
-        public event EventHandler<LogEventArgs> OnLogEvent;
+        //public event EventHandler<LogEventArgs> OnLogEvent;
 
         public event EventHandler<EventArgs> FinishedReading;
         private readonly LogDescription _logDescription;
-        protected readonly LogEventMatcher LogEventMatcher;
+        //protected readonly LogEventEvaluator LogEventEvaluator;
         private EventWaitHandle _mayStopFlag = new EventWaitHandle(true, EventResetMode.ManualReset);
 
         public LogDescription LogDescription
@@ -31,35 +31,35 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
             get { return _logDescription; }
         }
 
-        public LogReaderBase(string logFileName, Encoding encoding, LogDescription logDescription,
-                             LogEventMatcher logEventMatcher)
+        public LogReaderBase(string logFileName, Encoding encoding, LogDescription logDescription/*,
+                             LogEventEvaluator logEventEvaluator*/)
         {
             _logFileName = logFileName;
             _logFileEncoding = encoding;
             _logDescription = logDescription;
-            LogEventMatcher = logEventMatcher;
+            //LogEventEvaluator = logEventEvaluator;
             _currentPosition = 0;
             CreateWatcher();
         }
 
-        public LogReaderBase(string logFileName, long currentPosition, Encoding encoding, LogDescription logDescription,
-                             LogEventMatcher logEventMatcher)
+        public LogReaderBase(string logFileName, long currentPosition, Encoding encoding, LogDescription logDescription/*,
+                             LogEventEvaluator logEventEvaluator*/)
         {
             _logFileName = logFileName;
             _logFileEncoding = encoding;
             _logDescription = logDescription;
-            LogEventMatcher = logEventMatcher;
+            //LogEventEvaluator = logEventEvaluator;
             _currentPosition = currentPosition;
             CreateWatcher();
         }
 
-        public LogReaderBase(Stream stream, Encoding encoding, LogDescription logDescription,
-                             LogEventMatcher logEventMatcher)
+        public LogReaderBase(Stream stream, Encoding encoding, LogDescription logDescription/*,
+                             LogEventEvaluator logEventEvaluator*/)
         {
             _logFileName = "undefined";
             _logFileEncoding = encoding;
             _logDescription = logDescription;
-            LogEventMatcher = logEventMatcher;
+            //LogEventEvaluator = logEventEvaluator;
             _currentPosition = stream.Position;
             CreateWatcher();
         }
@@ -127,16 +127,15 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
                     _currentPosition = _logFileStreamReader.GetRealPosition();
                     if (LineReaded != null)
                     {
-                        LineReaded(this, new LineReadedEventArgs(_logFileName, line, LogEventMatcher));
-                        
+                        LineReaded(this, new LineReadedEventArgs(_logFileName, line/*, LogEventEvaluator*/));
                     }
-                    if (OnLogEvent != null)
+                    /*if (OnLogEvent != null)
                     {
-                        foreach (LogEvent logEvent in LogEventMatcher.FindMatches(_logFileName, line))
+                        foreach (LogEvent logEvent in LogEventEvaluator.Evaluate(_logFileName, line))
                         {
                             OnLogEvent(this, new LogEventArgs(logEvent));
                         }
-                    }
+                    }*/
                 }
 
                 if (FinishedReading != null)
@@ -165,6 +164,12 @@ namespace iPoint.ServiceStatistics.Agent.Core.LogFiles
             if (_fileInfoRefreshTimer != null)
                 _fileInfoRefreshTimer.Dispose();
             _mayStopFlag.Close();
+        }
+
+        public void Dispose()
+        {
+            Close();
+            LineReaded = null;
         }
     }
 }

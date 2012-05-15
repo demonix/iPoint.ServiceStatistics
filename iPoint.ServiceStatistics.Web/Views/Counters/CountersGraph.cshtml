@@ -1,12 +1,20 @@
 ﻿@model iPoint.ServiceStatistics.Web.Models.CounterGraphModel
 
 <div id="drawer-@Html.DisplayTextFor(m => m.Id)">
-    <p id="caption"></p>
-    <div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"></div>
-    <div id="legendContainer-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:10px"></div>
-    <div id="overview-@Html.DisplayTextFor(m => m.Id)" style="width:300px;height:150px;float:left;margin-left:20px"></div>
-    <p id="choices-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:20px">Show:</p>
-    <input id="drawBtn-@Html.DisplayTextFor(m => m.Id)" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />
-    <input id="showParamsBtn-@Html.DisplayTextFor(m => m.Id)" type="button" value="Show Parameters" onclick="showParameters('@Html.DisplayTextFor(m => m.Id)')" />
+    <div>
+        <p id="caption"></p>
+    </div>
+    <div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"/>
+
+    <div style="float:left;margin-left:10px">
+        <input id="drawBtn-@Html.DisplayTextFor(m => m.Id)" style="float:left;" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />
+        <input id="showParamsBtn-@Html.DisplayTextFor(m => m.Id)" style="float:left;margin-left:10px" type="button" value="Show Parameters" onclick="showParameters('@Html.DisplayTextFor(m => m.Id)')" />
+        <div style="clear:both;margin-bottom:10px"/>
+        <div id="legendContainer-@Html.DisplayTextFor(m => m.Id)" style="float:left;"></div>
+        <div style="clear:both;margin-top:10px"/>
+        <div id="overview-@Html.DisplayTextFor(m => m.Id)" style="width:300px;height:150px;float:left;"></div>     
+    </div>
     <div style="clear:both"></div>
 </div>
+
+

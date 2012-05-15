@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using CountersDataLayer;
+using CountersDataLayer.CountersCache;
+using EventEvaluationLib;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.КэшСчетчиков;
+using iPoint.ServiceStatistics.Agent;
 
 namespace CountersDbCleanup
 {
@@ -16,6 +19,11 @@ namespace CountersDbCleanup
         private static Dictionary<string, DateTime> _lastDates = new Dictionary<string, DateTime>();
         static void Main(string[] args)
         {
+
+            var a = FilePathHelpers.FindDirectoriesOnFixedDisks("\\\\lit-karmazin\\temp\\k*").ToList();
+
+            List<string> s = FilePathHelpers.GetDirectoriesByMaskedPath(@"c:\s*\m*").ToList();
+
             ReadLastDates();
             CountersDatabase.InitConnection("127.0.0.1", null, "counters");
             MongoCollection<BsonDocument> items = CountersDatabase.Instance.Database.GetCollection("countersData");
