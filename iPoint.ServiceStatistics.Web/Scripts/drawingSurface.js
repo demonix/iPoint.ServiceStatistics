@@ -55,7 +55,7 @@
         points: {
             show: false
         },
-        grid:{axisMargin:5, labelMargin:5},
+        grid: { axisMargin: 5, labelMargin: 5 },
         xaxis: {
             mode: "time",
             autoscaleMargin: 0.02
@@ -92,7 +92,10 @@
         var result = [];
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
-                result.push(dataSeries);
+                if (!dataSeries.lines || dataSeries.lines.show)
+                    result.push(dataSeries);
+                else
+                    result.push($.extend(false, {}, dataSeries, { data:  [null] }));
             });
         });
         return result;
