@@ -3,6 +3,8 @@
     var self = this;
 
     var dataUpdaters = new Array();
+    self.Name = name;
+    self.Id = id;
     self.drawingArea = drawingArea;
     self.drawingAreaPlot = undefined;
     self.overviewArea = overviewArea;
@@ -21,7 +23,31 @@
         hms += s.substr(s.length - 2) + "." + cs.substr(cs.length - 3);
         return hms;
     };
-    
+
+
+    self.formatLabel = function (label, s) {
+        var action = s.lines.show ? 'hide' : 'show';
+        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label + '\')">' + action + '</a>)';
+    };
+
+    //<a href="#" onclick="javascript:drawingSurfaces["bff1b2c3-4109-46d3-bf5b-1b0133eee675"].toggleseries("ft:="" error_count="" (app103)");"="">FT: Error_Count (APP103)</a>
+
+    //<a href="#" onclick="drawingSurfaces[7986ac57-99aa-439a-be88-30d77a5bf4e2].ToggleSeries(" ft:="" error_count="" (app106)")"="">FT: Error_Count (APP106)</a>
+
+    self.ToggleSeries = function (seriesName) {
+        $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
+            $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
+                if (dataSeries.label != seriesName) return;
+                if (dataSeries.lines == undefined)
+                    dataSeries.lines = {};
+                if (dataSeries.lines.show == undefined)
+                    dataSeries.lines.show = true;
+                dataSeries.lines.show = !dataSeries.lines.show;
+            });
+        });
+        self.ForcedUpdate();
+    };
+
     self.drawingOptions = {
         lines: {
             show: true
@@ -29,11 +55,12 @@
         points: {
             show: false
         },
+        grid:{axisMargin:5, labelMargin:5},
         xaxis: {
             mode: "time",
             autoscaleMargin: 0.02
         },
-        yaxis: { max: null,alignTicksWithAxis:1 },
+        yaxis: { max: null, alignTicksWithAxis: 1 },
         yaxes: [{}, { position: "right", tickFormatter: self.millisecondsToDuration}],
         zoom: {
             interactive: false
@@ -42,7 +69,7 @@
             interactive: false
         },
         //selection: { mode: "xy" },
-        legend: { container: legendArea }
+        legend: { container: legendArea, labelFormatter: self.formatLabel }
     };
 
     if (!legendArea)
@@ -120,11 +147,19 @@
         timeoutHandler = setTimeout(function () { self.UpdateInternal(); }, 5000);
     };
 
+    self.ForcedUpdate = function () {
+
+        var currentData = getCurrentData();
+        self.drawingAreaPlot = $.plot(self.drawingArea, currentData, self.drawingOptions);
+        if (self.overviewAreaPlot)
+            self.overviewAreaPlot = $.plot(self.overviewArea, currentData, self.overviewOptions);
+    };
+
     self.DataUpdaterSettingsToString = function () {
         var result = "";
         $.each(dataUpdaters, function (idx, dataUpdater) { result = result + dataUpdater.ParamsToString() + "\n"; });
         return $.base64.encode(result);
     };
 
-    
+
 }

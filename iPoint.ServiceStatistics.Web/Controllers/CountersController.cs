@@ -148,15 +148,6 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             List<object> allSeriesData = new List<object>();
             DateTime dt = DateTime.Now;
 
-
-            /*    var allSeriesRawData = parameters.Sources.AsParallel().SelectMany(
-                    source => parameters.Instances.AsParallel().SelectMany(
-                    instance => parameters.ExtendedDatas.AsParallel().Select(
-                    extData => 
-                        new Tuple<string, string, string, Dictionary<string, List<CounterData>>> (source.Name, instance.Name,extData.Name,
-                        CountersDatabase.Instance.GetCounterData(parameters.BeginDate,parameters.EndDate,
-                        parameters.CounterCategoryId,parameters.CounterNameId,source.Id,instance.Id,extData.Id, parameters.Series))))).ToList();
-    */
             List<CounterSeriesData> allCounterSeriesData = parameters.Sources.AsParallel().SelectMany(
                 source => parameters.Instances.AsParallel().SelectMany(
                     instance => parameters.ExtendedDatas.AsParallel().SelectMany(
@@ -179,9 +170,8 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                             counterName = counterSeriesData.CounterName,
                             counterCategory = counterSeriesData.CounterCategory,
                             seriesName = counterSeriesData.SeriesName,
-                            data =
-                        counterSeriesData.Points.Select(
-                            p => new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value})
+                            data = counterSeriesData.Points.Select(p => new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
+                            uniqId = counterSeriesData.UniqId
                         });
             }
             if (allSeriesData.Count == 0)
@@ -195,6 +185,32 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                         (dt < parameters.EndDate ? dt : parameters.EndDate).ToString("dd.MM.yyyy HH:mm:ss"),
                             seriesData = allSeriesData
                         }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public virtual JsonResult SaveGraph(string data)
+        {
+            Guid gd = Guid.NewGuid();
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\" + gd.ToString());
+            System.IO.File.WriteAllText(path, data);
+            return Json(new {id = gd.ToString()});
+        }
+
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
+        public virtual JsonResult SavedGraph(string id)
+        {
+            if (id.Contains("..\\") || id.Contains(".\\") || id.Contains("\\")) return Json(null,JsonRequestBehavior.AllowGet);
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\"+id);
+            if (!System.IO.File.Exists(path)) return Json(null, JsonRequestBehavior.AllowGet);
+            string[] savedData = System.IO.File.ReadAllLines(path);
+            List<object> result = new List<object>();
+            for (int i = 0; i <= savedData.Length - 2; i = i + 2)
+            {
+                string surfaceName = savedData[i];
+                string parameters = "[" + String.Join(",", Encoding.UTF8.GetString(Convert.FromBase64String(savedData[i + 1])).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)) + "]";
+                result.Add(new { surfaceName = surfaceName, parameters = parameters });
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public virtual ActionResult SingleGraph(string param, int width = 800, int height = 600)

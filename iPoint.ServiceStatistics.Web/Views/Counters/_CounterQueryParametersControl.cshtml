@@ -146,6 +146,8 @@
             <td>
                 <select id="drawingSurfaces" name="drawingSurfaces" />
                 <input id="addDrawingSurfaceBtn" type="button" value="Add Surface" onclick="addSurface()" />
+                <input id="saveGraphBtn" type="button" value="Save Graph" onclick="saveGraph()" />
+                <input id="loadGraphBtn" type="button" value="Load Graph" onclick="loadGraph()" />
             </td>
               
         </tr>
@@ -164,7 +166,40 @@
         }
     }
 
+    
+    function loadGraph() {
+        var id = prompt('Enter saved graph id', '');
+        if (id && id != '' && id != null && !drawingSurfaces[id]) {
+            $.get("/Counters/SavedGraph", { id: id })
+                .success(function(data) {
+                    $.each(drawingSurfaces, function(didx, drawingSurface) {
+                        remove(drawingSurface.Id);
+                    });
+                    $.each(data, function(gidx, graph) {
+                        createSurface(graph.surfaceName, function(surfaceData) {
+                            $.each(eval(graph.parameters), function(pidx, parameter) {
+                                createCounterAndAddToSurface(parameter, surfaceData.id, true);
+                            });
+                        });
+                    });
+                });
+        }
+    }
 
+    function saveGraph() {
+        var dataToSave = "";
+        $.each(drawingSurfaces, function(index, drawingSurface) {
+            dataToSave += drawingSurface.Name + "\r\n";
+            dataToSave += drawingSurface.DataUpdaterSettingsToString() + "\r\n";
+        });
+        $.post("/Counters/SaveGraph", { data: dataToSave }).success(function(data) { showId(data); }).error(function(data) { alert("error"); });
+    }
+
+
+    var showId = function(data) { alert(data.id); };
+      
+     
+     
     function createSurface(name, callback) {
         $.get("/Counters/CountersGraph")
             .success(function(data) {

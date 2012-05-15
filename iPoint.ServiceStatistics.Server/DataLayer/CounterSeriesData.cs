@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using iPoint.ServiceStatistics.Server.Aggregation;
 
 namespace iPoint.ServiceStatistics.Server.DataLayer
@@ -34,6 +35,8 @@ namespace iPoint.ServiceStatistics.Server.DataLayer
             lastPointWasNull = seriesPoint == null;
             Points.Add(seriesPoint);
         }
+
+        public string UniqId { get { return (CounterCategory+CounterName+CounterSource+CounterInstance+CounterExtData+SeriesName).GetHashCode().ToString(CultureInfo.InvariantCulture); } }
     }
 
     public class SeriesPoint
