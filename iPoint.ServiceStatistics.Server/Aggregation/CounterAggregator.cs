@@ -110,7 +110,13 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
        
         private Action<TotalAggregationResult> OnResult()
         {
-            return result => CountersDatabase.Instance.SaveCounters(result);
+            return result =>
+                       {
+                           Console.WriteLine(result.ResultGroups.Count() + " combinations of " + result.CounterCategory + "." +
+                                             result.CounterName + " aggregated for " +
+                                             DateTime.Now.Subtract(result.Date).TotalMilliseconds/1000d + " seconds. (" +result.Date.TimeOfDay + ")");
+                           CountersDatabase.Instance.SaveCounters(result);
+                       };
         }
         
         public Func<LogEventArgs, bool> CreateEventSelector()

@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="CounterData.cs" />
     <Compile Include="CountersCache\Cache.cs" />
     <Compile Include="CountersCache\CacheMonad.cs" />

@@ -27,7 +27,7 @@ namespace CountersDataLayer.CountersCache
         public void Update()
         {
             List<CounterCategoryInfo> freshCategories =
-                CountersDatabase.Instance.New_GetCounterCategories().Where(c => c.Id > _maxId).ToList();
+                CountersDatabase.Instance.GetCounterCategories().Where(c => c.Id > _maxId).ToList();
             if (freshCategories.Count == 0)
                 return;
             _maxId = freshCategories.Max(e => e.Id);
@@ -46,7 +46,7 @@ namespace CountersDataLayer.CountersCache
             if (_dict.TryAdd(cat.Name, cat))
             {
                 _reverseDict.TryAdd(cat.Id, cat);
-                CountersDatabase.Instance.New_SaveCounterCategory(cat);
+                CountersDatabase.Instance.SaveCounterCategory(cat);
             }
             return cat;
         }

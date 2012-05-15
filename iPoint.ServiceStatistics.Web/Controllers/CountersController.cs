@@ -89,19 +89,19 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             DateTime endDate = DateTime.ParseExact(ed, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
             IEnumerable<SelectListItem> sourcesListItems =
-                CountersDatabase.Instance.New_GetCounterSources(cc, cn).Select(s => new SelectListItem()
+                CountersDatabase.Instance.GetCounterSources(cc, cn).Select(s => new SelectListItem()
                                                                                         {
                                                                                             Text = s.Name,
                                                                                             Value = s.Id.ToString(CultureInfo.InvariantCulture)
                                                                                         });
             IEnumerable<SelectListItem> instancesListItems =
-                CountersDatabase.Instance.New_GetCounterInstances(cc, cn).Select(s => new SelectListItem()
+                CountersDatabase.Instance.GetCounterInstances(cc, cn).Select(s => new SelectListItem()
                                                                                           {
                                                                                               Text = s.Name,
                                                                                               Value = s.Id.ToString(CultureInfo.InvariantCulture)
                                                                                           });
             IEnumerable<SelectListItem> extDatasListItems =
-                CountersDatabase.Instance.New_GetCounterExtDatas(cc, cn).Select(s => new SelectListItem()
+                CountersDatabase.Instance.GetCounterExtDatas(cc, cn).Select(s => new SelectListItem()
                                                                                          {
                                                                                              Text = s.Name,
                                                                                              Value = s.Id.ToString(CultureInfo.InvariantCulture)
@@ -152,7 +152,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                 source => parameters.Instances.AsParallel().SelectMany(
                     instance => parameters.ExtendedDatas.AsParallel().SelectMany(
                         extData =>
-                        CountersDatabase.Instance.GetCounterDataNew(parameters.BeginDate, parameters.EndDate,
+                        CountersDatabase.Instance.GetCounterData(parameters.BeginDate, parameters.EndDate,
                                                                     parameters.CounterCategoryId,
                                                                     parameters.CounterNameId, source.Id, instance.Id,
                                                                     extData.Id, parameters.Series)

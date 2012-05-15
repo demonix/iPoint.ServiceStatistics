@@ -68,12 +68,6 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\ext\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\ext\MongoDB.Driver.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -95,18 +89,6 @@
     <ProjectReference Include="..\CountersDataLayer\CountersDataLayer.csproj">
       <Project>{6B8027E5-D5CC-4AC3-B73C-02D6913FB684}</Project>
       <Name>CountersDataLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventEvaluationLib\EventEvaluationLib.csproj">
-      <Project>{B9181A55-EE72-4A43-A013-7A119F830F0D}</Project>
-      <Name>EventEvaluationLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\iPoint.ServiceStatistics.Agent\iPoint.ServiceStatistics.Agent.csproj">
-      <Project>{CDBA75D7-087B-4B3F-A34E-FBB45BB3DD12}</Project>
-      <Name>iPoint.ServiceStatistics.Agent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\iPoint.ServiceStatistics.Server\iPoint.ServiceStatistics.Server.csproj">
-      <Project>{EAD971AD-38A8-459B-AA7B-802C574161AE}</Project>
-      <Name>iPoint.ServiceStatistics.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -20,7 +20,7 @@ namespace CountersDataLayer.CountersCache
             if (_dict.TryAdd(instanceInfo.Name, instanceInfo))
             {
                 _reverseDict.TryAdd(instanceInfo.Id, instanceInfo);
-                CountersDatabase.Instance.New_SaveCounterInstance(_parentCategoryId, _parentCounterId, instanceInfo);
+                CountersDatabase.Instance.SaveCounterInstance(_parentCategoryId, _parentCounterId, instanceInfo);
             }
             return instanceInfo;
         }
@@ -30,7 +30,7 @@ namespace CountersDataLayer.CountersCache
             if (_dict.Count != 0)
                 return;
             List<CounterInstanceInfo> instances =
-                CountersDatabase.Instance.New_GetCounterInstances(_parentCategoryId, _parentCounterId).ToList();
+                CountersDatabase.Instance.GetCounterInstances(_parentCategoryId, _parentCounterId).ToList();
             if (instances.Count == 0)
                 return;
             _maxId = instances.Max(e => e.Id);
@@ -44,7 +44,7 @@ namespace CountersDataLayer.CountersCache
         public void Update()
         {
             List<CounterInstanceInfo> instances =
-                CountersDatabase.Instance.New_GetCounterInstances(_parentCategoryId, _parentCounterId).Where(e=>e.Id>_maxId).ToList();
+                CountersDatabase.Instance.GetCounterInstances(_parentCategoryId, _parentCounterId).Where(e=>e.Id>_maxId).ToList();
             if (instances.Count == 0)
                 return;
             _maxId = instances.Max(e => e.Id);

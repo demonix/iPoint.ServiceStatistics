@@ -11,11 +11,19 @@ namespace CountersDataLayer
 {
     public class CountersDatabase
     {
-        private MongoServer _server;
-        public MongoDatabase Database { get; private set; }
+        private static object _locker = new object();
         private Cache _countersMapper = null;
         private object _countersMapperLock = new object();
+        private MongoServer _server;
 
+
+        private CountersDatabase(MongoServer server, MongoDatabase database)
+        {
+            _server = server;
+            Database = database;
+        }
+
+        public MongoDatabase Database { get; private set; }
 
         public Cache CountersMapper
         {
@@ -30,16 +38,7 @@ namespace CountersDataLayer
             }
         }
 
-        private CountersDatabase(MongoServer server, MongoDatabase database)
-        {
-            _server = server;
-            Database = database;
-
-        }
-
         public static CountersDatabase Instance { get; private set; }
-        private static object _locker = new object();
-
 
 
         public static void InitConnection(string host, int? port, string dbName)
@@ -82,7 +81,6 @@ namespace CountersDataLayer
 
         public void SaveCounters(TotalAggregationResult counters)
         {
-
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
 
             BsonDocument cData = new BsonDocument()
@@ -108,13 +106,7 @@ namespace CountersDataLayer
                                         {"type", counters.CounterAggregationType.ToString()},
                                         {"data", cData}
                                     };
-            Console.WriteLine(cData.ElementCount + " combinations of " + counters.CounterCategory + "." +
-                              counters.CounterName + " aggregated for " +
-                              DateTime.Now.Subtract((DateTime) counters.Date).TotalMilliseconds/1000d + " seconds. (" +
-                              counters.Date.TimeOfDay + ")");
             items.Insert(data);
-
-
         }
 
         private BsonValue GetBsonValue(UniversalValue item)
@@ -129,7 +121,6 @@ namespace CountersDataLayer
                     return new BsonString(item.StringValue);
                 default:
                     throw new Exception("Unknown type " + item.Type);
-
             }
         }
 
@@ -152,67 +143,6 @@ namespace CountersDataLayer
             return res == null ? null : new CounterCategoryInfo(res["category"].AsString, res["id"].AsInt32);
         }
 
-
-        public IEnumerable<CounterNameInfo> GetCounterNames2(int categoryId)
-        {
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
-            QueryComplete q = Query.EQ("id", categoryId);
-            var cursor = items.Find(q);
-            cursor.SetFields(Fields.Include("counters"));
-            var counter = cursor.FirstOrDefault();
-            if (counter == null || counter["counters"] == null)
-                return Enumerable.Empty<CounterNameInfo>();
-            return
-                counter["counters"].AsBsonArray.Select(
-                    d =>
-                    new CounterNameInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32, categoryId));
-        }
-
-        public IEnumerable<CounterSourceInfo> New_GetCounterSources(int categoryId, int counterId)
-        {
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
-            QueryComplete q = Query.EQ("id", categoryId);
-            var cursor = items.Find(q);
-            cursor.SetFields(Fields.Include("c" + counterId + ".sources"));
-            var counter = cursor.FirstOrDefault();
-            if (counter == null || counter["c" + counterId] == null ||
-                counter["c" + counterId].AsBsonDocument["sources"] == null)
-                return Enumerable.Empty<CounterSourceInfo>();
-            return
-                counter["c" + counterId].AsBsonDocument["sources"].AsBsonArray.Select(
-                    d => new CounterSourceInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
-        }
-
-        public IEnumerable<CounterInstanceInfo> New_GetCounterInstances(int categoryId, int counterId)
-        {
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
-            QueryComplete q = Query.EQ("id", categoryId);
-            var cursor = items.Find(q);
-            cursor.SetFields(Fields.Include("c" + counterId + ".instances"));
-            var counter = cursor.FirstOrDefault();
-            if (counter == null || counter["c" + counterId] == null ||
-                counter["c" + counterId].AsBsonDocument["instances"] == null)
-                return Enumerable.Empty<CounterInstanceInfo>();
-            return
-                counter["c" + counterId].AsBsonDocument["instances"].AsBsonArray.Select(
-                    d => new CounterInstanceInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
-        }
-
-        public IEnumerable<CounterExtDataInfo> New_GetCounterExtDatas(int categoryId, int counterId)
-        {
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
-            QueryComplete q = Query.EQ("id", categoryId);
-            var cursor = items.Find(q);
-            cursor.SetFields(Fields.Include("c" + counterId + ".extDatas"));
-            var counter = cursor.FirstOrDefault();
-            if (counter == null || counter["c" + counterId] == null ||
-                counter["c" + counterId].AsBsonDocument["extDatas"] == null)
-                return Enumerable.Empty<CounterExtDataInfo>();
-            return
-                counter["c" + counterId].AsBsonDocument["extDatas"].AsBsonArray.Select(
-                    d => new CounterExtDataInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
-        }
-
         public IEnumerable<string> GetCounterCategories(DateTime beginDate, DateTime endDate)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
@@ -221,6 +151,63 @@ namespace CountersDataLayer
             cursor.SetFields(Fields.Include("counterCategory"));
             return cursor.Select(d => d["counterCategory"].AsString).Distinct();
         }
+
+
+        public IEnumerable<CounterNameInfo> GetCounterNames2(int categoryId)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
+            QueryComplete q = Query.EQ("id", categoryId);
+            var cursor = items.Find(q);
+            cursor.SetFields(Fields.Include("counters"));
+            var counter = cursor.FirstOrDefault();
+            if (counter == null || !counter.Contains("counters"))
+                return Enumerable.Empty<CounterNameInfo>();
+            return
+                counter["counters"].AsBsonArray.Select(
+                    d =>
+                    new CounterNameInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32, categoryId));
+        }
+
+        public IEnumerable<CounterSourceInfo> GetCounterSources(int categoryId, int counterId)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
+            QueryComplete q = Query.EQ("id", categoryId);
+            var cursor = items.Find(q);
+            cursor.SetFields(Fields.Include("c" + counterId + ".sources"));
+            var counter = cursor.FirstOrDefault();
+            if (counter == null || !counter.Contains("c" + counterId)|| !counter["c" + counterId].AsBsonDocument.Contains("sources"))
+                return Enumerable.Empty<CounterSourceInfo>();
+            return
+                counter["c" + counterId].AsBsonDocument["sources"].AsBsonArray.Select(d => new CounterSourceInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
+        }
+
+        public IEnumerable<CounterInstanceInfo> GetCounterInstances(int categoryId, int counterId)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
+            QueryComplete q = Query.EQ("id", categoryId);
+            var cursor = items.Find(q);
+            cursor.SetFields(Fields.Include("c" + counterId + ".instances"));
+            var counter = cursor.FirstOrDefault();
+            if (counter == null || !counter.Contains("c" + counterId) || !counter["c" + counterId].AsBsonDocument.Contains("instances"))
+                return Enumerable.Empty<CounterInstanceInfo>();
+            return
+                counter["c" + counterId].AsBsonDocument["instances"].AsBsonArray.Select(d => new CounterInstanceInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
+        }
+
+        public IEnumerable<CounterExtDataInfo> GetCounterExtDatas(int categoryId, int counterId)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
+            QueryComplete q = Query.EQ("id", categoryId);
+            var cursor = items.Find(q);
+            cursor.SetFields(Fields.Include("c" + counterId + ".extDatas"));
+            var counter = cursor.FirstOrDefault();
+            if (counter == null || !counter.Contains("c" + counterId)|| !counter["c" + counterId].AsBsonDocument.Contains("extDatas"))
+                return Enumerable.Empty<CounterExtDataInfo>();
+            return
+                counter["c" + counterId].AsBsonDocument["extDatas"].AsBsonArray.Select(d => new CounterExtDataInfo(d.AsBsonDocument["name"].AsString, d.AsBsonDocument["id"].AsInt32));
+        }
+
+     
 
         public IEnumerable<string> GetCounterNames(DateTime beginDate, DateTime endDate, string counterCategory)
         {
@@ -246,13 +233,49 @@ namespace CountersDataLayer
                                  new CounterDetail(d["source"].AsString, d["instance"].AsString,
                                                    d.Contains("extendedData") ? d["extendedData"].AsString : null)
                 );
+        }
 
+        public DateTime? GetFreshestAfterDate( string counterCategory, string counterName, DateTime date)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
+            IMongoQuery sq = Query.And(Query.GT("date", date),
+                                       Query.EQ("counterCategory", counterCategory),
+                                       Query.EQ("counterName", counterName));
+            var cursor = items.Find(sq);
+            cursor.Limit = 1;
+            cursor.SetFields("date");
+            if (cursor.Size() == 0)
+                return null;
+            return cursor.First()["date"].AsDateTime;
+        }
+        public DateTime? GetFreshestNotAfterDate(string counterCategory, string counterName, DateTime date)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
+            IMongoQuery sq = Query.And(Query.LTE("date", date),
+                                       Query.EQ("counterCategory", counterCategory),
+                                       Query.EQ("counterName", counterName));
+            var cursor = items.Find(sq);
+            cursor.SetSortOrder(new SortByBuilder().Descending("date"));
+            cursor.Limit = 1;
+            cursor.SetFields("date");
+            if (cursor.Size() == 0)
+                return null;
+            return cursor.First()["date"].AsDateTime;
         }
 
 
-        public List<CounterSeriesData> GetCounterDataNew(DateTime beginDate, DateTime endDate, int counterCategoryId,
-                                                         int counterNameId, int counterSourceId, int counterInstanceId,
-                                                         int counterExtDataId, List<string> seriesFilter)
+        public void RemoveCountersValuesBetweenDates(string counterCategory, string counterName, DateTime leftDate, DateTime rightDate)
+        {
+            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
+            IMongoQuery dq = Query.And(Query.GT("date", leftDate).LT(rightDate),
+                                                   Query.EQ("counterCategory", counterCategory),
+                                                   Query.EQ("counterName", counterName));
+            items.Remove(dq, SafeMode.True);
+        }
+
+        public List<CounterSeriesData> GetCounterData(DateTime beginDate, DateTime endDate, int counterCategoryId,
+                                                      int counterNameId, int counterSourceId, int counterInstanceId,
+                                                      int counterExtDataId, List<string> seriesFilter)
         {
             List<CounterSeriesData> resultData = new List<CounterSeriesData>();
             if (seriesFilter.Count == 0)
@@ -318,63 +341,14 @@ namespace CountersDataLayer
         }
 
 
-        public Dictionary<string, List<CounterData>> GetCounterData(DateTime beginDate, DateTime endDate,
-                                                                    int counterCategoryId, int counterNameId,
-                                                                    int counterSourceId, int counterInstanceId,
-                                                                    int counterExtDataId, List<string> seriesFilter)
-        {
-            Dictionary<string, List<CounterData>> resultData = new Dictionary<string, List<CounterData>>();
-            if (seriesFilter.Count == 0)
-                return resultData;
-            bool getAllSeries = seriesFilter.Contains("*");
-            MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
-            QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
-            QueryComplete qb2 = Query.EQ("counterCategory", CountersMapper.GetMappedCategoryName(counterCategoryId));
-            QueryComplete qb3 = Query.EQ("counterName",
-                                         CountersMapper.GetMappedCounterName(counterCategoryId, counterNameId));
-            SortByBuilder sortOrder = new SortByBuilder().Ascending("date");
-            var cursor = items.Find(Query.And(qb, qb2, qb3));
-            cursor.SetSortOrder(sortOrder);
-            string key = counterSourceId + "/" + counterInstanceId + "/" + counterExtDataId;
-            cursor.SetFields(Fields.Include("type", "date", "data." + key));
-
-            foreach (BsonDocument cnt in cursor)
-            {
-                var data = cnt["data"].AsBsonDocument;
-                if (!data.Contains(key))
-                {
-                    foreach (string valueLabel in resultData.Keys)
-                        if (getAllSeries || seriesFilter.Contains(valueLabel))
-                            resultData[valueLabel].Add(new CounterData(cnt["date"].AsDateTime, null));
-                    continue;
-                }
-                var values = data[key].AsBsonDocument;
-                foreach (BsonElement bsonElement in values)
-                {
-                    if (!getAllSeries && !seriesFilter.Contains(bsonElement.Name)) continue;
-                    if (!resultData.ContainsKey(bsonElement.Name))
-                        resultData.Add(bsonElement.Name, new List<CounterData>());
-                    resultData[bsonElement.Name].Add(new CounterData(cnt["date"].AsDateTime,
-                                                                     bsonElement.Value.IsString
-                                                                         ? new UniversalValue(
-                                                                               TimeSpan.Parse(bsonElement.Value.AsString))
-                                                                         : new UniversalValue(
-                                                                               bsonElement.Value.ToDouble())));
-                }
-            }
-            return resultData;
-        }
-
-
-
-        public IEnumerable<CounterNameInfo> New_GetCounterNamesInCategory(int categoryId)
+        public IEnumerable<CounterNameInfo> GetCounterNamesInCategory(int categoryId)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             QueryComplete q = Query.EQ("id", categoryId);
             var cursor = items.Find(q);
             cursor.SetFields(Fields.Include("counters"));
             var counter = cursor.FirstOrDefault();
-            if (counter == null || counter["counters"] == null)
+            if (counter == null || !counter.Contains("counters"))
                 return Enumerable.Empty<CounterNameInfo>();
             return
                 counter["counters"].AsBsonArray.Select(
@@ -383,7 +357,7 @@ namespace CountersDataLayer
         }
 
 
-        public void New_SaveCounterCategory(CounterCategoryInfo cat)
+        public void SaveCounterCategory(CounterCategoryInfo cat)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             items.Insert(new BsonDocument
@@ -394,7 +368,7 @@ namespace CountersDataLayer
                              }, SafeMode.True);
         }
 
-        public void New_SaveCounterName(int parentCategoryId, CounterNameInfo nameInfo)
+        public void SaveCounterName(int parentCategoryId, CounterNameInfo nameInfo)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             IMongoQuery q = Query.EQ("id", parentCategoryId);
@@ -409,7 +383,7 @@ namespace CountersDataLayer
             items.Update(q, u, UpdateFlags.Upsert, SafeMode.True);
         }
 
-        public IEnumerable<CounterCategoryInfo> New_GetCounterCategories()
+        public IEnumerable<CounterCategoryInfo> GetCounterCategories()
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             var cursor = items.FindAll();
@@ -417,7 +391,7 @@ namespace CountersDataLayer
             return cursor.Select(d => new CounterCategoryInfo(d["category"].AsString, d["id"].AsInt32));
         }
 
-        public void New_SaveCounterSource(int parentCategoryId, int parentCounterId, CounterSourceInfo counterSourceInfo)
+        public void SaveCounterSource(int parentCategoryId, int parentCounterId, CounterSourceInfo counterSourceInfo)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             IMongoQuery q = Query.And(Query.EQ("id", parentCategoryId));
@@ -427,8 +401,8 @@ namespace CountersDataLayer
             items.Update(q, u, UpdateFlags.Upsert, SafeMode.True);
         }
 
-        public void New_SaveCounterInstance(int parentCategoryId, int parentCounterId,
-                                            CounterInstanceInfo counterInstanceInfo)
+        public void SaveCounterInstance(int parentCategoryId, int parentCounterId,
+                                        CounterInstanceInfo counterInstanceInfo)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             IMongoQuery q = Query.And(Query.EQ("id", parentCategoryId));
@@ -440,8 +414,8 @@ namespace CountersDataLayer
         }
 
 
-        public void New_SaveCounterExtData(int parentCategoryId, int parentCounterId,
-                                           CounterExtDataInfo counterExtDataInfo)
+        public void SaveCounterExtData(int parentCategoryId, int parentCounterId,
+                                       CounterExtDataInfo counterExtDataInfo)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersInfo");
             IMongoQuery q = Query.And(Query.EQ("id", parentCategoryId));
@@ -455,16 +429,15 @@ namespace CountersDataLayer
 
     public class CounterDetail
     {
-        public string Source { get; set; }
-        public string Instance { get; set; }
-        public string ExtData { get; set; }
-
         public CounterDetail(string source, string instance, string extData)
         {
             Source = source;
             Instance = instance;
             ExtData = extData;
         }
-    }
 
+        public string Source { get; set; }
+        public string Instance { get; set; }
+        public string ExtData { get; set; }
+    }
 }

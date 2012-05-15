@@ -2,15 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using CountersDataLayer;
 using CountersDataLayer.CountersCache;
-using EventEvaluationLib;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using iPoint.ServiceStatistics.Agent;
+
 
 namespace CountersDbCleanup
 {
@@ -19,19 +13,14 @@ namespace CountersDbCleanup
         private static Dictionary<string, DateTime> _lastDates = new Dictionary<string, DateTime>();
         static void Main(string[] args)
         {
-
-            var a = FilePathHelpers.FindDirectoriesOnFixedDisks("\\\\lit-karmazin\\temp\\k*").ToList();
-
-            List<string> s = FilePathHelpers.GetDirectoriesByMaskedPath(@"c:\s*\m*").ToList();
-
             ReadLastDates();
-            CountersDatabase.InitConnection("127.0.0.1", null, "counters");
-            MongoCollection<BsonDocument> items = CountersDatabase.Instance.Database.GetCollection("countersData");
-            List<CounterCategoryInfo> categories = CountersDatabase.Instance.New_GetCounterCategories().ToList();
+            string mongoUrl = File.ReadAllText("settings\\mongoConnection");
+            CountersDatabase.InitConnection(mongoUrl);
+            List<CounterCategoryInfo> categories = CountersDatabase.Instance.GetCounterCategories().ToList();
             foreach (CounterCategoryInfo counterCategoryInfo in categories)
             {
                 List<CounterNameInfo> counterNames =
-                    CountersDatabase.Instance.New_GetCounterNamesInCategory(counterCategoryInfo.Id).ToList();
+                    CountersDatabase.Instance.GetCounterNamesInCategory(counterCategoryInfo.Id).ToList();
                 foreach (CounterNameInfo counterNameInfo in counterNames)
                 {
                     Console.WriteLine("Чистим " + counterCategoryInfo.Name + "." + counterNameInfo.Name);
@@ -39,21 +28,11 @@ namespace CountersDbCleanup
                     left = right = GetLastProcessedDateForCounter(counterCategoryInfo, counterNameInfo);
                     while (right < DateTime.Now.AddMinutes(-20))
                     {
-                        IMongoQuery sq = Query.And(Query.GT("date", left),
-                                                   Query.EQ("counterCategory", counterCategoryInfo.Name),
-                                                   Query.EQ("counterName", counterNameInfo.Name));
-                        var cursor = items.Find(sq);
-                        cursor.Limit = 1;
-                        cursor.SetFields("date");
-                        if (cursor.Size() == 0)
-                            break;
-
-                        left = cursor.First()["date"].AsDateTime;
+                        var possibleLeftDate = CountersDatabase.Instance.GetFreshestAfterDate(counterCategoryInfo.Name, counterNameInfo.Name, left);
+                        if(!possibleLeftDate.HasValue) break;
+                        left = possibleLeftDate.Value;
                         right = left.AddMinutes(5).AddSeconds(-1);
-                        IMongoQuery dq = Query.And(Query.GT("date", left).LT(right),
-                                                   Query.EQ("counterCategory", counterCategoryInfo.Name),
-                                                   Query.EQ("counterName", counterNameInfo.Name));
-                        items.Remove(dq, SafeMode.True);
+                        CountersDatabase.Instance.RemoveCountersValuesBetweenDates(counterCategoryInfo.Name, counterNameInfo.Name, left, right);
                         //left = right.AddSeconds(1);
                     }
                     Console.WriteLine("Почистили " + counterCategoryInfo.Name + "." + counterNameInfo.Name);
@@ -61,6 +40,10 @@ namespace CountersDbCleanup
                 }
             }
         }
+
+       
+
+      
 
         private static void ReadLastDates()
         {
