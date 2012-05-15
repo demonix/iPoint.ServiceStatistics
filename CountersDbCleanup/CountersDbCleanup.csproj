@@ -92,6 +92,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CountersDataLayer\CountersDataLayer.csproj">
+      <Project>{6B8027E5-D5CC-4AC3-B73C-02D6913FB684}</Project>
+      <Name>CountersDataLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventEvaluationLib\EventEvaluationLib.csproj">
       <Project>{B9181A55-EE72-4A43-A013-7A119F830F0D}</Project>
       <Name>EventEvaluationLib</Name>

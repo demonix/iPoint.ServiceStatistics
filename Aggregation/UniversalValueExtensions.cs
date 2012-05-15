@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace iPoint.ServiceStatistics.Server.Aggregation
+namespace Aggregation
 {
     public static class UniversalValueExtensions
     {

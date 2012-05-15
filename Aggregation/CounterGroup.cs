@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 
-namespace iPoint.ServiceStatistics.Server.Aggregation
+namespace Aggregation
 {
     public class CounterGroup
     {

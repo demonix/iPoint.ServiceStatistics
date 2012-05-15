@@ -302,6 +302,14 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Aggregation\Aggregation.csproj">
+      <Project>{BE906802-FA85-480F-B6FF-2791E766E269}</Project>
+      <Name>Aggregation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CountersDataLayer\CountersDataLayer.csproj">
+      <Project>{6B8027E5-D5CC-4AC3-B73C-02D6913FB684}</Project>
+      <Name>CountersDataLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\iPoint.ServiceStatistics.Server\iPoint.ServiceStatistics.Server.csproj">
       <Project>{EAD971AD-38A8-459B-AA7B-802C574161AE}</Project>
       <Name>iPoint.ServiceStatistics.Server</Name>

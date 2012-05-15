@@ -72,12 +72,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\ext\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\ext\MongoDB.Driver.dll</HintPath>
-    </Reference>
     <Reference Include="MyLib">
       <HintPath>..\..\MyLib\MyLib\bin\Debug\MyLib.dll</HintPath>
     </Reference>
@@ -93,20 +87,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AggregationParameters.cs" />
-    <Compile Include="Aggregation\AggregationFunctions.cs" />
-    <Compile Include="Aggregation\GroupAggregationResult.cs" />
-    <Compile Include="Aggregation\AggregationType.cs" />
     <Compile Include="Aggregation\CounterAggregator.cs" />
-    <Compile Include="Aggregation\CounterGroup.cs" />
-    <Compile Include="Aggregation\TotalAggregationResult.cs" />
-    <Compile Include="Aggregation\UniversalValue.cs" />
-    <Compile Include="Aggregation\UniversalValueExtensions.cs" />
     <Compile Include="ArrayExtensions.cs" />
-    <Compile Include="CounterData.cs" />
     <Compile Include="CountersAutoDiscoverer.cs" />
-    <Compile Include="DataLayer\CountersDatabase.cs" />
-    <Compile Include="DataLayer\CounterSeriesData.cs" />
     <Compile Include="DeadCountersDetector.cs" />
     <Compile Include="ExtendedDataTransformations.cs" />
     <Compile Include="MessageReceiver.cs" />
@@ -115,20 +98,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="CountersCache\Cache.cs" />
-    <Compile Include="CountersCache\CacheMonad.cs" />
-    <Compile Include="CountersCache\CounterCategoryInfoCache.cs" />
-    <Compile Include="CountersCache\CounterExtDataInfo.cs" />
-    <Compile Include="CountersCache\CounterExtDataInfoCache.cs" />
-    <Compile Include="CountersCache\CounterInstanceInfo.cs" />
-    <Compile Include="CountersCache\CounterInstanceInfoCache.cs" />
-    <Compile Include="CountersCache\CounterNameInfo.cs" />
-    <Compile Include="CountersCache\CounterNameInfoCache.cs" />
-    <Compile Include="CountersCache\CounterSourceInfo.cs" />
-    <Compile Include="CountersCache\CounterSourceInfoCache.cs" />
-    <Compile Include="CountersCache\IInfo.cs" />
-    <Compile Include="CountersCache\InfoCacheBase.cs" />
-    <Compile Include="CountersCache\CounterCategoryInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -137,12 +106,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Aggregation\Aggregation.csproj">
+      <Project>{BE906802-FA85-480F-B6FF-2791E766E269}</Project>
+      <Name>Aggregation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CountersDataLayer\CountersDataLayer.csproj">
+      <Project>{6B8027E5-D5CC-4AC3-B73C-02D6913FB684}</Project>
+      <Name>CountersDataLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventEvaluationLib\EventEvaluationLib.csproj">
       <Project>{B9181A55-EE72-4A43-A013-7A119F830F0D}</Project>
       <Name>EventEvaluationLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DataLayer\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using iPoint.ServiceStatistics.Server.Aggregation;
+using Aggregation;
 
-namespace iPoint.ServiceStatistics.Server.DataLayer
+namespace CountersDataLayer
 {
     public class CounterSeriesData
     {

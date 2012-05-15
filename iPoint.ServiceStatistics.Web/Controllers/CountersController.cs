@@ -8,10 +8,10 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using Aggregation;
+using CountersDataLayer;
+using CountersDataLayer.CountersCache;
 using iPoint.ServiceStatistics.Server;
-using iPoint.ServiceStatistics.Server.Aggregation;
-using iPoint.ServiceStatistics.Server.DataLayer;
-using iPoint.ServiceStatistics.Server.CountersCache;
 using iPoint.ServiceStatistics.Web.Models;
 
 namespace iPoint.ServiceStatistics.Web.Controllers

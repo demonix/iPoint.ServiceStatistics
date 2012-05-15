@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Reactive.Linq;
-using iPoint.ServiceStatistics.Server.DataLayer;
+using CountersDataLayer;
 using MyLib.Networking;
 
 namespace iPoint.ServiceStatistics.Server

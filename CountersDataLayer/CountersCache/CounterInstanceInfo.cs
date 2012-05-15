@@ -1,8 +1,8 @@
-namespace iPoint.ServiceStatistics.Server.CountersCache
+namespace CountersDataLayer.CountersCache
 {
-    public class CounterSourceInfo
+    public class CounterInstanceInfo
     {
-        public CounterSourceInfo(string name, int id)
+        public CounterInstanceInfo(string name, int id)
         {
             Name = name;
             Id = id;

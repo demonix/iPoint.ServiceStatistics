@@ -1,7 +1,7 @@
-﻿using System;
-using iPoint.ServiceStatistics.Server.Aggregation;
+using System;
+using Aggregation;
 
-namespace iPoint.ServiceStatistics.Server
+namespace CountersDataLayer
 {
     public class CounterData
     {

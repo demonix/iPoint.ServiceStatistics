@@ -4,11 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Aggregation;
+using CountersDataLayer;
 using EventEvaluationLib;
-using iPoint.ServiceStatistics.Server.Aggregation;
-using iPoint.ServiceStatistics.Server.DataLayer;
 
-namespace iPoint.ServiceStatistics.Server
+namespace iPoint.ServiceStatistics.Server.Aggregation
 {
     public class CounterAggregator
     {
@@ -133,10 +133,10 @@ namespace iPoint.ServiceStatistics.Server
                 actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
                     break;
                 case AggregationType.Min:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Min()))));
+                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, Enumerable.Min(s)))));
                     break;
                 case AggregationType.Max:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Max()))));
+                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, Enumerable.Max(s)))));
                     break;
                 case AggregationType.Avg:
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Average()))));

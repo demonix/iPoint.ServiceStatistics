@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
 
-namespace iPoint.ServiceStatistics.Server.Aggregation
+namespace Aggregation
 {
     public class GroupAggregationResult
     {
@@ -36,7 +35,7 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
         }
         string FormatResult()
         {
-            return String.Join(", ", Result.Select(r => String.Format("{0}: \"{1}\"", r.Item1, r.Item2)));
+            return String.Join(", ", (IEnumerable<string>) Result.Select(r => String.Format("{0}: \"{1}\"", r.Item1, r.Item2)));
         }
 
 

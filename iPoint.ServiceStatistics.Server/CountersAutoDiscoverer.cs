@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive;
 using EventEvaluationLib;
+using iPoint.ServiceStatistics.Server.Aggregation;
 
 namespace iPoint.ServiceStatistics.Server
 {

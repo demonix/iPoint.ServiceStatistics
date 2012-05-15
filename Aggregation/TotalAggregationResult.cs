@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using iPoint.ServiceStatistics.Server.Aggregation;
-using MongoDB.Bson;
 
-namespace iPoint.ServiceStatistics.Server
+namespace Aggregation
 {
     public class TotalAggregationResult
     {

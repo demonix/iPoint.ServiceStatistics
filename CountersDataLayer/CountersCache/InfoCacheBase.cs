@@ -1,9 +1,6 @@
-﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
 
-namespace iPoint.ServiceStatistics.Server.CountersCache
+namespace CountersDataLayer.CountersCache
 {
     public class InfoCacheBase<T> where T:class
     {

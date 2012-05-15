@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using iPoint.ServiceStatistics.Server.DataLayer;
-
-namespace iPoint.ServiceStatistics.Server.CountersCache
+namespace CountersDataLayer.CountersCache
 {
     public class CounterCategoryInfo
     {

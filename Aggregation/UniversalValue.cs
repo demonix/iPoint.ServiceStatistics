@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Globalization;
 
-namespace iPoint.ServiceStatistics.Server.Aggregation
+namespace Aggregation
 {
     public class UniversalValue
     {

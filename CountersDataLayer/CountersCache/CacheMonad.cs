@@ -1,4 +1,4 @@
-﻿namespace iPoint.ServiceStatistics.Server.CountersCache
+namespace CountersDataLayer.CountersCache
 {
     public static class CacheMonad
     {

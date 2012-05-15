@@ -6,8 +6,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using CountersDataLayer;
 using iPoint.ServiceStatistics.Server;
-using iPoint.ServiceStatistics.Server.DataLayer;
 using iPoint.ServiceStatistics.Web.Models;
 
 namespace iPoint.ServiceStatistics.Web

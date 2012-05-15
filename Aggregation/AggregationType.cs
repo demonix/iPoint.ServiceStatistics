@@ -1,4 +1,4 @@
-﻿namespace iPoint.ServiceStatistics.Server
+namespace Aggregation
 {
     public enum AggregationType
     {

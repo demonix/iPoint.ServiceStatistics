@@ -1,26 +1,25 @@
 using System;
-using System.Dynamic;
-using System.Net;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Driver;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using Aggregation;
+using CountersDataLayer.CountersCache;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using iPoint.ServiceStatistics.Server.Aggregation;
-using iPoint.ServiceStatistics.Server.CountersCache;
 
-namespace iPoint.ServiceStatistics.Server.DataLayer
+namespace CountersDataLayer
 {
     public class CountersDatabase
     {
         private MongoServer _server;
         public MongoDatabase Database { get; private set; }
+        public static Cache CountersMapper { get; private set; }
 
         private CountersDatabase(MongoServer server, MongoDatabase database)
         {
             _server = server;
             Database = database;
+            CountersMapper = new Cache();
         }
 
         public static CountersDatabase Instance { get; private set; }
@@ -111,7 +110,7 @@ namespace iPoint.ServiceStatistics.Server.DataLayer
                                      {
                                          counters.ResultGroups.Select(
                                              r =>
-                                             new BsonElement(Settings.CountersMapper.Map(counters.CounterCategory,
+                                             new BsonElement(CountersMapper.Map(counters.CounterCategory,
                                                                              counters.CounterName, 
                                                                              r.CounterGroup.Source,
                                                                              r.CounterGroup.Instance,
@@ -127,7 +126,7 @@ namespace iPoint.ServiceStatistics.Server.DataLayer
                                         {"type", counters.CounterAggregationType.ToString()},
                                         {"data", cData}
                                     };
-            Console.WriteLine(cData.ElementCount + " combinations of " + counters.CounterCategory + "." + counters.CounterName + " aggregated for " + DateTime.Now.Subtract(counters.Date).TotalMilliseconds / 1000d + " seconds. (" + counters.Date.TimeOfDay+")");
+            Console.WriteLine(cData.ElementCount + " combinations of " + counters.CounterCategory + "." + counters.CounterName + " aggregated for " + DateTime.Now.Subtract((DateTime) counters.Date).TotalMilliseconds / 1000d + " seconds. (" + counters.Date.TimeOfDay+")");
             items.Insert(data);
             
 
@@ -350,11 +349,11 @@ case UniversalValue.UniversalClassType.String:
             List<string> seriesNames = new List<string>();
 
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
-            string mappedCategoryName = Settings.CountersMapper.GetMappedCategoryName(counterCategoryId);
-            string mappedCounterName = Settings.CountersMapper.GetMappedCounterName(counterCategoryId, counterNameId);
-            string mappedCounterInstance = Settings.CountersMapper.GetMappedCounterInstanceName(counterCategoryId, counterNameId, counterInstanceId);
-            string mappedCounterSource = Settings.CountersMapper.GetMappedCounterSourceName(counterCategoryId, counterNameId, counterSourceId);
-            string mappedCounterExtData = Settings.CountersMapper.GetMappedCounterExtDataName(counterCategoryId, counterNameId, counterExtDataId);
+            string mappedCategoryName = CountersMapper.GetMappedCategoryName(counterCategoryId);
+            string mappedCounterName = CountersMapper.GetMappedCounterName(counterCategoryId, counterNameId);
+            string mappedCounterInstance = CountersMapper.GetMappedCounterInstanceName(counterCategoryId, counterNameId, counterInstanceId);
+            string mappedCounterSource = CountersMapper.GetMappedCounterSourceName(counterCategoryId, counterNameId, counterSourceId);
+            string mappedCounterExtData = CountersMapper.GetMappedCounterExtDataName(counterCategoryId, counterNameId, counterExtDataId);
            
 
             QueryComplete qb = Query.GT("date", beginDate).LTE(endDate);
@@ -411,8 +410,8 @@ case UniversalValue.UniversalClassType.String:
             bool getAllSeries = seriesFilter.Contains("*");
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             QueryComplete qb = Query.GTE("date", beginDate).LTE(endDate);
-            QueryComplete qb2 = Query.EQ("counterCategory", Settings.CountersMapper.GetMappedCategoryName(counterCategoryId));
-            QueryComplete qb3 = Query.EQ("counterName", Settings.CountersMapper.GetMappedCounterName(counterCategoryId,counterNameId));
+            QueryComplete qb2 = Query.EQ("counterCategory", CountersMapper.GetMappedCategoryName(counterCategoryId));
+            QueryComplete qb3 = Query.EQ("counterName", CountersMapper.GetMappedCounterName(counterCategoryId,counterNameId));
             SortByBuilder sortOrder = new SortByBuilder().Ascending("date");
             var cursor = items.Find(Query.And(qb, qb2, qb3));
             cursor.SetSortOrder(sortOrder);
