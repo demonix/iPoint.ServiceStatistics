@@ -13,13 +13,28 @@ namespace CountersDataLayer
     {
         private MongoServer _server;
         public MongoDatabase Database { get; private set; }
-        public static Cache CountersMapper { get; private set; }
+        private  Cache _countersMapper = null;
+        private object _countersMapperLock = new object();
+
+
+        public Cache CountersMapper
+        {
+            get
+            {
+                if (_countersMapper == null)
+                    lock (_countersMapperLock)
+                    {
+                        _countersMapper = new Cache();
+                    }
+                return _countersMapper;
+            }
+        }
 
         private CountersDatabase(MongoServer server, MongoDatabase database)
         {
             _server = server;
             Database = database;
-            CountersMapper = new Cache();
+            
         }
 
         public static CountersDatabase Instance { get; private set; }
