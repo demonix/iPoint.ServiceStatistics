@@ -56,6 +56,8 @@ namespace EventEvaluationLib
                 new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
                 StringSplitOptions.RemoveEmptyEntries);
 
+            if (pathTailwithMask.StartsWith("\\\\"))
+                parts[0] = "\\\\" + parts[0];
             if (parts.Length == 0)
             {
                 yield return begining;
@@ -65,6 +67,8 @@ namespace EventEvaluationLib
             {
                 possibleDirectories = new string[1];
                 possibleDirectories[0] = begining + parts[0];
+                if (pathTailwithMask.StartsWith("\\\\"))
+                possibleDirectories[0] += "\\" + parts[1];
             }
             else if (String.IsNullOrEmpty(begining))
             {
@@ -91,10 +95,10 @@ namespace EventEvaluationLib
             }
             foreach (string possibleDirectory in possibleDirectories)
             {
-                foreach (string directory in GetDirectoryPathsRecurcively(possibleDirectory + Path.DirectorySeparatorChar,
+                foreach (string directory in GetDirectoryPathsRecurcively(possibleDirectory + Path.DirectorySeparatorChar ,
                                                                         String.Join(
                                                                             new string(Path.DirectorySeparatorChar, 1),
-                                                                            parts.Skip(1).ToArray())))
+                                                                            parts.Skip(pathTailwithMask.StartsWith("\\\\")? 2: 1).ToArray())))
                 {
                     yield return directory;
                 }

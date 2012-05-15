@@ -48,6 +48,7 @@ namespace EventEvaluationLib
         public LogWatcher(string configFilePath, List<string> watchedDirectories, Regex fileMask, Encoding encoding)
             : base(Path.ChangeExtension(configFilePath, "rules"), "*")
         {
+            _logger.Info("Watcher for "+configFilePath+" monitors files in folders:\r\n" + String.Join("\r\n",watchedDirectories.ToArray()));
             _logWatcherConfigFilePath = configFilePath;
             _logEventEvaluatorRulesConfigDirectoryPath = Path.ChangeExtension(_logWatcherConfigFilePath, "rules");
             if (!Directory.Exists(_logEventEvaluatorRulesConfigDirectoryPath)) 
