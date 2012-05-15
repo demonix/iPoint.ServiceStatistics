@@ -1,0 +1,1 @@
+mongodb://server1:port1[,server2:port2]/counters?[replSet=rs0]&safe=true&slaveOk=true

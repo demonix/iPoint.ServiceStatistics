@@ -287,6 +287,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4MvcJs.js</LastGenOutput>
     </None>
+    <None Include="settings\mongoConnection.example" />
     <None Include="T4MVC.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4MVC.cs</LastGenOutput>
