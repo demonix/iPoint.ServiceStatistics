@@ -225,6 +225,7 @@
     <Content Include="Scripts\flot\jquery.flot.pie.js" />
     <Content Include="Scripts\flot\jquery.flot.resize.js" />
     <Content Include="Scripts\flot\jquery.flot.selection.js" />
+    <Content Include="Scripts\flot\jquery.flot.spline.js" />
     <Content Include="Scripts\flot\jquery.flot.stack.js" />
     <Content Include="Scripts\flot\jquery.flot.symbol.js" />
     <Content Include="Scripts\flot\jquery.flot.threshold.js" />

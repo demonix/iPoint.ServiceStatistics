@@ -170,7 +170,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                             counterName = counterSeriesData.CounterName,
                             counterCategory = counterSeriesData.CounterCategory,
                             seriesName = counterSeriesData.SeriesName,
-                            data = counterSeriesData.Points.Select(p => new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
+                            data = counterSeriesData.Points.Select(p => p==null? null:new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
                             uniqId = counterSeriesData.UniqId
                         });
             }

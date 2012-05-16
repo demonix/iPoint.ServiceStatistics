@@ -282,7 +282,8 @@ namespace CountersDataLayer
                 return resultData;
             bool getAllSeries = seriesFilter.Contains("*");
             List<string> seriesNames = new List<string>();
-
+            
+            
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             string mappedCategoryName = CountersMapper.GetMappedCategoryName(counterCategoryId);
             string mappedCounterName = CountersMapper.GetMappedCounterName(counterCategoryId, counterNameId);
@@ -294,7 +295,10 @@ namespace CountersDataLayer
                                                                                      counterExtDataId);
 
 
-            QueryComplete qb = Query.GT("date", beginDate).LTE(endDate);
+            QueryComplete qb = beginDate == endDate
+                                   ? Query.EQ("date", beginDate)
+                                   : Query.GT("date", beginDate).LTE(endDate);
+
             QueryComplete qb2 = Query.EQ("counterCategory", mappedCategoryName);
             QueryComplete qb3 = Query.EQ("counterName", mappedCounterName);
             SortByBuilder sortOrder = new SortByBuilder().Ascending("date");
@@ -319,7 +323,8 @@ namespace CountersDataLayer
                 foreach (BsonElement seriesPoint in seriesPoints)
                 {
                     string seriesName = seriesPoint.Name;
-
+                    if (!seriesNames.Contains(seriesName))
+                        seriesNames.Add(seriesName);
                     if (!getAllSeries && !seriesFilter.Contains(seriesName)) continue;
                     var value = seriesPoint.Value.IsString
                                     ? new UniversalValue(
