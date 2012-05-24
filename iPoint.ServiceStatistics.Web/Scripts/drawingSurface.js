@@ -50,6 +50,7 @@
 
     self.drawingOptions = {
         lines: {
+            steps: true,
             show: true
         },
         points: {
@@ -96,7 +97,7 @@
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
                 if (!dataSeries.lines || dataSeries.lines.show)
-                    result.push(dataSeries);
+                    result.push($.extend(false, {}, dataSeries));
                 else
                     result.push($.extend(false, {}, dataSeries, { data:  [null] }));
             });

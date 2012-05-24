@@ -14,13 +14,14 @@
 <script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/date-ru-RU.js")" type="text/javascript"></script>
 
-<div id="drawersParameters">
+@*<div id="drawersParameters">
 @for (int i = 0; i < dps.Length; i++)
 {
     @Html.TextBox("dps." + i, dps[i], new { @class = "dps" })
     <br/>
 }
 </div>
+*@
 
 <div id ="drawings"/>
 
@@ -69,13 +70,13 @@
     function onCountersGraphReceived(data, name) {
         $("#drawings").append(data.graphingSurface);
         $("#placeholder-" + data.id).width(@ViewBag.PlotWidth).height(@ViewBag.PlotHeight);
-        $("#legendContainer-" + data.id).hide();
+        //$("#legendContainer-" + data.id).hide();
         $("#overview-" + data.id).hide();
         $("#choices-" + data.id).hide();
         $("#drawBtn-" + data.id).hide();
         $("#showParamsBtn-" + data.id).hide();
         drawingSurfaces[data.id] = new DrawingSurface(name, data.id,
-            $("#placeholder-" + data.id));
+            $("#placeholder-" + data.id),null,$("#legendContainer-" + data.id));
 
     }
     

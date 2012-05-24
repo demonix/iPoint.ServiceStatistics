@@ -220,7 +220,6 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             ViewBag.Temp = drawersParameters;
             ViewBag.PlotWidth = width;
             ViewBag.PlotHeight = height;
-
             return View();
         }
 

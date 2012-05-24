@@ -62,6 +62,7 @@ namespace EventEvaluationLib.LogReaders
             try
             {
                 //NOTE: винда обновляет информациию о файле при закрытии хендла. Поэтому открываем и тут же закрываем хендл :)
+                _logger.Trace("RefreshFileInfo for " + _fileInfo.FullName);
                 _fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite).Close();
                 _fileInfo.Refresh();
             }
@@ -88,6 +89,7 @@ namespace EventEvaluationLib.LogReaders
 
         protected void FileSystemWatcherFired(object sender, FileSystemEventArgs fileSystemEventArgs)
         {
+            _logger.Trace("FileSystemWatcher Fired for " + fileSystemEventArgs.FullPath);
             _readInternal.Invoke();
         }
 

@@ -15,21 +15,37 @@
     var removeUnneededPoints = function (seriesData, stripeInterval, untouchedTailing, totalInterval) {
         var toRemove = 0;
 
-        if (seriesData.data.length > 0) {
-            while (seriesData.data.length >0 && (seriesData.data[seriesData.data.length - 1] == null || seriesData.data[0] == null || (seriesData.data[seriesData.data.length - 1][0] - totalInterval > seriesData.data[0][0]))) {
-                seriesData.data.splice(0, 1);
-                if (seriesData.lastNonstrippedPointIdx > 0)
-                    seriesData.lastNonstrippedPointIdx--;
+        var lastIndexWithData = seriesData.data.length - 1;
+        for (; lastIndexWithData > 0; lastIndexWithData--) {
+            if (seriesData.data[lastIndexWithData] != null)
+                break;
+        }
+
+        //удаляем ненужные точки в начале графика
+        while (seriesData.data.length > 0 && //пока есть что удалять и 
+        (seriesData.data[0] == null ||  //перваря точка - null (они не нужна, нужно удалить) или
+                    seriesData.data[0][0] < seriesData.data[lastIndexWithData][0] - totalInterval))  //дата первой точки меньше диапазон, за который мы отображаем данные
+        {
+            seriesData.data.splice(0, 1);
+            lastIndexWithData--;
+            if (seriesData.lastNonstrippedPointIdx > 0) {
+                seriesData.lastNonstrippedPointIdx--; //сдвигаем последнюю промежуточную точку назад
             }
         }
 
+        //удаляем промежуточные точки
+
         for (var i = seriesData.lastNonstrippedPointIdx + 1; i < seriesData.data.length; i++) {
             if (seriesData.data[i] == null) continue;
-            if (seriesData.data[i][0] + untouchedTailing > seriesData.data[seriesData.data.length - 1][0]) {
+
+            while (seriesData.data[seriesData.lastNonstrippedPointIdx] == null && seriesData.lastNonstrippedPointIdx < seriesData.data.length - 1) {
+                seriesData.lastNonstrippedPointIdx++;
+            }
+
+            if (seriesData.data[i][0] + untouchedTailing > seriesData.data[lastIndexWithData][0]) {
                 break;
             }
-            
-            if (seriesData.data[seriesData.lastNonstrippedPointIdx] == null) continue;
+
             if (seriesData.data[i][0] < seriesData.data[seriesData.lastNonstrippedPointIdx][0] + stripeInterval) {
                 toRemove++;
                 continue;
@@ -37,6 +53,7 @@
 
             if (seriesData.data[i][0] >= seriesData.data[seriesData.lastNonstrippedPointIdx][0] + stripeInterval) {
                 seriesData.data.splice(seriesData.lastNonstrippedPointIdx + 1, toRemove);
+                lastIndexWithData = lastIndexWithData - toRemove;
                 toRemove = 0;
                 seriesData.lastNonstrippedPointIdx++;
                 i = seriesData.lastNonstrippedPointIdx;
