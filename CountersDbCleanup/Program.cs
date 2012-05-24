@@ -11,8 +11,43 @@ namespace CountersDbCleanup
     class Program
     {
         private static Dictionary<string, DateTime> _lastDates = new Dictionary<string, DateTime>();
+        
+        static void Test()
+        {
+            string mongoUrl = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"\settings\mongoConnection");
+            CountersDatabase.InitConnection(mongoUrl);
+
+            DateTime? date = CountersDatabase.Instance.GetFreshestAfterDate("Запросы на сертификат", "Количество запросов",
+                                                           DateTime.Now.AddMinutes(-30));
+            if (date.HasValue)
+            {
+                
+                List<CounterSeriesData> list = CountersDatabase.Instance.GetCounterData(
+                    new DateTime(date.Value.Ticks, DateTimeKind.Utc).AddHours(-0.6),
+                    new DateTime(date.Value.Ticks, DateTimeKind.Utc).AddHours(0.5),
+                    8, 1, 2, 2, 3, new List<string>() { "*" });
+
+                foreach (CounterSeriesData data in list)
+                {
+                    foreach (SeriesPoint point in data.Points)
+                    {
+                
+                    }
+                }
+                //<option value="2" selected="selected">ALL_SOURCES</option>
+                //<option value="2" selected="selected">ALL_INSTANCES</option>
+                //<option value="3" selected="selected">ALL_EXTDATA</option>
+            }
+            else
+            {
+                
+            }
+
+        }
+
         static void Main(string[] args)
         {
+            Test();
             ReadLastDates();
             string mongoUrl = File.ReadAllText("settings\\mongoConnection");
             CountersDatabase.InitConnection(mongoUrl);

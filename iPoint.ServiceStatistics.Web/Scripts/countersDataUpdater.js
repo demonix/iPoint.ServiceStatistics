@@ -16,7 +16,7 @@
         var toRemove = 0;
 
         if (seriesData.data.length > 0) {
-            while (seriesData.data[seriesData.data.length - 1] == null || (seriesData.data[seriesData.data.length - 1][0] - totalInterval > seriesData.data[0][0])) {
+            while (seriesData.data.length >0 && (seriesData.data[seriesData.data.length - 1] == null || seriesData.data[0] == null || (seriesData.data[seriesData.data.length - 1][0] - totalInterval > seriesData.data[0][0]))) {
                 seriesData.data.splice(0, 1);
                 if (seriesData.lastNonstrippedPointIdx > 0)
                     seriesData.lastNonstrippedPointIdx--;

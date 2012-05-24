@@ -115,7 +115,19 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
                            Console.WriteLine(result.ResultGroups.Count() + " combinations of " + result.CounterCategory + "." +
                                              result.CounterName + " aggregated for " +
                                              DateTime.Now.Subtract(result.Date).TotalMilliseconds/1000d + " seconds. (" +result.Date.TimeOfDay + ")");
-                           CountersDatabase.Instance.SaveCounters(result);
+                           for (int i = 0; i < 3;i++)
+                           {
+                               try
+                               {
+                                   CountersDatabase.Instance.SaveCounters(result);
+                                   break;
+                               }catch(Exception)
+                               {
+                                   
+                               }
+
+                           }
+
                        };
         }
         

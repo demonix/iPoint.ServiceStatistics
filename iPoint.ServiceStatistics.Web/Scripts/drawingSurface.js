@@ -27,7 +27,7 @@
 
     self.formatLabel = function (label, s) {
         var action = s.lines.show ? 'hide' : 'show';
-        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label + '\'); return false;">' + action + '</a>)';
+        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label.replace(new RegExp("\'", 'g'), "\\\'") + '\'); return false;">' + action + '</a>)';
     };
 
     //<a href="#" onclick="javascript:drawingSurfaces["bff1b2c3-4109-46d3-bf5b-1b0133eee675"].toggleseries("ft:="" error_count="" (app103)");"="">FT: Error_Count (APP103)</a>
@@ -59,6 +59,9 @@
         xaxis: {
             mode: "time",
             autoscaleMargin: 0.02
+        },
+        series: {
+            shadowSize: 0
         },
         yaxis: { max: null, alignTicksWithAxis: 1 },
         yaxes: [{}, { position: "right", tickFormatter: self.millisecondsToDuration}],

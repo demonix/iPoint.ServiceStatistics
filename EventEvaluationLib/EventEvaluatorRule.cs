@@ -99,7 +99,7 @@ namespace EventEvaluationLib
                                 TimeSpan timeSpan;
                                 if (Double.TryParse(match.Groups["value"].Value, out value))
                                     if (TimeSpan.TryParse(match.Groups["timespan"].Value, out timeSpan))
-                                        return (value/timeSpan.Milliseconds).ToString("F");
+                                        return (value/timeSpan.TotalMilliseconds).ToString("F");
                                 return "0";
                             };
             }

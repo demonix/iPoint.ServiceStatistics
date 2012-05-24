@@ -122,7 +122,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             return View(new CounterQueryParameters());
         }
 
-        [OutputCache(Location =  OutputCacheLocation.None)]
+        [OutputCache(Location =  OutputCacheLocation.None, NoStore = true)]
         public virtual JsonResult CountersGraph()
         {
             Guid id = Guid.NewGuid();
@@ -174,7 +174,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                             uniqId = counterSeriesData.UniqId
                         });
             }
-            if (allSeriesData.Count == 0)
+            if (allSeriesData.Count == 0 && String.IsNullOrEmpty(ed))
                 return Json(null, JsonRequestBehavior.AllowGet);
             return
                 Json(

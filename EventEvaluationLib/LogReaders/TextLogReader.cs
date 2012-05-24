@@ -18,7 +18,14 @@ namespace EventEvaluationLib.LogReaders
         {
             CreateReader();
         }
-        
+
+        protected override void ReCreateReader()
+        {
+            LogFileStreamReader.Close();
+            _logFileStream.Close();
+            CreateReader();
+        }
+
         protected override void CreateReader()
         {
             _logFileStream = new FileStream(LogFileName,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete,8*1024,FileOptions.SequentialScan);

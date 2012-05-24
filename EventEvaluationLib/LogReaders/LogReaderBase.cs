@@ -100,9 +100,22 @@ namespace EventEvaluationLib.LogReaders
                 _mayStopFlag.Reset();
                 _reading = true;
                 Watcher.EnableRaisingEvents = false;
-                string line;
-                while (((line = LogFileStreamReader.ReadLine()) != null) && !_stopRequested)
+                string line = null;
+                bool eof = false;
+                while (!_stopRequested)
                 {
+                    try
+                    {
+                        line = LogFileStreamReader.ReadLine();
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.Warn("Error while reading file " + _fileInfo.FullName + ": "+ex.Message);
+                        line = null;
+                        ReCreateReader();
+                    }
+                    if (line == null)
+                        break;
                     CurrentPosition = LogFileStreamReader.GetRealPosition();
                     if (LineReaded != null)
                     {
@@ -144,5 +157,7 @@ namespace EventEvaluationLib.LogReaders
             Close();
             LineReaded = null;
         }
+
+        protected abstract void ReCreateReader();
     }
 }

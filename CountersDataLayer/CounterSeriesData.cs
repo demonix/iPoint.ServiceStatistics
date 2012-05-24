@@ -47,7 +47,7 @@ namespace CountersDataLayer
         public SeriesPoint(DateTime dateTime, UniversalValue value)
         {
             DateTime = dateTime;
-            Value = value.Type == UniversalValue.UniversalClassType.TimeSpan? value.TimespanValue.Milliseconds: value.DoubleValue;
+            Value = value.Type == UniversalValue.UniversalClassType.TimeSpan? value.TimespanValue.TotalMilliseconds: value.DoubleValue;
         }
     }
 }
