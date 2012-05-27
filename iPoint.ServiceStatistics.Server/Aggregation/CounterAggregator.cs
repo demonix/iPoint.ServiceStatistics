@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using Aggregation;
 using CountersDataLayer;
 using EventEvaluationLib;
@@ -121,9 +122,10 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
                                {
                                    CountersDatabase.Instance.SaveCounters(result);
                                    break;
-                               }catch(Exception)
+                               }
+                               catch (Exception)
                                {
-                                   
+                                   Thread.Sleep(1000);
                                }
 
                            }

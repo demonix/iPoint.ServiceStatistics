@@ -50,8 +50,9 @@
 
     self.drawingOptions = {
         lines: {
-            steps: true,
-            show: true
+            //spline: 1000,
+            //steps: true,
+            show: false
         },
         points: {
             show: false
@@ -62,7 +63,10 @@
             autoscaleMargin: 0.02
         },
         series: {
-            shadowSize: 0
+            shadowSize: 0,
+            curvedLines: {
+                active: true
+            }
         },
         yaxis: { max: null, alignTicksWithAxis: 1 },
         yaxes: [{}, { position: "right", tickFormatter: self.millisecondsToDuration}],
@@ -97,7 +101,7 @@
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
                 if (!dataSeries.lines || dataSeries.lines.show)
-                    result.push($.extend(false, {}, dataSeries));
+                    result.push($.extend(false, {}, dataSeries, {curvedLines:{show: true, fit:true, fitPointDist:0.000000001, lineWidth:3}}));
                 else
                     result.push($.extend(false, {}, dataSeries, { data:  [null] }));
             });

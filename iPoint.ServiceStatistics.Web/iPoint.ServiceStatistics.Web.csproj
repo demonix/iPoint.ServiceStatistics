@@ -216,6 +216,7 @@
     <Content Include="Scripts\flot\excanvas.js" />
     <Content Include="Scripts\flot\excanvas.min.js" />
     <Content Include="Scripts\flot\jquery.colorhelpers.js" />
+    <Content Include="Scripts\flot\jquery.curvedlines-0.2.1.js" />
     <Content Include="Scripts\flot\jquery.flot.categories.js" />
     <Content Include="Scripts\flot\jquery.flot.crosshair.js" />
     <Content Include="Scripts\flot\jquery.flot.fillbetween.js" />

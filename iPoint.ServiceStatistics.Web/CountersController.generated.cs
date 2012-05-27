@@ -61,6 +61,16 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
         }
         [NonAction]
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.JsonResult SaveGraph() {
+            return new T4MVC_JsonResult(Area, Name, ActionNames.SaveGraph);
+        }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.JsonResult SavedGraph() {
+            return new T4MVC_JsonResult(Area, Name, ActionNames.SavedGraph);
+        }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public System.Web.Mvc.ActionResult SingleGraph() {
             return new T4MVC_ActionResult(Area, Name, ActionNames.SingleGraph);
         }
@@ -86,6 +96,8 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public readonly string Index = "Index";
             public readonly string CountersGraph = "CountersGraph";
             public readonly string CounterData = "CounterData";
+            public readonly string SaveGraph = "SaveGraph";
+            public readonly string SavedGraph = "SavedGraph";
             public readonly string SingleGraph = "SingleGraph";
         }
 
@@ -98,6 +110,8 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             public const string Index = "Index";
             public const string CountersGraph = "CountersGraph";
             public const string CounterData = "CounterData";
+            public const string SaveGraph = "SaveGraph";
+            public const string SavedGraph = "SavedGraph";
             public const string SingleGraph = "SingleGraph";
         }
 
@@ -178,8 +192,21 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             return callInfo;
         }
 
-        public override System.Web.Mvc.ActionResult SingleGraph(string param, int width, int height) {
+        public override System.Web.Mvc.JsonResult SaveGraph(string data) {
+            var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.SaveGraph);
+            callInfo.RouteValueDictionary.Add("data", data);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.JsonResult SavedGraph(string id) {
+            var callInfo = new T4MVC_JsonResult(Area, Name, ActionNames.SavedGraph);
+            callInfo.RouteValueDictionary.Add("id", id);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult SingleGraph(string name, string param, int width, int height) {
             var callInfo = new T4MVC_ActionResult(Area, Name, ActionNames.SingleGraph);
+            callInfo.RouteValueDictionary.Add("name", name);
             callInfo.RouteValueDictionary.Add("param", param);
             callInfo.RouteValueDictionary.Add("width", width);
             callInfo.RouteValueDictionary.Add("height", height);

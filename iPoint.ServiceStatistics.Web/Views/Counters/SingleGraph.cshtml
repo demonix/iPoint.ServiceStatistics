@@ -1,14 +1,15 @@
 ﻿@{
-    ViewBag.Title = "SingleGraph";
+    //ViewBag.Title = "SingleGraph";
     string[] dps = ViewBag.Temp;
     string parameters = "[" + String.Join(",", dps) + "]"; 
     Layout = "~/Views/Shared/_Html5Boilerplate.cshtml";
 }
 
-<h2>SingleGraph</h2>
+<h2>@ViewBag.Title</h2>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.fillbetween.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/flot/jquery.flot.selection.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/flot/jquery.curvedlines-0.2.1.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/countersDataUpdater.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/drawingSurface.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>

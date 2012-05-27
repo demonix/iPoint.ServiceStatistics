@@ -170,7 +170,7 @@ namespace iPoint.ServiceStatistics.Web.Controllers
                             counterName = counterSeriesData.CounterName,
                             counterCategory = counterSeriesData.CounterCategory,
                             seriesName = counterSeriesData.SeriesName,
-                            data = counterSeriesData.Points.Select(p => p==null? null:new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
+                            data = counterSeriesData.Points.Select(p => p==null? null :new List<object> {p.DateTime.ToLocalTime().Ticks/TimeSpan.TicksPerMillisecond, p.Value}),
                             uniqId = counterSeriesData.UniqId
                         });
             }
@@ -213,13 +213,14 @@ namespace iPoint.ServiceStatistics.Web.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public virtual ActionResult SingleGraph(string param, int width = 800, int height = 600)
+        public virtual ActionResult SingleGraph(string name, string param, int width = 800, int height = 600)
         {
             
             string[] drawersParameters = Encoding.UTF8.GetString(Convert.FromBase64String(param)).Split(new []{"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
             ViewBag.Temp = drawersParameters;
             ViewBag.PlotWidth = width;
             ViewBag.PlotHeight = height;
+            ViewBag.Title = name; 
             return View();
         }
 

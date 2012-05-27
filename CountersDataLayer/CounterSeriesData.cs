@@ -42,12 +42,12 @@ namespace CountersDataLayer
     public class SeriesPoint
     {
         public DateTime DateTime;
-        public double Value;
+        public double? Value;
 
         public SeriesPoint(DateTime dateTime, UniversalValue value)
         {
             DateTime = dateTime;
-            Value = value.Type == UniversalValue.UniversalClassType.TimeSpan? value.TimespanValue.TotalMilliseconds: value.DoubleValue;
+            Value = value == null? (double?)null: value.Type == UniversalValue.UniversalClassType.TimeSpan ? value.TimespanValue.TotalMilliseconds : value.DoubleValue;
         }
     }
 }

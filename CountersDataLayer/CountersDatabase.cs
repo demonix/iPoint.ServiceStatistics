@@ -315,7 +315,7 @@ namespace CountersDataLayer
                 {
                     foreach (string seriesName in seriesNames)
                         if (getAllSeries || seriesFilter.Contains(seriesName))
-                            resultData.Find(f => f.SeriesName == seriesName).AddSeriesPoint(null);
+                            resultData.Find(f => f.SeriesName == seriesName).AddSeriesPoint(new SeriesPoint(dateTime, null));
                     continue;
                 }
                 var seriesPoints = countersData[counterDescription].AsBsonDocument;
