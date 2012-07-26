@@ -56,7 +56,7 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             CounterName = counterName;
             AggregationType = aggregationType;
             EventSelector = CreateEventSelector();
-            AggregationAction = CreateAggregationActionNew();
+            AggregationAction = CreateAggregationAction();
             InputType = inputType;
             _onResult = OnResult();
             
@@ -138,19 +138,17 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             Expression<Func<LogEventArgs, bool>> exp =
                 item =>  (item.LogEvent.Category == CounterCategory) && (item.LogEvent.Counter == CounterName);
             return exp.Compile();
-
-
         }
 
         
         
-        private Action<IEnumerable<LogEventArgs>> CreateAggregationActionNew()
+        private Action<IEnumerable<LogEventArgs>> CreateAggregationAction()
         {
             Expression<Action<IEnumerable<LogEventArgs>>> actionResult;// = input => _onResult("empty");
             switch (AggregationType)
             {
-                case AggregationType.Sum: 
-                actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
+                case AggregationType.Sum:
+                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
                     break;
                 case AggregationType.Min:
                     actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Min()))));
@@ -173,7 +171,6 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
                 default:
                     throw new Exception("Unknown aggregationType: " + AggregationType);
             }
-
             return actionResult.Compile();
         }
 

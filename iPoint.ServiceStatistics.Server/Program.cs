@@ -26,6 +26,8 @@ namespace iPoint.ServiceStatistics.Server
             CountersAutoDiscoverer countersAutoDiscoverer = new CountersAutoDiscoverer(receiver.ObservableEvents, settings);
             countersAutoDiscoverer.StartDiscovery();
             
+            CounterDumper counterDumper = new CounterDumper(receiver.ObservableEvents);
+
             DeadCountersDetector deadCountersDetector = new DeadCountersDetector(receiver.ObservableEvents, settings);
             
             observableEvents.Subscribe(l => Console.WriteLine("Total events: " + l.Count));
@@ -47,9 +49,23 @@ namespace iPoint.ServiceStatistics.Server
                     settings.ReadAggregators();
                     Console.WriteLine("Aggregators were updated");
                 }
+                if (keyInfo.Key == ConsoleKey.D)
+                {
+                    if (counterDumper.IsDumping)
+                    {
+                        counterDumper.StopDumping();
+                        Console.WriteLine("Counter Dumping Stopped");
+                    }
+                    else
+                    {
+                        counterDumper.StartDumping();
+                        Console.WriteLine("Counter Dumping Started");
+                    }
+                }
                 if (keyInfo.Key == ConsoleKey.A)
                 {
-                    Console.WriteLine(deadCountersDetector.GetCounterFreshnessTimeStats());
+                    File.WriteAllText("deadCounters",deadCountersDetector.GetCounterFreshnessTimeStats());
+                    Console.WriteLine("Stats have been written to file deadCounters");
                 }
             }
         }

@@ -11,7 +11,8 @@
     <RootNamespace>iPoint.ServiceStatistics.Server</RootNamespace>
     <AssemblyName>iPoint.ServiceStatistics.Server</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\iPoint.ServiceStatistics\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -89,12 +90,12 @@
   <ItemGroup>
     <Compile Include="Aggregation\CounterAggregator.cs" />
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="CounterDumper.cs" />
     <Compile Include="CountersAutoDiscoverer.cs" />
     <Compile Include="DeadCountersDetector.cs" />
     <Compile Include="ExtendedDataTransformations.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MovingWindowSequence.cs" />
-    <Compile Include="PercentileResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
