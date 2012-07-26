@@ -9,9 +9,9 @@
     <file relUrl="Content/themes/base/jquery.ui.datepicker.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Scripts/yepnope.js" publishTime="01/29/2012 21:21:26" />
     <file relUrl="Content/themes/base/images/ui-icons_ef8c08_256x240.png" publishTime="01/27/2012 02:34:50" />
-    <file relUrl="Scripts/drawingSurface.js" publishTime="05/15/2012 12:15:06" />
+    <file relUrl="Scripts/drawingSurface.js" publishTime="07/04/2012 11:07:16" />
     <file relUrl="Content/themes/base/minified/jquery-ui.min.css" publishTime="01/25/2012 14:41:45" />
-    <file relUrl="bin/iPoint.ServiceStatistics.Web.pdb" publishTime="05/15/2012 12:08:50" />
+    <file relUrl="bin/iPoint.ServiceStatistics.Web.pdb" publishTime="07/04/2012 16:52:54" />
     <file relUrl="Content/themes/base/minified/jquery.ui.autocomplete.min.css" publishTime="01/25/2012 14:41:54" />
     <file relUrl="Content/themes/base/images/ui-bg_highlight-soft_75_cccccc_1x100.png" publishTime="01/25/2012 14:41:56" />
     <file relUrl="Scripts/jquery-ui.datepicker-ru.js" publishTime="01/27/2012 17:21:53" />
@@ -23,6 +23,7 @@
     <file relUrl="bin/ICSharpCode.SharpZipLib.dll" publishTime="04/25/2012 16:34:26" />
     <file relUrl="Scripts/jquery-ui-1.8.17.js" publishTime="01/25/2012 14:41:45" />
     <file relUrl="Content/themes/base/jquery.ui.all.css" publishTime="01/25/2012 14:41:55" />
+    <file relUrl="Scripts/flot/jquery.flot.symbol.js" publishTime="01/26/2012 11:59:16" />
     <file relUrl="bin/NLog.xml" publishTime="02/27/2012 17:56:37" />
     <file relUrl="Views/Home/Index.cshtml" publishTime="01/24/2012 19:15:41" />
     <file relUrl="bin/MyLib.pdb" publishTime="02/07/2012 10:59:59" />
@@ -32,11 +33,12 @@
     <file relUrl="Views/Shared/Error.cshtml" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Content/themes/base/minified/jquery.ui.progressbar.min.css" publishTime="01/25/2012 14:41:53" />
     <file relUrl="Scripts/jquery-1.7.1.min.js" publishTime="01/25/2012 14:42:01" />
+    <file relUrl="Scripts/MicrosoftAjax.debug.js" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Scripts/jquery-ui-1.8.17.min.js" publishTime="01/25/2012 14:41:43" />
     <file relUrl="README.jQuery.vsdoc.txt" publishTime="01/25/2012 14:42:00" />
     <file relUrl="Content/themes/base/jquery-ui-1.8.17.custom.css" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_55_fbf9ee_1x400.png" publishTime="01/25/2012 14:41:56" />
-    <file relUrl="Views/Counters/SingleGraph.cshtml" publishTime="04/19/2012 14:44:43" />
+    <file relUrl="Views/Counters/SingleGraph.cshtml" publishTime="07/04/2012 17:20:17" />
     <file relUrl="Content/themes/base/minified/jquery.ui.accordion.min.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/jquery-ui.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/jquery.ui.resizable.css" publishTime="01/25/2012 14:41:55" />
@@ -46,22 +48,23 @@
     <file relUrl="favicon.ico" publishTime="01/24/2012 14:57:34" />
     <file relUrl="Content/themes/base/jquery.ui.timepicker.css" publishTime="12/04/2011 08:24:42" />
     <file relUrl="Views/Counters/Index.cshtml" publishTime="05/12/2012 17:44:57" />
-    <file relUrl="Content/themes/base/images/ui-icons_888888_256x240.png" publishTime="01/25/2012 14:41:55" />
+    <file relUrl="Content/themes/base/images/ui-icons_ffffff_256x240.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Scripts/date-ru-RU.js" publishTime="11/13/2007 05:17:04" />
     <file relUrl="Content/themes/base/images/ui-icons_2e83ff_256x240.png" publishTime="01/25/2012 14:41:56" />
     <file relUrl="Scripts/flot/jquery.flot.stack.js" publishTime="01/26/2012 11:59:25" />
     <file relUrl="Content/themes/base/images/ui-bg_diagonals-thick_20_666666_40x40.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Scripts/MicrosoftMvcAjax.js" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Scripts/flot/jquery.flot.navigate.js" publishTime="01/26/2012 11:59:07" />
-    <file relUrl="bin/CountersDataLayer.pdb" publishTime="05/15/2012 12:08:48" />
+    <file relUrl="bin/CountersDataLayer.pdb" publishTime="07/04/2012 14:20:59" />
     <file relUrl="Scripts/flot/excanvas.min.js" publishTime="01/26/2012 11:58:45" />
     <file relUrl="Scripts/flot/excanvas.js" publishTime="01/26/2012 11:58:40" />
     <file relUrl="bin/MongoDB.Bson.dll" publishTime="11/29/2011 01:18:16" />
-    <file relUrl="bin/Aggregation.pdb" publishTime="05/15/2012 12:08:44" />
+    <file relUrl="bin/Aggregation.pdb" publishTime="07/04/2012 14:20:56" />
     <file relUrl="Content/themes/base/images/ui-bg_gloss-wave_35_f6a828_500x100.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Scripts/flot/jquery.flot.fillbetween.js" publishTime="01/26/2012 11:59:30" />
     <file relUrl="Global.asax" publishTime="01/24/2012 14:56:57" />
-    <file relUrl="bin/iPoint.ServiceStatistics.Server.exe" publishTime="05/15/2012 12:08:49" />
+    <file relUrl="Views/Shared/_EmptyHtml5Boilerplate.cshtml" publishTime="07/03/2012 16:05:58" />
+    <file relUrl="bin/iPoint.ServiceStatistics.Server.exe" publishTime="07/04/2012 14:21:01" />
     <file relUrl="Scripts/libs/dd_belatedpng.js" publishTime="01/24/2012 14:57:33" />
     <file relUrl="Scripts/MicrosoftMvcValidation.js" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Content/themes/base/minified/jquery.ui.theme.min.css" publishTime="01/25/2012 14:41:47" />
@@ -73,12 +76,13 @@
     <file relUrl="packages.config" publishTime="01/25/2012 16:46:02" />
     <file relUrl="Scripts/date.js" publishTime="11/13/2007 05:17:04" />
     <file relUrl="apple-touch-icon-114x114-precomposed.png" publishTime="01/24/2012 14:57:34" />
-    <file relUrl="bin/EntityFramework.xml" publishTime="01/24/2012 14:55:50" />
+    <file relUrl="Content/themes/base/jquery.ui.dialog.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/minified/images/ui-icons_2e83ff_256x240.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/minified/images/ui-bg_glass_55_fbf9ee_1x400.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/images/ui-icons_222222_256x240.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Content/themes/base/minified/jquery.ui.tabs.min.css" publishTime="01/25/2012 14:41:51" />
     <file relUrl="Content/themes/base/minified/images/ui-icons_cd0a0a_256x240.png" publishTime="01/25/2012 14:41:55" />
+    <file relUrl="Content/themes/base/minified/jquery.ui.resizable.min.css" publishTime="01/25/2012 14:41:52" />
     <file relUrl="Scripts/jquery.validate.unobtrusive.js" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Scripts/jquery.validate.unobtrusive.min.js" publishTime="01/24/2012 14:56:57" />
     <file relUrl="Scripts/flot/jquery.flot.js" publishTime="05/15/2012 12:06:16" />
@@ -87,17 +91,16 @@
     <file relUrl="Scripts/flot/jquery.colorhelpers.js" publishTime="01/26/2012 11:58:54" />
     <file relUrl="Content/themes/base/jquery.ui.autocomplete.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="bin/MongoDB.Driver.dll" publishTime="11/29/2011 01:18:18" />
-    <file relUrl="bin/EventEvaluationLib.dll" publishTime="05/15/2012 12:08:43" />
+    <file relUrl="bin/EventEvaluationLib.dll" publishTime="07/04/2012 14:20:54" />
     <file relUrl="Views/Home/About.cshtml" publishTime="01/24/2012 15:45:21" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_75_e6e6e6_1x400.png" publishTime="01/25/2012 14:41:56" />
     <file relUrl="Content/themes/base/minified/jquery.ui.dialog.min.css" publishTime="01/25/2012 14:41:53" />
     <file relUrl="Scripts/jquery.validate-vsdoc.js" publishTime="01/25/2012 14:41:58" />
     <file relUrl="Content/themes/base/jquery.ui.theme.css" publishTime="01/25/2012 14:41:55" />
-    <file relUrl="Scripts/jquery.validate.min.js" publishTime="01/25/2012 14:41:58" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_95_fef1ec_1x400.png" publishTime="01/25/2012 14:41:56" />
     <file relUrl="Content/themes/base/minified/images/ui-bg_glass_75_dadada_1x400.png" publishTime="01/25/2012 14:41:55" />
-    <file relUrl="bin/iPoint.ServiceStatistics.Web.dll" publishTime="05/15/2012 12:08:50" />
-    <file relUrl="Views/Counters/CountersGraph.cshtml" publishTime="05/15/2012 12:06:16" />
+    <file relUrl="bin/iPoint.ServiceStatistics.Web.dll" publishTime="07/04/2012 16:52:54" />
+    <file relUrl="Views/Counters/CountersGraph.cshtml" publishTime="06/29/2012 17:41:52" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_100_fdf5ce_1x400.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Scripts/jquery-1.7.1-vsdoc.js" publishTime="02/02/2012 15:36:55" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_75_dadada_1x400.png" publishTime="01/25/2012 14:41:56" />
@@ -110,24 +113,24 @@
     <file relUrl="Scripts/T4MvcJs/T4MvcJs.js" publishTime="01/25/2012 16:46:01" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_100_f6f6f6_1x400.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Content/themes/base/images/ui-bg_glass_65_ffffff_1x400.png" publishTime="01/27/2012 02:34:50" />
+    <file relUrl="bin/settings/mongoConnection.example" publishTime="05/15/2012 17:54:20" />
     <file relUrl="Content/themes/base/minified/jquery.ui.selectable.min.css" publishTime="01/25/2012 14:41:51" />
     <file relUrl="Content/themes/base/images/ui-icons_ffd27a_256x240.png" publishTime="01/27/2012 02:34:50" />
-    <file relUrl="Views/Shared/_Layout.cshtml" publishTime="01/25/2012 16:47:34" />
     <file relUrl="Content/themes/base/minified/images/ui-bg_glass_95_fef1ec_1x400.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Scripts/flot/jquery.flot.image.js" publishTime="01/26/2012 11:59:21" />
-    <file relUrl="Views/Shared/_Html5Boilerplate.cshtml" publishTime="05/03/2012 18:30:42" />
+    <file relUrl="Views/Shared/_Html5Boilerplate.cshtml" publishTime="07/03/2012 16:05:58" />
+    <file relUrl="Scripts/flot/jquery.flot.spline.js" publishTime="05/16/2012 10:16:56" />
     <file relUrl="Scripts/flot/jquery.flot.crosshair.js" publishTime="01/26/2012 11:59:03" />
     <file relUrl="Content/themes/base/jquery.ui.accordion.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Scripts/flot/jquery.flot.resize.js" publishTime="01/26/2012 11:58:58" />
-    <file relUrl="Views/Counters/_CounterQueryParametersControl.cshtml" publishTime="05/15/2012 12:06:16" />
+    <file relUrl="Views/Counters/_CounterQueryParametersControl.cshtml" publishTime="07/03/2012 16:05:58" />
     <file relUrl="Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png" publishTime="01/25/2012 14:41:56" />
     <file relUrl="Scripts/flot/jquery.flot.pie.js" publishTime="01/26/2012 11:58:50" />
     <file relUrl="Scripts/script.js" publishTime="01/24/2012 14:57:33" />
-    <file relUrl="Scripts/flot/jquery.flot.threshold.js" publishTime="01/26/2012 11:58:35" />
     <file relUrl="Content/themes/base/images/ui-bg_highlight-soft_100_eeeeee_1x100.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Content/themes/base/images/ui-bg_flat_10_000000_40x100.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="Content/themes/base/minified/images/ui-icons_454545_256x240.png" publishTime="01/25/2012 14:41:55" />
-    <file relUrl="Content/themes/base/minified/jquery.ui.resizable.min.css" publishTime="01/25/2012 14:41:52" />
+    <file relUrl="Scripts/flot/jquery.flot.threshold.js" publishTime="01/26/2012 11:58:35" />
     <file relUrl="Content/themes/base/minified/jquery.ui.core.min.css" publishTime="01/25/2012 14:41:53" />
     <file relUrl="Scripts/jquery-ui.timepicker-ru.js" publishTime="01/27/2012 17:23:47" />
     <file relUrl="Content/themes/base/images/ui-bg_flat_75_ffffff_40x100.png" publishTime="01/25/2012 14:41:56" />
@@ -140,30 +143,30 @@
     <file relUrl="Content/themes/base/minified/images/ui-icons_888888_256x240.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/themes/base/minified/jquery.ui.all.min.css" publishTime="01/25/2012 14:41:54" />
     <file relUrl="Scripts/modernizr-1.7.js" publishTime="01/24/2012 14:57:05" />
-    <file relUrl="bin/CountersDataLayer.dll" publishTime="05/15/2012 12:08:48" />
+    <file relUrl="bin/CountersDataLayer.dll" publishTime="07/04/2012 14:20:59" />
     <file relUrl="Scripts/flot/jquery.flot.categories.js" publishTime="01/26/2012 11:58:25" />
-    <file relUrl="Scripts/MicrosoftAjax.debug.js" publishTime="01/24/2012 14:56:57" />
+    <file relUrl="bin/EntityFramework.xml" publishTime="01/24/2012 14:55:50" />
     <file relUrl="Content/themes/base/images/ui-bg_diagonals-thick_18_b81900_40x40.png" publishTime="01/27/2012 02:34:50" />
     <file relUrl="apple-touch-icon.png" publishTime="01/24/2012 14:57:34" />
     <file relUrl="Content/themes/base/jquery.ui.button.css" publishTime="01/25/2012 14:41:55" />
     <file relUrl="bin/EntityFramework.dll" publishTime="01/24/2012 14:55:50" />
     <file relUrl="bin/App.config" publishTime="01/09/2012 18:42:27" />
-    <file relUrl="bin/Aggregation.dll" publishTime="05/15/2012 12:08:45" />
-    <file relUrl="Content/themes/base/images/ui-icons_ffffff_256x240.png" publishTime="01/27/2012 02:34:50" />
+    <file relUrl="bin/Aggregation.dll" publishTime="07/04/2012 14:20:57" />
+    <file relUrl="Content/themes/base/images/ui-icons_888888_256x240.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Views/Counters/Data.cshtml" publishTime="01/24/2012 17:05:18" />
-    <file relUrl="bin/EventEvaluationLib.pdb" publishTime="05/15/2012 12:08:43" />
-    <file relUrl="Content/themes/base/jquery.ui.dialog.css" publishTime="01/25/2012 14:41:55" />
+    <file relUrl="bin/EventEvaluationLib.pdb" publishTime="07/04/2012 14:20:54" />
     <file relUrl="Content/themes/base/jquery.ui.progressbar.css" publishTime="01/25/2012 14:41:55" />
-    <file relUrl="Scripts/countersDataUpdater.js" publishTime="05/15/2012 12:06:16" />
+    <file relUrl="Scripts/flot/jquery.flot.curvedLines.js" publishTime="07/03/2012 15:05:45" />
+    <file relUrl="Scripts/countersDataUpdater.js" publishTime="05/25/2012 02:50:28" />
     <file relUrl="Scripts/jquery-ui.timepicker.js" publishTime="12/04/2011 08:24:42" />
-    <file relUrl="bin/iPoint.ServiceStatistics.Server.pdb" publishTime="05/15/2012 12:08:49" />
+    <file relUrl="bin/iPoint.ServiceStatistics.Server.pdb" publishTime="07/04/2012 14:21:01" />
     <file relUrl="Content/themes/base/minified/images/ui-bg_flat_75_ffffff_40x100.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="Content/Site.css" publishTime="01/24/2012 14:56:57" />
     <file relUrl="bin/MongoDB.Bson.xml" publishTime="11/29/2011 01:18:16" />
     <file relUrl="Content/themes/base/minified/images/ui-bg_flat_0_aaaaaa_40x100.png" publishTime="01/25/2012 14:41:55" />
     <file relUrl="bin/MongoDB.Bson.pdb" publishTime="11/29/2011 01:18:16" />
     <file relUrl="robots.txt" publishTime="01/24/2012 14:57:34" />
-    <file relUrl="Scripts/flot/jquery.flot.symbol.js" publishTime="01/26/2012 11:59:16" />
+    <file relUrl="Scripts/jquery.validate.min.js" publishTime="01/25/2012 14:41:58" />
     <file relUrl="bin/NLog.dll" publishTime="02/27/2012 17:56:37" />
     <file relUrl="Content/themes/base/minified/jquery.ui.button.min.css" publishTime="01/25/2012 14:41:53" />
     <file relUrl="Scripts/jquery.unobtrusive-ajax.min.js" publishTime="01/24/2012 14:56:57" />

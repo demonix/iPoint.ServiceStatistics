@@ -4,7 +4,9 @@
     <div>
         <p id="caption"></p>
     </div>
-    <div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"/>
+    <div id="resizable">
+        <div id="placeholder-@Html.DisplayTextFor(m => m.Id)" style="width:600px;height:300px;float:left;"/>
+        </div>
 
     <div style="float:left;margin-left:10px">
         <input id="drawBtn-@Html.DisplayTextFor(m => m.Id)" style="float:left;" type="button" value="Remove" onclick="remove('@Html.DisplayTextFor(m => m.Id)')" />

@@ -204,12 +204,13 @@ namespace iPoint.ServiceStatistics.Web.Controllers {
             return callInfo;
         }
 
-        public override System.Web.Mvc.ActionResult SingleGraph(string name, string param, int width, int height) {
+        public override System.Web.Mvc.ActionResult SingleGraph(string name, string param, int width, int height, bool saved) {
             var callInfo = new T4MVC_ActionResult(Area, Name, ActionNames.SingleGraph);
             callInfo.RouteValueDictionary.Add("name", name);
             callInfo.RouteValueDictionary.Add("param", param);
             callInfo.RouteValueDictionary.Add("width", width);
             callInfo.RouteValueDictionary.Add("height", height);
+            callInfo.RouteValueDictionary.Add("saved", saved);
             return callInfo;
         }
 

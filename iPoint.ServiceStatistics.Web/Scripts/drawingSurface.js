@@ -1,7 +1,7 @@
 ﻿var DrawingSurface = function (name, id, drawingArea, overviewArea, legendArea) {
     "use strict";
     var self = this;
-
+    drawingArea.resizable();
     var dataUpdaters = new Array();
     self.Name = name;
     self.Id = id;
@@ -26,8 +26,11 @@
 
 
     self.formatLabel = function (label, s) {
-        var action = s.lines.show ? 'hide' : 'show';
-        return label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + label.replace(new RegExp("\'", 'g'), "\\\'") + '\'); return false;">' + action + '</a>)';
+        var action = s.lines.enabled ? 'hide' : 'show';
+        var seriesName = label;
+        label = label + ' (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].ToggleSeries(\'' + seriesName.replace(new RegExp("\'", 'g'), "\\\'") + '\'); return false;">' + action + '</a>)';
+        var smooth = s.lines.smooth ? 'turn off' : 'turn on';
+        return label + ' smooth: (<a href="#" onclick="drawingSurfaces[\'' + id + '\'].SmoothSeries(\'' + seriesName.replace(new RegExp("\'", 'g'), "\\\'") + '\'); return false;">' + smooth + '</a>)';
     };
 
     //<a href="#" onclick="javascript:drawingSurfaces["bff1b2c3-4109-46d3-bf5b-1b0133eee675"].toggleseries("ft:="" error_count="" (app103)");"="">FT: Error_Count (APP103)</a>
@@ -39,10 +42,20 @@
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
                 if (dataSeries.label != seriesName) return;
                 if (dataSeries.lines == undefined)
-                    dataSeries.lines = {};
-                if (dataSeries.lines.show == undefined)
-                    dataSeries.lines.show = true;
-                dataSeries.lines.show = !dataSeries.lines.show;
+                    dataSeries.lines = {enabled: true, smooth: true};
+                dataSeries.lines.enabled = !dataSeries.lines.enabled;
+            });
+        });
+        self.ForcedUpdate();
+    };
+
+    self.SmoothSeries = function (seriesName) {
+        $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
+            $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
+                if (dataSeries.label != seriesName) return;
+                if (dataSeries.lines == undefined)
+                    dataSeries.lines = { enabled: true, smooth: true };
+                dataSeries.lines.smooth = !dataSeries.lines.smooth;
             });
         });
         self.ForcedUpdate();
@@ -52,7 +65,9 @@
         lines: {
             //spline: 1000,
             //steps: true,
-            show: false
+            show: false,
+            enabled: true
+
         },
         points: {
             show: false
@@ -100,10 +115,13 @@
         var result = [];
         $.each(dataUpdaters, function (dataUpdaterIdx, dataUpdater) {
             $.each(dataUpdater.currentData, function (seriesIndex, dataSeries) {
-                if (!dataSeries.lines || dataSeries.lines.show)
-                    result.push($.extend(false, {}, dataSeries, {curvedLines:{show: true, fit:true, fitPointDist:0.000000001, lineWidth:3}}));
+                if (!dataSeries.lines || dataSeries.lines.enabled)
+                    if (!dataSeries.lines || dataSeries.lines.smooth)
+                        result.push($.extend(false, {}, dataSeries, { curvedLines: { active: true, show: true, fit: true, fitPointDist: 0.000000001, lineWidth: 3} }));
+                    else
+                        result.push($.extend(false, {}, dataSeries, { lines: { show: true} }));
                 else
-                    result.push($.extend(false, {}, dataSeries, { data:  [null] }));
+                    result.push($.extend(false, {}, dataSeries, { data: [null] }));
             });
         });
         return result;

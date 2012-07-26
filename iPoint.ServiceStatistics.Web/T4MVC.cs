@@ -334,11 +334,11 @@ namespace Links {
             public static readonly string excanvas_min_js = Url("excanvas.min.js");
             public static readonly string jquery_colorhelpers_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.colorhelpers.min.js") ? Url("jquery.colorhelpers.min.js") : Url("jquery.colorhelpers.js");
                           
-            public static readonly string jquery_curvedlines_0_2_1_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.curvedlines-0.2.1.min.js") ? Url("jquery.curvedlines-0.2.1.min.js") : Url("jquery.curvedlines-0.2.1.js");
-                          
             public static readonly string jquery_flot_categories_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.categories.min.js") ? Url("jquery.flot.categories.min.js") : Url("jquery.flot.categories.js");
                           
             public static readonly string jquery_flot_crosshair_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.crosshair.min.js") ? Url("jquery.flot.crosshair.min.js") : Url("jquery.flot.crosshair.js");
+                          
+            public static readonly string jquery_flot_curvedLines_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.curvedLines.min.js") ? Url("jquery.flot.curvedLines.min.js") : Url("jquery.flot.curvedLines.js");
                           
             public static readonly string jquery_flot_fillbetween_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/jquery.flot.fillbetween.min.js") ? Url("jquery.flot.fillbetween.min.js") : Url("jquery.flot.fillbetween.js");
                           

@@ -199,29 +199,56 @@ namespace iPoint.ServiceStatistics.Web.Controllers
         [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public virtual JsonResult SavedGraph(string id)
         {
-            if (id.Contains("..\\") || id.Contains(".\\") || id.Contains("\\")) return Json(null,JsonRequestBehavior.AllowGet);
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\"+id);
-            if (!System.IO.File.Exists(path)) return Json(null, JsonRequestBehavior.AllowGet);
+            List<Tuple<string, string>> result = LoadSavedGraphs(id);
+            return Json(result.Select(t => new { surfaceName = t.Item1, parameters = t.Item2 }), JsonRequestBehavior.AllowGet);
+        }
+
+        private List<Tuple<string, string>> LoadSavedGraphs(string path)
+        {
+            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
+            if (path.Contains("..\\") || path.Contains(".\\") || path.Contains("\\"))
+            {
+                return null;
+            }
+            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "savedGraphs\\" + path);
+            if (!System.IO.File.Exists(path))
+            {
+                return null;
+            }
             string[] savedData = System.IO.File.ReadAllLines(path);
-            List<object> result = new List<object>();
             for (int i = 0; i <= savedData.Length - 2; i = i + 2)
             {
                 string surfaceName = savedData[i];
-                string parameters = "[" + String.Join(",", Encoding.UTF8.GetString(Convert.FromBase64String(savedData[i + 1])).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)) + "]";
-                result.Add(new { surfaceName = surfaceName, parameters = parameters });
+                string parameters = "[" +
+                                    String.Join(",",
+                                                Encoding.UTF8.GetString(Convert.FromBase64String(savedData[i + 1])).Split(
+                                                    new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries)) + "]";
+                result.Add(new Tuple<string,string>(surfaceName, parameters));
             }
-            return Json(result, JsonRequestBehavior.AllowGet);
+            return result;
         }
 
-        public virtual ActionResult SingleGraph(string name, string param, int width = 800, int height = 600)
+        public virtual ActionResult SingleGraph(string name, string param, int width = 800, int height = 600, bool saved = false)
         {
-            
-            string[] drawersParameters = Encoding.UTF8.GetString(Convert.FromBase64String(param)).Split(new []{"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
-            ViewBag.Temp = drawersParameters;
-            ViewBag.PlotWidth = width;
-            ViewBag.PlotHeight = height;
-            ViewBag.Title = name; 
-            return View();
+            string graphName, parameters;
+            if (saved)
+            {
+                var graphs = LoadSavedGraphs(param);
+                    if (graphs == null || graphs.Count == 0) 
+                        throw new Exception("cannot load graph from " + param) ;
+                    graphName = graphs[0].Item1;
+                    parameters = graphs[0].Item2;
+
+            } else
+            {
+                string[] drawersParameters = Encoding.UTF8.GetString(Convert.FromBase64String(param)).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                graphName = name;
+                parameters = "[" + String.Join(",", drawersParameters) +"]";
+                
+            }
+
+            SingleGraphModel model = new SingleGraphModel(graphName, parameters,width, height);
+            return View(model);
         }
 
         
