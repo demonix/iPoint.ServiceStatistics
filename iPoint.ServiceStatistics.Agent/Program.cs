@@ -27,6 +27,7 @@ namespace iPoint.ServiceStatistics.Agent
         private static bool _debug;
         static IPAddress _currentServerIpAddress = null;
         static int _currentServerPort = -1;
+        private static Timer _reconnectTimer;
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -36,6 +37,7 @@ namespace iPoint.ServiceStatistics.Agent
         static ReaderWriterLockSlim _tcpClientLocker = new ReaderWriterLockSlim();
         private static void Main(string[] args)
         {
+            _reconnectTimer = new Timer(CreateTcpClientTimerWrapper);
             _logger.Info("Starting App...");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             if (args.Length > 0 && args[0].ToLower() == "debug")
@@ -45,7 +47,7 @@ namespace iPoint.ServiceStatistics.Agent
             if (!_debug)
             {
                 CreateTcpClient("settings\\ServerAddress");
-                serverConfig = new MultiDirectoryFileChangeMonitor(Path.GetFullPath("settings\\"), CreateTcpClient, null, ConfigChanged, null);
+                serverConfig = new MultiDirectoryFileChangeMonitor(Path.GetFullPath("settings\\"), CreateTcpClient, null, ServerConfigChanged, null);
                 
             }
 
@@ -67,8 +69,10 @@ namespace iPoint.ServiceStatistics.Agent
             if (serverConfig != null) 
                 serverConfig.Dispose();
         }
+      
 
-        private static void ConfigChanged(string filePath)
+
+        private static void ServerConfigChanged(string filePath)
         {
             if (Path.GetFileName(filePath).ToLower() == "serveraddress")
                 CreateTcpClient(filePath);
@@ -88,8 +92,8 @@ namespace iPoint.ServiceStatistics.Agent
                 _logger.Error("Server address config file is invalid");
                 return;
             }
-            string[] addressAndPort = file[0].Split(':');
 
+            string[] addressAndPort = file[0].Split(':');
             if (addressAndPort.Length != 2)
             {
                 _logger.Error("Server address config is invalid: " + file[0]);
@@ -98,20 +102,19 @@ namespace iPoint.ServiceStatistics.Agent
 
             IPAddress ipAddress;
             int port;
-            try
+            
+            _tcpClientLocker.EnterWriteLock();
+            if (IPAddress.TryParse(addressAndPort[0], out ipAddress) && Int32.TryParse(addressAndPort[1], out port))
             {
-                ipAddress = IPAddress.Parse(addressAndPort[0]);
-                port = Int32.Parse(addressAndPort[1]);
-                if (_currentServerIpAddress == ipAddress && _currentServerPort == port)
+                if (_currentServerIpAddress == ipAddress && _currentServerPort == port && _tcpClient != null)
                     return;
             }
-            catch (Exception ex)
+            else
             {
                 _logger.Error("Server address config is invalid: " + file[0]);
                 return;
             }
-            
-            _tcpClientLocker.EnterWriteLock();
+
             try
             {
                 _logger.Info("Server address is " + ipAddress+":"+port);
@@ -152,7 +155,11 @@ namespace iPoint.ServiceStatistics.Agent
 
         private static void OutToServer(object sender, LogEvent e)
         {
-            if (_tcpClient == null) return;
+            if (_tcpClient == null)
+            {
+                SheduleReconnect();
+                return;
+            }
             byte[] data = e.Serialize();
             _tcpClientLocker.EnterReadLock();
             try
@@ -161,12 +168,33 @@ namespace iPoint.ServiceStatistics.Agent
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Error while sending", ex);
+                _logger.Error("Error while sending\r\n" + ex);
             }
             finally
             {
                 _tcpClientLocker.ExitReadLock();
             }
+
+        }
+
+        private const int ReconnectScheduled = 1;
+        private const int ReconnectNotScheduled = 0;
+        private static int _isReconnectSheduled = ReconnectNotScheduled;
+        
+        private static void SheduleReconnect()
+        {
+            if (Interlocked.Exchange(ref _isReconnectSheduled, ReconnectScheduled) == ReconnectNotScheduled)
+            {
+                _reconnectTimer.Change(TimeSpan.FromSeconds(5), TimeSpan.Zero);
+                _logger.Info("Sheduling tcpClient reconnect");
+            }
+        }
+
+        private static void CreateTcpClientTimerWrapper(object obj)
+        {
+            CreateTcpClient("settings\\ServerAddress");
+            _logger.Info("tcpClient reconnected");
+            _isReconnectSheduled = ReconnectNotScheduled;
 
         }
 
