@@ -35,13 +35,13 @@ namespace EventEvaluationLib
             }
         }
 
-        public string GetConfigParam(string paramName, bool required = true)
+        public string GetConfigParam(string paramName, bool required = true, string defaultValue = "")
         {
 
             if (!_settings.ContainsKey(paramName.ToLower()) && required)
                 throw new Exception(String.Format("{0} not specified in config {1}", paramName, _fileName));
             if (!_settings.ContainsKey(paramName.ToLower()))
-                return "";
+                return defaultValue;
             if (_settings[paramName.ToLower()].Count > 1)
                 throw new Exception(String.Format("{0} specified miltiple times in config {1}", paramName, _fileName));
             return _settings[paramName.ToLower()][0];
@@ -52,7 +52,7 @@ namespace EventEvaluationLib
             if (!_settings.ContainsKey(paramName.ToLower()) && required)
                 throw new Exception(String.Format("{0} not specified in config {1}", paramName, _fileName));
             if (!_settings.ContainsKey(paramName.ToLower()))
-                return new List<string> { "" };
+                return new List<string> ();
             return _settings[paramName.ToLower()];
         }
 

@@ -69,6 +69,7 @@ namespace EventEvaluationLib.LogReaders
             catch(Exception ex)
             {
                 LogManager.GetCurrentClassLogger().Debug("Something went wrong during refreshing FileInfo data:\r\n" + ex );
+                ReCreateReader();
             }
 
            

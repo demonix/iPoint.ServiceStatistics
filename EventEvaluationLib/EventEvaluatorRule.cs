@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NLog;
 
@@ -13,6 +15,7 @@ namespace EventEvaluationLib
         public string Id { get; private set; }
         public EventType EventType { get; private set; }
         public Regex RegexRule { get; private set; }
+        public List<Regex> ExcludingRules { get; set; }
         public string DateFormat { get; private set; }
 
         private MatchDelegate _getCounterCategory;
@@ -25,12 +28,12 @@ namespace EventEvaluationLib
 
 
 
-        public EventEvaluatorRule(EventType eventType, Regex regexRule, string eventSource, string counterCategory,
-                                  string counterInstance, string counterName, string extendedData, string value,
-                                  string dateTime, string dateFormat)
+        public EventEvaluatorRule(EventType eventType, Regex regexRule, List<Regex> excludingRules, string eventSource, string counterCategory, string counterInstance, string counterName, string extendedData, string value, string dateTime, string dateFormat)
         {
             EventType = eventType;
             RegexRule = regexRule;
+            HasExcludingRules = excludingRules.Count > 0;
+            ExcludingRules = excludingRules;
             DateFormat = dateFormat;
             _getSource = CreateMatchDelegate(eventSource);
             _getCounterCategory = CreateMatchDelegate(counterCategory);
@@ -40,6 +43,8 @@ namespace EventEvaluationLib
             _getValue = CreateMatchDelegate(value);
             _getDateTime = CreateMatchDelegate(dateTime);
         }
+
+        public bool HasExcludingRules { get; private set; }
 
         public static EventEvaluatorRule CreateFromFile(string configFilePath)
         {
@@ -56,9 +61,15 @@ namespace EventEvaluationLib
                 string dateTime = settingsReader.GetConfigParam("DateTime");
                 string dateFormat = settingsReader.GetConfigParam("DateFormat");
                 Regex regexRule = new Regex(settingsReader.GetConfigParam("Regex"), RegexOptions.Compiled);
-                return new EventEvaluatorRule(eventType,regexRule,eventSource, counterCategory,
+                List<Regex> excludingRules =
+                    settingsReader.GetConfigParams("ExcludeRegex",false).Distinct().Select(r => new Regex(r, RegexOptions.Compiled)).
+                        ToList();
+
+                var eventEvaluatorRule = new EventEvaluatorRule(eventType, regexRule, excludingRules, eventSource, counterCategory,
                                   counterInstance, counterName, extendedData, value,
                                   dateTime, dateFormat);
+                _logger.Debug("Rule created from {0} is {2} and has {1} excludings",configFilePath, eventEvaluatorRule.ExcludingRules.Count, eventEvaluatorRule.RegexRule.ToString());
+                return eventEvaluatorRule;
             }
             catch (Exception ex)
             {
@@ -81,6 +92,7 @@ namespace EventEvaluationLib
             }
         }
 
+       
         private MatchDelegate CreateMatchDelegate(string rule)
         {
             if (rule.ToLower() == "$host")

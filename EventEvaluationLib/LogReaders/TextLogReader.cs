@@ -23,7 +23,8 @@ namespace EventEvaluationLib.LogReaders
         {
             LogFileStreamReader.Close();
             _logFileStream.Close();
-            CreateReader();
+            if (File.Exists(LogFileName))
+                CreateReader();
         }
 
         protected override void CreateReader()

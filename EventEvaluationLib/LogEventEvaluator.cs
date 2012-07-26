@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -31,6 +32,7 @@ namespace EventEvaluationLib
                 {
                     Match m = eventEvaluationRule.RegexRule.Match(line);
                     if (!m.Success) continue;
+                    if (eventEvaluationRule.HasExcludingRules && eventEvaluationRule.ExcludingRules.Any(r => r.Match(line).Success)) continue;
                     LogEvent evt = new LogEvent
                                        {
                                            Source = eventEvaluationRule.GetSource(logFileName, m),
@@ -39,7 +41,6 @@ namespace EventEvaluationLib
                                            Instance = eventEvaluationRule.GetInstance(logFileName, m),
                                            Type = eventEvaluationRule.EventType,
                                            DateTime = eventEvaluationRule.GetDateTime(logFileName, m),
-
                                            ExtendedData = eventEvaluationRule.GetExtendedData(logFileName, m),
                                            Value = eventEvaluationRule.GetValue(logFileName, m)
                                        };
