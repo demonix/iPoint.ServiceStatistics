@@ -95,7 +95,7 @@
     <Compile Include="MultiDirectoryFileChangeMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsReader.cs" />
-    <Compile Include="StreamReaderExtensions.cs" />
+    <Compile Include="Extensions\StreamReaderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="NLog.config">

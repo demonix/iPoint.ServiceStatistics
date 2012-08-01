@@ -99,8 +99,10 @@ namespace EventEvaluationLib
                 return (logFileName, match) => Environment.MachineName;
             if (rule.ToLower() == "$datetime")
                 return (logFileName, match) => DateTime.Now.ToString(CultureInfo.InvariantCulture);
-            if (rule.ToLower().StartsWith("$path:"))
-                return (logFileName, match) => logFileName.Split('/', '\\')[Convert.ToInt32(rule.Split(':')[1])];
+            int elemenNumgerInPath;
+            if (rule.ToLower().StartsWith("$path:") && Int32.TryParse(rule.Split(':').ElementAtOrDefault(1), out elemenNumgerInPath))
+                return
+                    (logFileName, match) => logFileName.Split('/', '\\').ElementAtOrDefault(elemenNumgerInPath);
             if (rule.ToLower() == "$rate")
             {
                 if (RegexRule.GroupNumberFromName("timespan") > 0 && RegexRule.GroupNumberFromName("value") > 0)
@@ -111,7 +113,8 @@ namespace EventEvaluationLib
                                 TimeSpan timeSpan;
                                 if (Double.TryParse(match.Groups["value"].Value, out value))
                                     if (TimeSpan.TryParse(match.Groups["timespan"].Value, out timeSpan))
-                                        return (value/timeSpan.TotalMilliseconds).ToString("F");
+                                        if (timeSpan != TimeSpan.Zero)
+                                            return (value/timeSpan.TotalMilliseconds).ToString("F");
                                 return "0";
                             };
             }
