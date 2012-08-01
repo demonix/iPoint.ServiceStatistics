@@ -118,6 +118,9 @@ namespace EventEvaluationLib
                                 return "0";
                             };
             }
+            if (rule.ToLower().StartsWith("$replace:"))
+                return (logFileName, match) => match.Result(rule.Split(new[] {':'}, 2)[1]);
+
             string regexGroupName = rule.Trim(new[] {'{', '}'});
             if (rule.StartsWith("{") && rule.EndsWith("}") && RegexRule.GroupNumberFromName(regexGroupName) >= 0)
                 return (logFileName, match) => match.Groups[regexGroupName].Value;
