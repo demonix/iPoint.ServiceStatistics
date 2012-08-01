@@ -47,7 +47,7 @@ namespace Aggregation
                 case "Double":
                     return new UniversalValue(ParseDouble(value));
                 case "TimeSpan":
-                    return new UniversalValue(value.Contains(":")? TimeSpan.Parse(value):TimeSpan.FromSeconds(ParseDouble(value)));
+                    return new UniversalValue(value.Contains(":") ? TimeSpan.Parse(value) : value.ToLower().EndsWith("ms") ? TimeSpan.FromMilliseconds(ParseDouble(value.TrimEnd('m','s'))) : TimeSpan.FromSeconds(ParseDouble(value)));
                 case "String":
                     return new UniversalValue(value);
                 default:
