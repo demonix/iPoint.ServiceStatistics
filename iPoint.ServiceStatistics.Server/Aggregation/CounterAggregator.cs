@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
@@ -135,16 +134,16 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
         
         public Func<LogEventArgs, bool> CreateEventSelector()
         {
-            Expression<Func<LogEventArgs, bool>> exp =
+            Func<LogEventArgs, bool> exp =
                 item =>  (item.LogEvent.Category == CounterCategory) && (item.LogEvent.Counter == CounterName);
-            return exp.Compile();
+            return exp;
         }
 
         
         
         private Action<IEnumerable<LogEventArgs>> CreateAggregationAction()
         {
-            Expression<Action<IEnumerable<LogEventArgs>>> actionResult;// = input => _onResult("empty");
+            Action<IEnumerable<LogEventArgs>> actionResult;// = input => _onResult("empty");
             switch (AggregationType)
             {
                 case AggregationType.Sum:
@@ -171,7 +170,7 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
                 default:
                     throw new Exception("Unknown aggregationType: " + AggregationType);
             }
-            return actionResult.Compile();
+            return actionResult;
         }
 
        
