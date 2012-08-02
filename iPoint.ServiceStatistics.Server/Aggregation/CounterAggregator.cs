@@ -143,33 +143,39 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
         
         private Action<IEnumerable<LogEventArgs>> CreateAggregationAction()
         {
-            Action<IEnumerable<LogEventArgs>> actionResult;// = input => _onResult("empty");
+            Func<IGrouping<CounterGroup, UniversalValue>, GroupAggregationResult> aggregate;
             switch (AggregationType)
             {
                 case AggregationType.Sum:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Sum()))));
+                    aggregate = s => new GroupAggregationResult(s, s.Sum());
                     break;
                 case AggregationType.Min:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Min()))));
+                    aggregate = s => new GroupAggregationResult(s, s.Min());
                     break;
                 case AggregationType.Max:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Max()))));
+                    aggregate = s => new GroupAggregationResult(s, s.Max());
                     break;
                 case AggregationType.Avg:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Average()))));
+                    aggregate = s => new GroupAggregationResult(s, s.Average());
                     break;
                 case AggregationType.Percentile:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Percentile(_percentileParameters)))));
+                    aggregate = s => new GroupAggregationResult(s, s.Percentile(_percentileParameters));
                     break;
                 case AggregationType.ValueDistributionGroups:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, s.Distribution(_distributionParameters)))));
+                    aggregate = s => new GroupAggregationResult(s, s.Distribution(_distributionParameters));
                     break;
                 case AggregationType.Count:
-                    actionResult = input => _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType, GroupCounters(input.Where(EventSelector)).Select(s => new GroupAggregationResult(s, new UniversalValue(s.Count())))));
+                    aggregate = s => new GroupAggregationResult(s, new UniversalValue(s.Count()));
                     break;
                 default:
                     throw new Exception("Unknown aggregationType: " + AggregationType);
             }
+            Func<IEnumerable<LogEventArgs>, IEnumerable<LogEventArgs>> filterCounters = input => input.Where(EventSelector);
+
+            Action<IEnumerable<LogEventArgs>> actionResult = input =>
+                                  _onResult(new TotalAggregationResult(CounterCategory, CounterName, AggregationType,
+                                                                       GroupCounters(filterCounters(input)).Select(aggregate)));
+
             return actionResult;
         }
 

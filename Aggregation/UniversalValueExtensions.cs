@@ -6,7 +6,6 @@ namespace Aggregation
 {
     public static class UniversalValueExtensions
     {
-
         private static double Percentile(IOrderedEnumerable<double> sortedData, double p)
         {
             int count = sortedData.Count();
@@ -14,10 +13,10 @@ namespace Aggregation
             if (count == 1) return sortedData.Last();
             if (p >= 100.0d) return sortedData.Last();
 
-            double position = (count + 1) * p / 100.0;
+            double position = (count + 1) * p / 100d;
             double leftNumber, rightNumber;
 
-            double n = p / 100.0d * (count - 1) + 1.0d;
+            double n = p / 100d * (count - 1) + 1d;
 
             if (position >= 1)
             {
@@ -30,39 +29,7 @@ namespace Aggregation
                 rightNumber = sortedData.ElementAt(1);
             }
 
-            if (leftNumber == rightNumber)
-                return leftNumber;
-            else
-            {
-                double part = n - Math.Floor(n);
-                return leftNumber + part * (rightNumber - leftNumber);
-            }
-        }
-
-        private static double Percentile(IOrderedEnumerable<long> sortedData, double p)
-        {
-            int count = sortedData.Count();
-            if (count == 0) return 0;
-            if (count == 1) return sortedData.Last();
-            if (p >= 100.0d) return sortedData.Last();
-
-            double position = (count + 1) * p / 100.0;
-            long leftNumber, rightNumber;
-
-            double n = p / 100.0d * (count - 1) + 1.0d;
-
-            if (position >= 1)
-            {
-                leftNumber = sortedData.ElementAt((int)Math.Floor(n) - 1);
-                rightNumber = sortedData.ElementAt((int)Math.Floor(n));
-            }
-            else
-            {
-                leftNumber = sortedData.First();
-                rightNumber = sortedData.ElementAt(1);
-            }
-
-            if (leftNumber == rightNumber)
+            if (Math.Abs(leftNumber - rightNumber) < Double.Epsilon)
                 return leftNumber;
             else
             {
@@ -112,7 +79,6 @@ namespace Aggregation
             }
         }
 
-
         public static IEnumerable<Tuple<string,UniversalValue>> Percentile(this IEnumerable<UniversalValue> input, List<double> percents)
         {
             if (input == null)
@@ -135,7 +101,7 @@ namespace Aggregation
                             pp =>
                             new Tuple<string,UniversalValue>(pp.ToString(),new UniversalValue(
                                 TimeSpan.FromTicks(
-                                    (long) Percentile(input.Select(i => i.TimespanValue.Ticks).OrderBy(i => i), pp)))));
+                                    (long) Percentile(input.Select(i => (double)i.TimespanValue.Ticks).OrderBy(i => i), pp)))));
                 default:
                     throw new Exception("Percentile operarion not supported for " + first.Type);
             }
@@ -203,7 +169,5 @@ namespace Aggregation
                 default: throw new Exception("Min operarion not supported for " + first.Type);
             }
         }
-
-       
     }
 }

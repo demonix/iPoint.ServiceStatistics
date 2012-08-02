@@ -6,6 +6,12 @@ namespace Aggregation
 {
     public class GroupAggregationResult
     {
+        public GroupAggregationResult(IGrouping<CounterGroup, UniversalValue> s, UniversalValue result)
+        {
+            CounterGroup = s.Key;
+            Result = new List<Tuple<string, UniversalValue>>() { new Tuple<string, UniversalValue>("value", result) };
+        }
+
         public GroupAggregationResult(IGrouping<CounterGroup, UniversalValue> s, IEnumerable<Tuple<string, UniversalValue>> result)
         {
             CounterGroup = s.Key;
@@ -39,11 +45,7 @@ namespace Aggregation
         }
 
 
-        public GroupAggregationResult(IGrouping<CounterGroup, UniversalValue> s, UniversalValue result)
-        {
-            CounterGroup = s.Key;
-            Result = new List<Tuple<string, UniversalValue>>() { new Tuple<string, UniversalValue>("value", result) };
-        }
+      
 
        
     }
