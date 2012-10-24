@@ -37,6 +37,9 @@ namespace iPoint.ServiceStatistics.Agent
         static ReaderWriterLockSlim _tcpClientLocker = new ReaderWriterLockSlim();
         private static void Main(string[] args)
         {
+            ServicePointManager.Expect100Continue = false;
+            ServicePointManager.UseNagleAlgorithm = false;
+            ServicePointManager.DefaultConnectionLimit = 10;
             _reconnectTimer = new Timer(CreateTcpClientTimerWrapper);
             _logger.Info("Starting App...");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -62,7 +65,7 @@ namespace iPoint.ServiceStatistics.Agent
                 logWatcherManager.EventFromLog +=
                     (s, ev) => CountEvents(null, ev.LogEvent);
                 logWatcherManager.EventFromLog +=
-                    (s, ev) => OutToServer(null, ev.LogEvent);
+                    (s, ev) => OutToHttpServer(null, ev.LogEvent);
             }
 
             Console.ReadKey();
@@ -137,13 +140,13 @@ namespace iPoint.ServiceStatistics.Agent
         private static void CountEvents(object sender, LogEvent e)
         {
             _logger.Debug(e);
-            if (_lastCountEventsCheckPoint.AddMinutes(5) > DateTime.Now)
+            if (_lastCountEventsCheckPoint.AddMinutes(1) > DateTime.Now)
                 Interlocked.Increment(ref _totalEvents);
             else
             {
                 lock (_eLock)
                 {
-                    if (_lastCountEventsCheckPoint.AddMinutes(5) <= DateTime.Now)
+                    if (_lastCountEventsCheckPoint.AddMinutes(1) <= DateTime.Now)
                     {
                         _logger.Info(_totalEvents + " events generated");
                         _totalEvents = 0;
@@ -151,6 +154,49 @@ namespace iPoint.ServiceStatistics.Agent
                     }
                 }
             }
+        }
+
+        private static void OutToHttpServer(object sender, LogEvent e)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://lit-karmazin:80/Temporary_Listen_Addresses/postbinary");
+            request.KeepAlive = true;
+            request.Method = "POST";
+            request.BeginGetRequestStream(OnRequestStreamGot, new GetRequestAsyncState(request,e));
+        }
+
+        private static void OnRequestStreamGot(IAsyncResult ar)
+        {
+            GetRequestAsyncState state = (GetRequestAsyncState) ar.AsyncState;
+            Stream requestStream = state.Request.EndGetRequestStream(ar);
+            byte[] data = state.LogEvent.Serialize();
+            requestStream.Write(data, 0, data.Length);
+            requestStream.Flush();
+            requestStream.Close();
+            state.Request.BeginGetResponse(OnResponseGot, state.Request);
+        }
+        
+        private static void OnResponseGot(IAsyncResult ar)
+        {
+            HttpWebRequest request = (HttpWebRequest) ar.AsyncState;
+            HttpWebResponse response = null;
+            try
+            {
+                response = (HttpWebResponse)request.EndGetResponse(ar);
+            }catch(Exception ex)
+            {
+                _logger.Error(ex.ToString);
+            }
+            finally
+            {
+                if (response!=null)
+                    response.Close();
+            }
+                
+        }
+
+        private static void OnWriteFinished(IAsyncResult ar)
+        {
+            
         }
 
         private static void OutToServer(object sender, LogEvent e)
@@ -201,6 +247,18 @@ namespace iPoint.ServiceStatistics.Agent
         private static void OutToConsole(object sender, LogEvent e)
         {
             Console.WriteLine(e);
+        }
+    }
+
+    internal class GetRequestAsyncState
+    {
+        public HttpWebRequest Request { get; set; }
+        public LogEvent LogEvent { get; set; }
+
+        public GetRequestAsyncState(HttpWebRequest request, LogEvent logEvent)
+        {
+            Request = request;
+            LogEvent = logEvent;
         }
     }
 

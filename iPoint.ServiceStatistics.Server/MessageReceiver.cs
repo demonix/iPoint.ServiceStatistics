@@ -1,16 +1,19 @@
 using System;
-using System.IO;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Threading;
 using EventEvaluationLib;
 using MyLib.Networking;
+using System.Reactive.Subjects;
 
 namespace iPoint.ServiceStatistics.Server
 {
     public class MessageReceiver:IDisposable
     {
+        
         private AsyncTcpServer  _asyncTcpServer;
         private Subject<LogEventArgs> _eventSubject;
         public IObservable<LogEventArgs> ObservableEvents { get { return _eventSubject.AsObservable(); }}
@@ -41,4 +44,44 @@ namespace iPoint.ServiceStatistics.Server
             _asyncTcpServer.MessageReceived -= srv_MessageReceived;
         }
     }
+
+
+    public class MessageReceiverEx : IDisposable 
+    {
+
+        private AsyncTcpServer _asyncTcpServer;
+        public IObservable<EventPattern<MessageReceivedEventArgs>> MessageReceived { get; private set; }
+        public IObservable<string>  LogEvents { get; private set; }
+
+
+        public MessageReceiverEx(AsyncTcpServer asyncTcpServer)
+        {
+            _asyncTcpServer = asyncTcpServer;
+            MessageReceived = Observable.FromEventPattern<MessageReceivedEventArgs>(_asyncTcpServer, "MessageReceived");
+            Random rnd = new Random();
+            LogEvents =
+                Observable.Create<string>(
+                    o =>
+                        {
+                            return 
+                            MessageReceived.Subscribe(
+                                data =>
+                                    {
+                                        string value = Encoding.UTF8.GetString(data.EventArgs.Message.MessageData);
+                                        Console.WriteLine("Received "+value + " at "+ Thread.CurrentThread.ManagedThreadId);
+                                        o.OnNext(value);
+                                    });
+                       });
+            
+        }
+
+        
+        public void Dispose()
+        {
+            
+        }
+    }
+
+    
+
 }

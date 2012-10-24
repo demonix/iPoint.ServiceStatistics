@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Reactive.Linq;
+using Aggregation;
 using CountersDataLayer;
 using MyLib.Networking;
 
@@ -11,15 +12,14 @@ namespace iPoint.ServiceStatistics.Server
     {
         static void Main(string[] args)
         {
-            
             AsyncTcpServer srv = new AsyncTcpServer(new IPEndPoint(IPAddress.Any, 50001));
             srv.Start();
             MessageReceiver receiver = new MessageReceiver(srv);
             MovingWindowSequence seq = new MovingWindowSequence(1000*60, 1000*5*60);
             string mongoUrl = File.ReadAllText("settings\\mongoConnection");
-            CountersDatabase.InitConnection(mongoUrl);
+            //CountersDatabase.InitConnection(mongoUrl);
             var observableEvents = receiver.ObservableEvents.Buffer(seq.BufferOpenings, seq.ClosingWindowSequenceSelector).Publish();
-            observableEvents.Connect();
+            //observableEvents.Connect();
             Settings settings = new Settings();
             settings.ObservableEvents = observableEvents;
             settings.ReadAggregators();
@@ -27,6 +27,7 @@ namespace iPoint.ServiceStatistics.Server
             countersAutoDiscoverer.StartDiscovery();
             
             CounterDumper counterDumper = new CounterDumper(receiver.ObservableEvents);
+            CounterForwarder counterForwarder = new CounterForwarder(receiver.ObservableEvents);
 
             DeadCountersDetector deadCountersDetector = new DeadCountersDetector(receiver.ObservableEvents, settings);
             
@@ -48,6 +49,20 @@ namespace iPoint.ServiceStatistics.Server
                 {
                     settings.ReadAggregators();
                     Console.WriteLine("Aggregators were updated");
+                }
+
+                if (keyInfo.Key == ConsoleKey.F)
+                {
+                    if (counterForwarder.IsForwarding)
+                    {
+                        counterForwarder.StopForwarding();
+                        Console.WriteLine("Forwarding stopped");
+                    }
+                    else
+                    {
+                        counterForwarder.StartForwarding();
+                        Console.WriteLine("Forwarding started");
+                    }
                 }
                 if (keyInfo.Key == ConsoleKey.D)
                 {

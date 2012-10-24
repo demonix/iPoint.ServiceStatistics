@@ -6,6 +6,7 @@ namespace Aggregation
 {
     public static class UniversalValueExtensions
     {
+         
         private static double Percentile(IOrderedEnumerable<double> sortedData, double p)
         {
             int count = sortedData.Count();
@@ -38,8 +39,9 @@ namespace Aggregation
             }
         }
 
-       
-        public static IEnumerable<Tuple<string, UniversalValue>> Distribution(this IEnumerable<UniversalValue> input, List<Tuple<UniversalValue,UniversalValue>> groups)
+
+         [Obsolete]
+        public static IEnumerable<Tuple<string, UniversalValue>> Distribution(this IList<UniversalValue> input, List<Tuple<UniversalValue, UniversalValue>> groups)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -79,7 +81,8 @@ namespace Aggregation
             }
         }
 
-        public static IEnumerable<Tuple<string,UniversalValue>> Percentile(this IEnumerable<UniversalValue> input, List<double> percents)
+        [Obsolete]
+         public static IEnumerable<Tuple<string, UniversalValue>> Percentile(this IList<UniversalValue> input, List<double> percents)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -107,7 +110,7 @@ namespace Aggregation
             }
         }
 
-        public static UniversalValue Sum(this IEnumerable<UniversalValue> input)
+        public static UniversalValue Sum(this IList<UniversalValue> input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -123,7 +126,7 @@ namespace Aggregation
             }
         }
 
-        public static UniversalValue Average(this IEnumerable<UniversalValue> input)
+        public static UniversalValue Average(this IList<UniversalValue> input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -137,8 +140,8 @@ namespace Aggregation
                 default: throw new Exception("Average operarion not supported for " + first.Type);
             }
         }
-        
-        public static UniversalValue Max(this IEnumerable<UniversalValue> input)
+
+        public static UniversalValue Max(this IList<UniversalValue> input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -154,7 +157,7 @@ namespace Aggregation
             }
         }
 
-        public static UniversalValue Min(this IEnumerable<UniversalValue> input)
+        public static UniversalValue Min(this IList<UniversalValue> input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");

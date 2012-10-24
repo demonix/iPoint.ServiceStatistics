@@ -235,7 +235,7 @@ namespace CountersDataLayer
                 );
         }
 
-        public DateTime? GetFreshestAfterDate( string counterCategory, string counterName, DateTime date)
+        public DateTime? GetFreshestAfterDate(string counterCategory, string counterName, DateTime date)
         {
             MongoCollection<BsonDocument> items = Database.GetCollection("countersData");
             IMongoQuery sq = Query.And(Query.GT("date", date),

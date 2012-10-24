@@ -12,6 +12,8 @@
     <AssemblyName>Aggregation</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\iPoint.ServiceStatistics\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,8 +33,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EventEvaluationLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core, Version=2.0.20814.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Core.2.0.20814\lib\Net40\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.0.20814.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Interfaces.2.0.20814\lib\Net40\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.0.20814.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Linq.2.0.20814\lib\Net40\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\ExperimentalApp\bin\Debug\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,19 +58,33 @@
     <Compile Include="AggregationParameters.cs" />
     <Compile Include="AggregationType.cs" />
     <Compile Include="CounterGroup.cs" />
+    <Compile Include="Experimental\AggregatedValue.cs" />
+    <Compile Include="Experimental\AggregatorsManager.cs" />
+    <Compile Include="Experimental\AggregationOperations\AggregationOperationFactory.cs" />
+    <Compile Include="Experimental\AggregationOperations\AggregationOperationResult.cs" />
+    <Compile Include="Experimental\AggregationOperations\AvgAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\CountAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\DistributionGroupAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\IAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\MaxAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\MinAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\PercentileAggregationOperation.cs" />
+    <Compile Include="Experimental\AggregationOperations\SumAggregationOperation.cs" />
+    <Compile Include="Experimental\Aggregator.cs" />
+    <Compile Include="Experimental\RxExtensions\ConsumingExtensions.cs" />
+    <Compile Include="Experimental\RxExtensions\Maybe.cs" />
     <Compile Include="GroupAggregationResult.cs" />
+    <Compile Include="MovingWindowSequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TotalAggregationResult.cs" />
     <Compile Include="UniversalValue.cs" />
     <Compile Include="UniversalValueExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventEvaluationLib\EventEvaluationLib.csproj">
-      <Project>{B9181A55-EE72-4A43-A013-7A119F830F0D}</Project>
-      <Name>EventEvaluationLib</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -108,13 +108,11 @@
     <Compile Include="HomeController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\CounterDataParameters.cs" />
     <Compile Include="Models\CounterDrawingParameters.cs" />
     <Compile Include="Models\CounterGraphModel.cs" />
     <Compile Include="Models\CounterQueryParameters.cs" />
     <Compile Include="Models\CounterQueryParametersBinder.cs" />
     <Compile Include="Models\FakeCountersDb.cs" />
-    <Compile Include="Models\Helpers.cs" />
     <Compile Include="Models\SingleGraphModel.cs" />
     <Compile Include="MVCExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -245,8 +243,7 @@
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\libs\dd_belatedpng.js" />
-    <Content Include="Scripts\modernizr-1.7.js" />
-    <Content Include="Scripts\modernizr-1.7.min.js" />
+    <Content Include="Scripts\modernizr-2.5.3.js" />
     <Content Include="Scripts\plugins.js" />
     <Content Include="Scripts\script.js" />
     <Content Include="Scripts\T4MvcJs\T4MvcJs.js">
@@ -285,6 +282,8 @@
     <Content Include="Views\Counters\_CounterQueryParametersControl.cshtml" />
     <Content Include="Views\Counters\Data.cshtml" />
     <Content Include="Views\Counters\Index.cshtml" />
+    <None Include="Scripts\T4MvcJs\T4MVC.source.t4" />
+    <None Include="Scripts\T4MvcJs\T4MVC.tt.settings.t4" />
     <None Include="Scripts\T4MvcJs\T4MvcJs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4MvcJs.js</LastGenOutput>
@@ -294,10 +293,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4MVC.cs</LastGenOutput>
     </None>
-    <None Include="T4MVC.tt.settings.t4" />
     <Content Include="Views\Counters\CountersGraph.cshtml" />
     <Content Include="Views\Counters\SingleGraph.cshtml" />
     <Content Include="Views\Shared\_EmptyHtml5Boilerplate.cshtml" />
+    <None Include="T4MVC.tt.settings.t4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -336,7 +335,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7687</DevelopmentServerPort>
+          <DevelopmentServerPort>62878</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

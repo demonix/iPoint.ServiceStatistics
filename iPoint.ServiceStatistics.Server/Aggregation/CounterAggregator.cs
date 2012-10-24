@@ -147,22 +147,22 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
             switch (AggregationType)
             {
                 case AggregationType.Sum:
-                    aggregate = s => new GroupAggregationResult(s, s.Sum());
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Sum());
                     break;
                 case AggregationType.Min:
-                    aggregate = s => new GroupAggregationResult(s, s.Min());
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Min());
                     break;
                 case AggregationType.Max:
-                    aggregate = s => new GroupAggregationResult(s, s.Max());
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Max());
                     break;
                 case AggregationType.Avg:
-                    aggregate = s => new GroupAggregationResult(s, s.Average());
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Average());
                     break;
                 case AggregationType.Percentile:
-                    aggregate = s => new GroupAggregationResult(s, s.Percentile(_percentileParameters));
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Percentile(_percentileParameters));
                     break;
                 case AggregationType.ValueDistributionGroups:
-                    aggregate = s => new GroupAggregationResult(s, s.Distribution(_distributionParameters));
+                    aggregate = s => new GroupAggregationResult(s, s.ToList().Distribution(_distributionParameters));
                     break;
                 case AggregationType.Count:
                     aggregate = s => new GroupAggregationResult(s, new UniversalValue(s.Count()));
@@ -227,7 +227,7 @@ namespace iPoint.ServiceStatistics.Server.Aggregation
     
         public void BeginAggregation(IObservable<IList<LogEventArgs>> observableEvents)
         {
-            UnsubscriptionToken = observableEvents.ObserveOn(Scheduler.ThreadPool).Subscribe(AggregationAction);
+            UnsubscriptionToken = observableEvents.ObserveOn(Scheduler.Default).Subscribe(AggregationAction);
         }
 
         public bool Equals(CounterAggregator other)

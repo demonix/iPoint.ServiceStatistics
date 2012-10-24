@@ -1,0 +1,177 @@
+<stylecopresultscache>
+  <version>11</version>
+  <project key="-103060970">
+    <configuration>DEBUG;TRACE</configuration>
+  </project>
+  <sourcecode name="ChangeMonitorableConfigStore.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>425</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="EventType.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>439</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="StreamReaderExtensions.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>601</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="FilePathHelpers.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>443</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogEvent.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>08/18/2012 18:35:50</timestamp>
+    <milliseconds>736</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogEventArgs.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>456</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogEventEvaluator.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>07/04/2012 13:38:24</timestamp>
+    <milliseconds>320</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="GzLogReader.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/21/2012 16:34:56</timestamp>
+    <milliseconds>297</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ILogReader.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>497</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LineReadedEventArgs.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>506</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogReaderBase.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>06/18/2012 16:00:20</timestamp>
+    <milliseconds>54</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogReaderFactory.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>519</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="TextLogReader.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>06/18/2012 16:04:14</timestamp>
+    <milliseconds>136</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogWatcher.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>528</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="LogWatcherManager.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>532</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="MultiDirectoryFileChangeMonitor.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>06/18/2012 16:00:20</timestamp>
+    <milliseconds>72</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="AssemblyInfo.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>05/15/2012 12:06:15</timestamp>
+    <milliseconds>587</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SettingsReader.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>07/23/2012 14:22:16</timestamp>
+    <milliseconds>40</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="EventEvaluatorRule.cs" parser="StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/31/2012 15:44:08</timestamp>
+      <milliseconds>288</milliseconds>
+    </settings>
+    <timestamp>08/01/2012 16:37:43</timestamp>
+    <milliseconds>79</milliseconds>
+    <violations />
+  </sourcecode>
+</stylecopresultscache>

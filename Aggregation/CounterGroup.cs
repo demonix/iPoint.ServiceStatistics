@@ -11,6 +11,14 @@ namespace Aggregation
         public string ExtendedData { get; private set; }
         private readonly int _hashCode = Int32.MinValue;
 
+        [Flags]
+        public enum GroupBy
+        {
+            NoGrpopping,
+            Source,
+            Instance,
+            ExtendedData
+        }
 
         public CounterGroup(string counterName, string source, string instance, string extendedData)
         {
@@ -67,6 +75,11 @@ namespace Aggregation
         public static bool operator !=(CounterGroup left, CounterGroup right)
         {
             return !Equals(left, right);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}/{1}/{2}/{3}", Source, CounterName, Instance, ExtendedData);
         }
     }
 }

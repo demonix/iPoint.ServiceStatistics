@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
+using CountersDataLayer;
 
 namespace iPoint.ServiceStatistics.Web.Models
 {

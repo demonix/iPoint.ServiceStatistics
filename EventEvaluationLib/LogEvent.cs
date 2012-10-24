@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace EventEvaluationLib
@@ -16,6 +17,21 @@ namespace EventEvaluationLib
         public string Instance;
         public string ExtendedData;
         public string Value;
+        
+        public LogEvent()
+        {}
+
+        public LogEvent(EventType type, DateTime dateTime, string source, string category, string counter, string instance, string extendedData, string value)
+        {
+            Type = type;
+            DateTime = dateTime;
+            Source = source;
+            Category = category;
+            Counter = counter;
+            Instance = instance;
+            ExtendedData = extendedData;
+            Value = value;
+        }
 
         public override string ToString()
         {
